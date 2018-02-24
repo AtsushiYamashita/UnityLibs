@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Events;
 using System;
+using BasicExtends;
 
 [Serializable]
 public class NodeEvent: UnityEvent<ActionNode> { }
@@ -17,42 +19,38 @@ public class Node {
 
 }
 
-public class NodeList: List<Node> {
+
+[Serializable]
+public class NodeArray: BufferedArray<Node> {
+
+    public new NodeArray Add ( Node node ) {
+        return (NodeArray) base.Add(node);
+    }
+
+    public NodeArray Remove ( Node node ) {
+        Map(( e ) => { return e.mName == node.mName ? null : e; });
+        SetFront();
+        return this;
+    }
+
     public void Invoke ( string state, ActionNode component ) {
-        foreach (var node in this) {
-            if (node.mName != state) { continue; }
-            node.mActions.Invoke(component);
-        }
+        ForEach(( e ) =>
+        {
+            if (e.mName != state) { return; }
+            e.mActions.Invoke(component);
+        });
     }
 }
 
 [Serializable]
-public class StateList {
+public class StateArray: BufferedArray<string> {
 
-    public static readonly uint SIZE = 5;
-
-    [SerializeField]
-    private string [] mStates = new string [SIZE];
-
-    public StateList Add ( string str ) {
-        ForEach(( e ) => { return e == string.Empty ? string.Empty : str; });
-        return this;
-    }
-    public StateList Remove ( string str ) {
-        ForEach(( e ) => { return e == str ? string.Empty : e;  });
-        return this;
+    public new StateArray Add ( string str ) {
+        return (StateArray) base.Add(str.ToUpper());
     }
 
-    public StateList ForEach ( Func<string, string> func ) {
-        for (int i = 0; i < SIZE; i++) {
-            mStates [i] = func(mStates [i]);
-        }
-        return this;
-    }
-    public StateList ForEach ( Action<string> func ) {
-        for (int i = 0; i < SIZE; i++) {
-             func(mStates [i]);
-        }
+    public StateArray Remove ( string str ) {
+        Map(( e ) => { return e == str.ToUpper() ? string.Empty : e; });
         return this;
     }
 }
@@ -60,24 +58,38 @@ public class StateList {
 public class ActionNode: MonoBehaviour {
 
     [SerializeField]
-    StateList mStates = new StateList();
+    StateArray mStates = new StateArray().Add("start");
 
     [SerializeField]
-    private NodeList mNodes = new NodeList  {
-        new Node("skiped"),
-        new Node("start",( ActionNode node) =>{
+    private NodeArray mNodes = new NodeArray()
+        .Add(new Node("skiped"))
+        .Add(new Node("start", ( ActionNode node ) =>
+        {
             node.mStates.Add("update");
             node.mStates.Remove("start");
-        } ),
-        new Node("update"),
-        new Node("end",( ActionNode node) =>{
+        }))
+        .Add(new Node("update"))
+        .Add(new Node("end", ( ActionNode node ) =>
+        {
             node.mStates.Add("start");
             node.mStates.Remove("end");
             node.gameObject.SetActive(false);
-        } ),
-    };
+        }));
 
     private void Update () {
         mStates.ForEach(( e ) => { mNodes.Invoke(e, this); });
+    }
+
+    /// <summary>
+    /// When received "A to B",
+    /// thne this switch own state A to B.
+    /// </summary>
+    /// <param name="str"></param>
+    public void Switch(string str ) {
+        var strs = str.Split(' ');
+        Assert.IsTrue(strs.Length == 3);
+        var a = strs [0];
+        var b = strs [2];
+        mStates.Remove(b).Add(a);
     }
 }
