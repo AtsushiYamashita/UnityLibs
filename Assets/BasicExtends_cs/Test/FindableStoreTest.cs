@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace BasicExtends {
-    public class FindableStoreTest: TestComponent<FindableStore> {
+    public class FindableStoreTest: TestComponent {
 
         public string TryGetTest () {
             return Fail();

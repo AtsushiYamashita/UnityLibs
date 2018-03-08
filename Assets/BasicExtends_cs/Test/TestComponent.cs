@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System;
 using System.Text;
 
 namespace BasicExtends {
@@ -12,35 +11,47 @@ namespace BasicExtends {
     /// リズムのためにエラー以外の情報が必要だった。
     /// 
     /// このコンポネントを使うには
-    /// Tにテスト対象のクラスを指定し、
     /// このクラスを継承する形でxxxTestという関数を実装するだけ。
     /// ただし関数はstringを返し、publicであることが必要。
     /// 
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class TestComponent<T>: MonoBehaviour {
-        Type mType;
+    public class TestComponent: MonoBehaviour {
 
         int size = 0;
         int ok = 0;
 
-        private void Start () {
-            mType = typeof(T);
+        protected virtual void Init() { }
+
+        private void TestProcess(ref StringBuilder sb)
+        {
             var methods = this.GetType().GetMethods();
-            StringBuilder sb = new StringBuilder();
-            foreach (var m in methods) {
+            foreach (var m in methods)
+            {
                 var name = m.Name;
                 if (name.IndexOf("Test") == -1) { continue; }
-                sb.Append(Print(name, (string) m.Invoke(this, null)));
+                sb.Append(Print(name, (string)m.Invoke(this, null)));
             }
-            var t_name = mType.Name;
-            if (t_name.IndexOf("1") > -1) {
+        }
+
+        private void TestResult(ref StringBuilder sb)
+        {
+            var t_name = GetType().Name;
+            if (t_name.IndexOf("1") > -1)
+            {
                 t_name = t_name.Substring(0, t_name.Length - 2);
             }
+
             var format = " Test [ {0} ] end ({1}/{2})\n{3}\n ";
             var str = string.Format(format, t_name, ok, size, sb.ToString());
             var type = ok - size == 0 ? DebugLog.Log : DebugLog.Error;
             type.Print(str);
+        }
+
+        private void Start () {
+            Init();
+            StringBuilder sb = new StringBuilder();
+            TestProcess(ref sb);
+            TestResult(ref sb);
         }
 
         private string Print ( string name, string ret ) {
@@ -59,6 +70,16 @@ namespace BasicExtends {
 
         protected string Fail () {
             return "Fail";
+        }
+
+        protected string Fail(int data)
+        {
+            return "Fail : " + data;
+        }
+
+        protected string Fail(float data)
+        {
+            return "Fail : " + data;
         }
 
         protected string Fail ( string str ) {

@@ -5,7 +5,7 @@ using UnityEngine.Assertions;
 
 namespace BasicExtends {
 
-    public class BindingValueTest: TestComponent<BindingValue> {
+    public class BindingValueTest: TestComponent {
 
         public string BindTest () {
             string old = "", now = "";

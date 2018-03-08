@@ -1,6 +1,6 @@
 ﻿using BasicExtends;
 
-public class StArrTest: TestComponent<StArrTest> {
+public class StArrTest: TestComponent {
 
     string h = StArr.BasicHead;
     string t = StArr.BasicTail;

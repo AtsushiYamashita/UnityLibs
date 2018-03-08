@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using BasicExtends;
 
-public class SingletonTest : TestComponent<Singleton<SingletonTest>> {
+public class SingletonTest : TestComponent {
 
     public class TestClass  : Singleton<TestClass> {
         public int i = 0;

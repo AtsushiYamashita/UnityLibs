@@ -1,7 +1,7 @@
 ﻿
 namespace BasicExtends {
 
-    public class StDicTest: TestComponent<StDicTest> {
+    public class StDicTest: TestComponent {
         public string StringifyTest1 () {
             var dict = new StringDict() { {"test","a" } };
             var str = dict.Stringify();

@@ -1,6 +1,6 @@
 ﻿namespace BasicExtends {
 
-    public class StaticGameObjectTest: TestComponent<StaticGameObjectTest> {
+    public class StaticGameObjectTest: TestComponent {
 
         public string ChildrenTest () {
             var children = gameObject.Children();

@@ -3,7 +3,7 @@ using UnityEngine.Assertions;
 using BasicExtends;
 
 
-public class BufferedArrayTest : TestComponent<BufferedArray> {
+public class BufferedArrayTest : TestComponent {
 
     private static readonly uint SIZE = 5;
 
