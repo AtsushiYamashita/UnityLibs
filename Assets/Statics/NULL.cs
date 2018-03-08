@@ -17,6 +17,7 @@ public class NULL : Singleton<NULL> {
 
 public static class NullChecker {
     public static Type Type = typeof(NULL);
+
     public static bool IsNull ( this object n ) {
         if (n == null) { return true; }
         if (n.GetType() == Type) { return true; }
@@ -39,7 +40,7 @@ public static class NullChecker {
         throw new Exception("Error : null exception.");
     }
 
-    public static T NullDefault<T> ( this T n,T def ) {
+    public static T Default<T> ( this T n,T def ) {
         return n.IsNull() ? def : n;
     }
 }
