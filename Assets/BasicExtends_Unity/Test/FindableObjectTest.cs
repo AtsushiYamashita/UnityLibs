@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using BasicExtends;
+using BasicExtends.Findable;
 
 
-public class CallTest: MonoBehaviour {
+public class FindableObjectTest: MonoBehaviour {
 
     private void Start () {
-        var store = Findable.Store.Instance;
+        var store = Store.Instance;
         TestA(store.GetNamed, "largeC", "CCC", "Basic test.");
         TestA(store.GetNamed, "SmallF", "fff", "Get from another scene.");
         TestB(store.GetTagged, "Scene1", 4, "Basic test.");

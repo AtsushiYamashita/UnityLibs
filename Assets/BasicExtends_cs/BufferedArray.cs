@@ -4,11 +4,14 @@ using UnityEngine.Assertions;
 
 namespace BasicExtends {
 
-    /// <summary>
-    /// 可変長配列。ただしシンプルな実装なので重い。
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
     [Serializable]
+    public class BufferedArray: BufferedArray<object> { }
+
+        /// <summary>
+        /// 可変長配列。ただしシンプルな実装なので重い。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        [Serializable]
     public class BufferedArray<T> where T : class {
 
         private static readonly uint SIZE = 5;
@@ -27,7 +30,10 @@ namespace BasicExtends {
             get { return mSize; }
             set { mSize = value; }
         }
-
+        public int Length
+        {
+            get { return mArr.Length; }
+        }
         public BufferedArray () : this(SIZE) { }
         public BufferedArray ( uint first ) : this(first, SIZE) { }
 
@@ -184,6 +190,20 @@ namespace BasicExtends {
                 func(mArr [i]);
             }
             return this;
+        }
+
+        public T Get ( int index ) {
+            Assert.IsTrue(index < mArr.Length);
+            return mArr [index];
+        }
+
+        public C TryGet<C> ( int index ) where C : class {
+            Assert.IsTrue(index < mArr.Length);
+            return mArr [index] as C;
+        }
+
+        public C [] TryGet<C> () where C : class {
+            return mArr as C [];
         }
     }
 }

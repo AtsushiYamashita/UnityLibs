@@ -3,7 +3,7 @@ using UnityEngine.Assertions;
 using BasicExtends;
 
 
-public class BufferedArrayTest : TestComponent<BufferedArray<string>> {
+public class BufferedArrayTest : TestComponent<BufferedArray> {
 
     private static readonly uint SIZE = 5;
 
@@ -63,37 +63,45 @@ public class BufferedArrayTest : TestComponent<BufferedArray<string>> {
     }
 
     public string ForEachTest () {
-        return "fail";
+        return Fail();
     }
 
     public string MapTest () {
-        return "fail";
+        return Fail();
     }
 
     public string RemoveTest () {
-        return "fail";
+        return Fail();
     }
 
     public string ExpendTestD () {
-        return "fail";
+        return Fail();
     }
 
     public string ExpendTest0 () {
-        return "fail";
+        return Fail();
     }
 
     public string ExpendTest1 () {
-        return "fail";
+        return Fail();
     }
     public string ExpendTest1000 () {
-        return "fail";
+        return Fail();
     }
 
     public string SetFrontTest () {
-        return "fail";
+        return Fail();
     }
 
     public string SetFrontTest0 () {
-        return "fail";
+        return Fail();
+    }
+
+    public string TryGetTest () {
+        return Fail();
+    }
+
+    public string TryGetTest2 () {
+        return Fail();
     }
 }

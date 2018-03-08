@@ -2,6 +2,7 @@
     using System.Collections.Generic;
     using System.Text;
     using UnityEngine;
+    using UnityEngine.Assertions;
 
     public class StringDict : Dictionary<string, string> { }
     public class GameObjDict : Dictionary<string, GameObject> { }
@@ -44,6 +45,10 @@
                 basicSeparator1,
                 basicSeparator2,
                 basicTail);
+        }
+
+        public static bool KeyNotFound<K,V>( this Dictionary<K, V> dic ,K key) {
+            return !dic.ContainsKey(key);
         }
     }
 
