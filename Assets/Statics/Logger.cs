@@ -6,13 +6,14 @@ using UnityEngine;
 
 namespace BasicExtends {
 
-    public class Logger {
-        private static Logger mInstance = new Logger();
+    public enum DebugLog { Log,Error } 
+    public enum ReportLog { Log,Error } 
+
+    public static class Logger{
         private static Dictionary<string, string> mPlaceHolder
             = new Dictionary<string, string>();
-        private Logger () { }
 
-        private static Logger LogPrint ( string str ) {
+        private static string LogString ( string str ) {
             var stack = new System.Diagnostics.StackFrame(2);
             var stack_arr = StArr.To(
                 stack.GetFileName(),
@@ -22,32 +23,39 @@ namespace BasicExtends {
                 );
             var now = DateTime.Now;
             var date = StArr.To(
-                now.Minute,
-                now.Second,
-                now.Millisecond);
+                //now.Minute + "m",
+                now.Second + "s",
+                now.Millisecond + "ms");
             var dic = new Dictionary<string, string> {
             { "msg", str },
             { "date", date.Stringify("(","/",")")},
             { "stack", stack_arr.Stringify("(","/",")")}
         };
-            Debug.Log(dic.ToJson());
-            return mInstance;
+            return dic.ToJson();
         }
 
-        public static Logger Log ( string str ) {
-            LogPrint(str);
-            return mInstance;
-        }
-        public static Logger Log ( string str, params object [] args ) {
-            LogPrint(string.Format(str, args));
-            return mInstance;
+        public static void Print ( this DebugLog type, string str ) {
+            var log_str = LogString(str);
+            Action<string> log = Debug.Log;
+            Action<string> err = Debug.LogError;
+            var print = type == DebugLog.Log ? log : err;
+            print(log_str);
         }
 
-        public Logger LogSend ( string to ) {
-            if (to == null) { return mInstance; }
-            if (to.Length < 1) { return mInstance; }
+        public static void Print ( this DebugLog type, string str, params object [] args ) {
+             Print(type, string.Format(str, args));
+        }
 
-            return mInstance;
+        public static void Print ( this ReportLog type, string str ) {
+            var log_str = LogString(str);
+            Action<string> log = Debug.Log;
+            Action<string> err = Debug.LogError;
+            var print = type == ReportLog.Log ? log : err;
+            print(log_str);
+        }
+
+        public static void Print ( this ReportLog type, string str, params object [] args ) {
+            Print(type, string.Format(str, args));
         }
     }
 }
