@@ -1,6 +1,6 @@
 ﻿using BasicExtends;
 
-public class MessengerTest: TestComponent<Msg> {
+public class MessengerTest: TestComponent {
 
     public string SetTest () {
         var msg = new Msg()

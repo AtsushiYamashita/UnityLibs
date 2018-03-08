@@ -4,7 +4,7 @@ using BasicExtends;
 using System.Linq;
 using System;
 
-public class CoroutinTest :  TestComponent<IEnumerable>{
+public class CoroutinTest :  TestComponent{
 
 	public string CountUpTest1 () {
         var sum = CountUp(0, 100).Sum();

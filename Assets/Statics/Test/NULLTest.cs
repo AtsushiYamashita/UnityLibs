@@ -1,10 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 using BasicExtends;
 
-public class NULLTest: TestComponent<NULL> {
+public class NULLTest: TestComponent {
 
     public string ToStringTest () {
         if (NULL.Null.ToString() != "NULL") { return "Error, this isn't null."; }
