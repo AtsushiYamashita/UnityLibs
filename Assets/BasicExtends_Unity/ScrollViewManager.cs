@@ -21,8 +21,8 @@ public class ScrollViewManager: MonoBehaviour {
         return -1;
     }
 
-    public void AddData<T> ( System.Action<GameObject> viewAction,
-        params T [] data ) where T : class {
+    public void AddData ( System.Action<GameObject, StringDict> viewAction,
+        params StringDict [] data ) {
         foreach (var d in data) {
             var t = Instantiate(mViewPrefabs);
             t.SetData(d, viewAction);
