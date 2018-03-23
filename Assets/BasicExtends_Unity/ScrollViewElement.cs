@@ -4,19 +4,19 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
 
+
 public class ScrollViewElement : MonoBehaviour
 {
+
     /// <summary>
     /// こいつの親として一番近いScrollRectを返します。
     /// 取得に失敗したらnullが戻ります。
     /// </summary>
     /// <returns></returns>
-    public ScrollRect TryGetScrollView()
-    {
+    public  ScrollRect TryGetScrollView () {
         ScrollRect ret = null;
         Transform temp = transform;
-        while (ret == null)
-        {
+        while (ret == null) {
             var parent = temp.parent;
             if (parent == temp) { return null; ; }
 
@@ -27,5 +27,6 @@ public class ScrollViewElement : MonoBehaviour
         return ret;
     }
 
-    public virtual void SetData(object obj) { }
+    public virtual void SetData(object obj,
+        System.Action<GameObject> action ) { }
 }
