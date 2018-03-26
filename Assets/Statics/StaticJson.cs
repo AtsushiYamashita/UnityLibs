@@ -50,6 +50,16 @@ public static class StaticJson {
         return dic.ToJson();
     }
 
+    private static Pair<bool,string> ObjectString(string json) {
+        // オブジェクト要素でなければ受け入れない。
+        var s = json.IndexOf('{');
+        var e = json.LastIndexOf('}');
+        Assert.IsTrue(s == 0);
+        Assert.IsTrue(s > -1 && e > -1, "Parse Error, this message is not json style object");
+        var inside = json.Substring(1, e - 1);
+        return StPair.Gen(true, inside);
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -58,16 +68,10 @@ public static class StaticJson {
     public static StringDict FromJSON ( this string json ) {
         var dic = new StringDict();
 
-        // オブジェクト要素でなければ受け入れない。
-        var s = json.IndexOf('{');
-        Assert.IsTrue(s == 0);
-
-        var e = json.LastIndexOf('}');
-        Assert.IsTrue(s > -1 && e > -1, "Parse Error, this message is not json style object");
-        var inside = json.Substring(1, e - 1);
+        var inside = ObjectString(json);
 
         // 要素の操作
-        var splited = inside.Split(',');
+        var splited = inside.GetValue().Split(',');
         Array.ForEach(splited, ( data ) =>
         {
             // 重複したキーが入っていないかチェックしてからdicに。

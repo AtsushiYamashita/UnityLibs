@@ -8,6 +8,11 @@
     public class GameObjDict : Dictionary<string, GameObject> { }
     public class ObjDict : Dictionary<string, object> { }
 
+    public interface IDictionaryDataConvertable<K,V> {
+        K GetKey ();
+        V GetValue ();
+    }
+
     /// <summary>
     /// 辞書型コレクションに対する
     /// スタンダードな拡張関数を提供しています。
@@ -49,6 +54,18 @@
 
         public static bool KeyNotFound<K,V>( this Dictionary<K, V> dic ,K key) {
             return !dic.ContainsKey(key);
+        }
+        public static Dictionary<K,V> TrySet<K, V> (this Dictionary<K, V> dic, K key, V val) {
+            if (dic.ContainsKey(key)) {
+                dic [key] = val;
+                return dic;
+            }
+            dic.Add(key, val);
+            return dic;
+        }
+
+        public static Dictionary<K, V> TrySet<K, V> ( this Dictionary<K, V> dic, IDictionaryDataConvertable<K,V> data ) {
+            return dic.TrySet(data.GetKey(), data.GetValue()) ;
         }
     }
 
