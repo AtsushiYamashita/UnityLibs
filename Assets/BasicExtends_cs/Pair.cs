@@ -1,10 +1,9 @@
 ﻿namespace BasicExtends {
-    using System;
     using System.Linq;
     using System.Collections.Generic;
-    using UnityEngine;
 
     public class StringPair: Pair<string, string> { }
+    public class CheckedRet<T>: Pair<bool, T> where T : class { }
 
     public static class StPair {
         public static Dictionary<K, V> GenDic<K, V>
@@ -64,5 +63,8 @@
         public Pair<K, V> Set ( K key, V value ) { mKey = key; mValue = value; return this; }
         public K GetKey () { return mKey; }
         public V GetValue () { return mValue; }
+        public Dictionary<K, V> ToDic () {
+            return new Dictionary<K, V> { { mKey, mValue } };
+        }
     }
 }
