@@ -37,10 +37,10 @@ public class ScrollViewElement : MonoBehaviour
     public virtual void SetData( StringDict obj,
         Action<GameObject,StringDict> action ) {
         mViewAction = action;
-        Update(obj);
+        DataUpdate(obj);
     }
 
-    public virtual void Update ( StringDict obj ) {
+    public virtual void DataUpdate ( StringDict obj ) {
         Assert.IsTrue(mViewAction != null);
         mViewAction.Invoke(gameObject, obj);
     }
