@@ -1,9 +1,13 @@
 ﻿using System;
+using UnityEngine;
 using UnityEngine.Assertions;
-using System.Text;
 using System.Collections.Generic;
 using BasicExtends;
 
+/// <summary>
+/// Jsonとして文字列化する
+/// (TODO：メソッドチェーンを書いたらそちらに分岐処理を渡す)
+/// </summary>
 public static class StaticJson {
     public static string ToJson ( this Array arr ) {
         return arr.Stringify("[", ", ", "]");
@@ -16,19 +20,39 @@ public static class StaticJson {
         return "''";
     }
 
+    public static string ToJson ( this Vector3 vec ) {
+        return new Dictionary<string, string> {
+            {"x", ""+vec.x},
+            {"y", ""+vec.y},
+            {"z", ""+vec.z}
+        }.ToJson();
+    }
+
     public static string ToJson ( this object obj ) {
         if (obj.IsNull()) { return "''"; }
-        if (obj.GetType().IsArray) {
+        var type = obj.GetType();
+        if (type.IsArray) {
             Array arr = (Array) obj;
             return arr.ToJson();
         }
-        if (obj.GetType().IsPrimitive) {
+        if (type.IsPrimitive) {
             return "'" + obj.ToString() + "'";
+        }
+        if (type == typeof(Vector3)) {
+            return "'" + obj.ToJson() + "'";
         }
         var dic = obj as Dictionary<object, object>;
         return dic.ToJson();
     }
 
+    /// <summary>
+    /// ディクショナリに対して、Keyを指定してJSON処理を行う
+    /// </summary>
+    /// <typeparam name="K"></typeparam>
+    /// <typeparam name="V"></typeparam>
+    /// <param name="obj"></param>
+    /// <param name="keys"></param>
+    /// <returns></returns>
     public static string ToJson<K, V> ( this object obj, 
         params string[] keys ) {
         var type = obj.GetType();
