@@ -2,7 +2,6 @@
 namespace BasicExtends {
     using System.Collections.Generic;
     using UnityEngine;
-    using UnityEngine.Assertions;
     using System;
 
     /// <summary>
@@ -111,7 +110,7 @@ namespace BasicExtends {
         /// <summary>
         /// PushされたMsgを受け取るための関数を入れる。
         /// この中に入れられたアクション経由で、
-        /// メッセージの処理をかくことになる。
+        /// メッセージの処理を書くことになる。
         /// </summary>
         /// <param name="callback"></param>
         public static void Assign ( Action<Msg> callback ) {
