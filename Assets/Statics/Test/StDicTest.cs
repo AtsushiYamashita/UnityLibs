@@ -17,7 +17,7 @@ namespace BasicExtends {
 
         public string KeyNotFoundTest () {
             var dict = new StringDict() { { "test", "a" }, { "t", "b" } };
-            var str = dict.Stringify();
+            //var str = dict.Stringify();
             if (dict.KeyNotFound("test")) { return "発見できるはずの要素が見つかっていません"; }
             if (dict.KeyNotFound("a")) { return ""; }
             return "発見できないはずの要素が見つかっています";

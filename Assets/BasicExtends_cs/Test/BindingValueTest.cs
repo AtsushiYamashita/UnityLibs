@@ -9,7 +9,7 @@ namespace BasicExtends {
 
         public string BindTest () {
             string old = "", now = "";
-            var val = "".Bind(( o, n ) => { old = o; now = n; });
+            //var val = "".Bind(( o, n ) => { old = o; now = n; });
             if (old != now) { return "望まない処理かゴミが発生しています。"; }
             return "";
         }
