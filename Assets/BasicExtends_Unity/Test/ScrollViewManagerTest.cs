@@ -47,7 +47,7 @@ public class ScrollViewManagerTest : TestComponent {
 
     public string AddDataTest()
     {
-        var p = StPair.Gen("name", "");
+        //var p = StPair.Gen("name", "");
         mManager.AddData((self,obj)=> { self.name =  obj[name] as string; },
             new StringDict { { "name", "a" } },
             new StringDict { { "name", "b" } },

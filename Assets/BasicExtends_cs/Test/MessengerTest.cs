@@ -28,7 +28,7 @@ public class MessengerTest: TestComponent {
         });
 
         if (n != string.Empty) { return "ゴミが入っています"; }
-        var m = Msg.Gen().To("n").Message("test").Push();
+        //var m = Msg.Gen().To("n").Message("test").Push();
         if (n == string.Empty) { return "正しく送信できていません"; }
         if (n != "test") { return "正しく送信できていません"; }
         return Pass();
@@ -41,7 +41,7 @@ public class MessengerTest: TestComponent {
         });
 
         if (n != string.Empty) { return "ゴミが入っています"; }
-        var m = Msg.Gen().To("m").Message("test").Push();
+        //var m = Msg.Gen().To("m").Message("test").Push();
         if (n != string.Empty) { return "ゴミが入っています"; }
         return Pass();
     }
