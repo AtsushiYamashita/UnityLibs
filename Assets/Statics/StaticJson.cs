@@ -4,16 +4,22 @@ using UnityEngine.Assertions;
 using System.Collections.Generic;
 using BasicExtends;
 
+public interface IJsonable {
+    string ToJson ();
+}
+
 /// <summary>
 /// Jsonとして文字列化する
 /// (TODO：メソッドチェーンを書いたらそちらに分岐処理を渡す)
 /// </summary>
 public static class StaticJson {
     public static string ToJson ( this Array arr ) {
+        Assert.IsNotNull(arr);
         return arr.Stringify("[", ", ", "]");
     }
 
     public static string ToJson<K, V> ( this Dictionary<K, V> dic ) {
+        Assert.IsNotNull(dic);
         return dic.Stringify();
     }
     public static string ToJson (  ) {
@@ -40,6 +46,10 @@ public static class StaticJson {
         }
         if (type == typeof(Vector3)) {
             return "'" + obj.ToJson() + "'";
+        }
+        var jsonable = obj as IJsonable;
+        if (jsonable != null) {
+
         }
         var dic = obj as Dictionary<object, object>;
         return dic.ToJson();
@@ -95,7 +105,7 @@ public static class StaticJson {
         var inside = ObjectString(json);
 
         // 要素の操作
-        var splited = inside.GetValue().Split(',');
+        var splited = inside.Value.Split(',');
         Array.ForEach(splited, ( data ) =>
         {
             // 重複したキーが入っていないかチェックしてからdicに。
