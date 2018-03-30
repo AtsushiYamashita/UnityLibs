@@ -9,8 +9,8 @@
     public class ObjDict : Dictionary<string, object> { }
 
     public interface IDictionaryDataConvertable<K,V> {
-        K GetKey ();
-        V GetValue ();
+        K Key { get; set; }
+        V Value { get; set; }
     }
 
     /// <summary>
@@ -23,7 +23,9 @@
         public static string basicSeparator1 = ":";
         public static string basicSeparator2 = ",";
 
-
+        /// <summary>
+        /// 指定したセパレータと括弧を使って、辞書の中身を文字列に変換する
+        /// </summary>
         public static string Stringify<K, V> (
             this Dictionary<K, V> dic,
             string head, string sep1,string sep2, string tail ) {
@@ -65,8 +67,7 @@
         }
 
         public static Dictionary<K, V> TrySet<K, V> ( this Dictionary<K, V> dic, IDictionaryDataConvertable<K,V> data ) {
-            return dic.TrySet(data.GetKey(), data.GetValue()) ;
+            return dic.TrySet(data.Key, data.Value) ;
         }
     }
-
 }
