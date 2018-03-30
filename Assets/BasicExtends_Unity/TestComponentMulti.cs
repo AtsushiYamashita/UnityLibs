@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System.Text;
 
 namespace BasicExtends {
@@ -17,16 +18,33 @@ namespace BasicExtends {
     /// </summary>
     public class TestComponentMulti: MonoBehaviour {
 
+        public class Result {
+            private System.Action<string, string> mAction;
+            private string mName;
+            private int mTimes = 0;
+            public Result ( System.Action<string, string> action, string name ) {
+                mAction = action;
+                mName = name;
+            }
+            public void Invoke ( string str ) {
+                if (IsActive() == false) { return; }
+                mTimes++;
+                mAction(mName, str);
+            }
+            public bool IsActive () { return mTimes == 0; }
+
+
+        }
+
         int _Size = 0;
         int _ResEnd = 0;
         int _Ok = 0;
         StringBuilder _Buffer = new StringBuilder();
 
-
         protected virtual void Init () { }
         protected virtual void Close () { }
 
-        private void Result ( string name, string res ) {
+        private void ResultAction ( string name, string res ) {
             // Debug.Log("Result:" + res);
             _ResEnd++;
             var based = "{0}に{1}しました。{2}{3}{4}\n";
@@ -48,17 +66,17 @@ namespace BasicExtends {
 
         private void TestProcess () {
             var methods = GetType().GetMethods();
-            object [] arr = new object [2];
-            arr [1] = (System.Action<string, string>) Result;
+            object [] arr = new object [1];
             foreach (var m in methods) {
                 var name = m.Name;
                 if (name.IndexOf("Test") == -1) { continue; }
-                arr [0] = name;
+                var res = new Result(ResultAction, name); ;
+                arr [0] = res;
                 _Size++;
                 try {
                     m.Invoke(this, arr);
                 } catch (System.Exception e) {
-                    Result(name, "Error:" + e.Message);
+                    res.Invoke("Error:" + e.Message);
                 }
             }
         }
@@ -82,34 +100,35 @@ namespace BasicExtends {
         }
 
 
-        protected string Fail () {
+        protected static string Fail () {
             return "Fail";
         }
 
-        protected string Fail ( int data ) {
+        protected static string Fail ( int data ) {
             return "Fail : " + data;
         }
 
-        protected string Fail ( float data ) {
+        protected static string Fail ( float data ) {
             return "Fail : " + data;
         }
 
-        protected string Fail ( string str ) {
+        protected static string Fail ( string str ) {
             return "Fail : " + str;
         }
 
-        protected string Fail ( string str, params object [] obj ) {
+        protected static string Fail ( string str, params object [] obj ) {
             return "Fail : " + string.Format(str, obj);
         }
 
-        protected string Pass () {
+        protected static string Pass () {
             return "";
         }
     }
 }
 
 /*
-  public string Test () {
-            return "false";
-        }
+    public void FailTest(string name, Action<string,string> result ) {
+        result.Invoke(name, Fail());
+    }
+
  */
