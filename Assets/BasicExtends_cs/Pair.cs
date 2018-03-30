@@ -1,5 +1,6 @@
 ﻿namespace BasicExtends {
     using System.Linq;
+    using System.Text;
     using System.Collections.Generic;
 
     public class StringPair: Pair<string, string> { }
@@ -10,7 +11,7 @@
             ( this Pair<K, V> a )
             where V : class {
             var dic = new Dictionary<K, V>();
-            dic.TrySet(a.mKey, a.mValue);
+            dic.TrySet(a.Key, a.Value);
             return dic;
         }
 
@@ -19,7 +20,7 @@
             where V : class {
             var dic = new Dictionary<K, V>();
             foreach (var a in list) {
-                dic.TrySet(a.mKey, a.mValue);
+                dic.TrySet(a.Key, a.Value);
             }
             return dic;
         }
@@ -55,16 +56,46 @@
         }
     }
 
-    public class Pair<K, V>: IDictionaryDataConvertable<K, V>
+    public class Pair<K, V>: IDictionaryDataConvertable<K, V>, IJsonable
         where V : class {
-        public K mKey;
-        public V mValue = null;
+        private K mKey;
+        private V mValue = null;
         public Pair () { }
-        public Pair<K, V> Set ( K key, V value ) { mKey = key; mValue = value; return this; }
-        public K GetKey () { return mKey; }
-        public V GetValue () { return mValue; }
+        public K Key
+        {
+            set { mKey = value; }
+            get { return mKey; }
+        }
+        public V Value
+        {
+            set { mValue = value; }
+            get { return mValue; }
+        }
+        public virtual Pair<K, V> Set ( K key, V value ) {
+            mKey = key;
+            mValue = value;
+            return this;
+        }
         public Dictionary<K, V> ToDic () {
             return new Dictionary<K, V> { { mKey, mValue } };
+        }
+
+        public string ToJson () {
+            return Stringify("{", ",", "}");
+        }
+
+        public override string ToString () {
+            return Stringify("{", ",", "}");
+        }
+
+        /// <summary>
+        /// 指定したセパレータと括弧を使って、中身を文字列に変換する
+        /// </summary>
+        public string Stringify (
+            string head, string sep1, string tail ) {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(head).Append(mKey).Append(sep1).Append(mValue).Append(tail);
+            return sb.ToString();
         }
     }
 }
