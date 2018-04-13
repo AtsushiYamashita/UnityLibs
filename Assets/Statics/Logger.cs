@@ -6,30 +6,25 @@ using UnityEngine;
 
 namespace BasicExtends {
 
-    public enum DebugLog { Log,Error } 
-    public enum ReportLog { Log,Error } 
+    public enum DebugLog { Log, Error }
+    public enum ReportLog { Log, Error }
 
-    public static class Logger{
+    public static class Logger {
+        public static long mStart = 0;
+        public static long mPrev = 0;
         private static Dictionary<string, string> mPlaceHolder
             = new Dictionary<string, string>();
 
         private static string LogString ( string str ) {
-            var stack = new System.Diagnostics.StackFrame(2);
-            var stack_arr = StArr.To(
-                stack.GetFileName(),
-                stack.GetFileLineNumber(),
-                stack.GetType().Name,
-                stack.GetMethod().Name
-                );
-            var now = DateTime.Now;
-            var date = StArr.To(
-                //now.Minute + "m",
-                now.Second + "s",
-                now.Millisecond + "ms");
+            var stack = new System.Diagnostics.StackFrame(3);
+            if (mStart == 0) { mStart = DateTime.Now.Ticks; }
+            var now = (DateTime.Now.Ticks - mStart) / 1000;
+            var dt = now - mPrev;
+            mPrev = now;
             var dic = new Dictionary<string, string> {
             { "msg", str },
-            { "date", date.Stringify("(","/",")")},
-            { "stack", stack_arr.Stringify("(","/",")")}
+            { "passed", dt +"/" + now},
+            { "stack", stack.GetMethod().Name }
         };
             return dic.ToJson();
         }
@@ -43,7 +38,7 @@ namespace BasicExtends {
         }
 
         public static void Print ( this DebugLog type, string str, params object [] args ) {
-             Print(type, string.Format(str, args));
+            Print(type, string.Format(str, args));
         }
 
         public static void Print ( this ReportLog type, string str ) {

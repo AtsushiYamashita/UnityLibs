@@ -88,6 +88,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ShowResolutionOverlay: 1
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -109,6 +110,8 @@ NavMeshSettings:
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
+    debug:
+      m_Flags: 0
   m_NavMeshData: {fileID: 0}
 --- !u!1 &362517112
 GameObject:
@@ -120,7 +123,7 @@ GameObject:
   - component: {fileID: 362517113}
   - component: {fileID: 362517114}
   m_Layer: 0
-  m_Name: Tester
+  m_Name: ActionNodeTester
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -190,45 +193,83 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c47e5fc31be82264fb4974073b9b14b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mStates:
-    arr:
-    - START
-    - 
-    - 
-    - 
-    - 
+  mState: start
   mNodes:
-    arr:
-    - mName: SKIPED
-      mActions:
-        m_PersistentCalls:
-          m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+    mArr:
     - mName: START
       mActions:
         m_PersistentCalls:
           m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
     - mName: UPDATE
       mActions:
         m_PersistentCalls:
-          m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+          m_Calls:
+          - m_Target: {fileID: 527610369}
+            m_MethodName: SetState
+            m_Mode: 5
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: end
+              m_BoolArgument: 0
+            m_CallState: 2
+          - m_Target: {fileID: 527610369}
+            m_MethodName: DebugPrint
+            m_Mode: 5
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: b -> end
+              m_BoolArgument: 0
+            m_CallState: 2
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
     - mName: END
       mActions:
         m_PersistentCalls:
-          m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+          m_Calls:
+          - m_Target: {fileID: 557895260}
+            m_MethodName: SetState
+            m_Mode: 5
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: end
+              m_BoolArgument: 0
+            m_CallState: 2
+          - m_Target: {fileID: 527610369}
+            m_MethodName: DebugPrint
+            m_Mode: 5
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: a -> end
+              m_BoolArgument: 0
+            m_CallState: 2
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
     - mName: 
       mActions:
         m_PersistentCalls:
           m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    - mName: 
+      mActions:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
 --- !u!1 &557895258
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,45 +313,50 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c47e5fc31be82264fb4974073b9b14b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mStates:
-    arr:
-    - START
-    - 
-    - 
-    - 
-    - 
+  mState: start
   mNodes:
-    arr:
-    - mName: SKIPED
-      mActions:
-        m_PersistentCalls:
-          m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+    mArr:
     - mName: START
       mActions:
         m_PersistentCalls:
           m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
     - mName: UPDATE
       mActions:
         m_PersistentCalls:
           m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
     - mName: END
       mActions:
         m_PersistentCalls:
-          m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+          m_Calls:
+          - m_Target: {fileID: 557895260}
+            m_MethodName: DebugPrint
+            m_Mode: 5
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
     - mName: 
       mActions:
         m_PersistentCalls:
           m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    - mName: 
+      mActions:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
 --- !u!1 &708690353
 GameObject:
   m_ObjectHideFlags: 0
@@ -366,45 +412,61 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c47e5fc31be82264fb4974073b9b14b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mStates:
-    arr:
-    - START
-    - 
-    - 
-    - 
-    - 
+  mState: start
   mNodes:
-    arr:
-    - mName: SKIPED
-      mActions:
-        m_PersistentCalls:
-          m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+    mArr:
     - mName: START
       mActions:
         m_PersistentCalls:
-          m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+          m_Calls:
+          - m_Target: {fileID: 1575505311}
+            m_MethodName: DebugPrint
+            m_Mode: 5
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: root start
+              m_BoolArgument: 0
+            m_CallState: 2
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
     - mName: UPDATE
       mActions:
         m_PersistentCalls:
-          m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+          m_Calls:
+          - m_Target: {fileID: 1575505311}
+            m_MethodName: SetState
+            m_Mode: 5
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: close
+              m_BoolArgument: 0
+            m_CallState: 2
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
     - mName: END
       mActions:
         m_PersistentCalls:
           m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
     - mName: 
       mActions:
         m_PersistentCalls:
           m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    - mName: 
+      mActions:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
 --- !u!4 &1575505312
 Transform:
   m_ObjectHideFlags: 0
@@ -457,6 +519,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2082173834}
   - component: {fileID: 2082173835}
+  - component: {fileID: 2082173837}
+  - component: {fileID: 2082173836}
   m_Layer: 0
   m_Name: ccc
   m_TagString: Untagged
@@ -488,42 +552,78 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c47e5fc31be82264fb4974073b9b14b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mStates:
-    arr:
-    - START
-    - 
-    - 
-    - 
-    - 
+  mState: start
   mNodes:
-    arr:
-    - mName: SKIPED
-      mActions:
-        m_PersistentCalls:
-          m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+    mArr:
     - mName: START
       mActions:
         m_PersistentCalls:
-          m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+          m_Calls:
+          - m_Target: {fileID: 2082173837}
+            m_MethodName: Send
+            m_Mode: 1
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
     - mName: UPDATE
       mActions:
         m_PersistentCalls:
           m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
     - mName: END
       mActions:
         m_PersistentCalls:
           m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
     - mName: 
       mActions:
         m_PersistentCalls:
           m_Calls: []
-        m_TypeName: NodeEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    - mName: 
+      mActions:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+--- !u!114 &2082173836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2082173833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cb5ee318a9452d4fa0a2728bf872025, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mParent: {fileID: 1632419697}
+  mPrefab: {fileID: 708690354}
+--- !u!114 &2082173837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2082173833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ff6a551a60b1d54fb9cbe27b316f491, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mSended: 0
+  mTo: ccc
+  mAs: SimpleCreater
+  mAct: cReaTe
+  mList:
+  - name
+  - test

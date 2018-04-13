@@ -2,7 +2,6 @@
 namespace BasicExtends {
     using System.Collections.Generic;
     using UnityEngine;
-    using UnityEngine.Assertions;
     using System;
 
     /// <summary>
@@ -20,6 +19,8 @@ namespace BasicExtends {
         /// <param name="value"></param>
         /// <returns></returns>
         public Msg Set ( string key, string value ) {
+            if (key.Length < 1) { throw new Exception("Error, illigal MSG key set"); }
+            key = key.ToUpper();
             if (ContainsKey(key) == false) { Add(key, value); return this; }
             this [key] = value;
             return this;
@@ -27,6 +28,10 @@ namespace BasicExtends {
 
         public Msg To ( string v ) {
             return Set("to", v);
+        }
+
+        public Msg As ( string v ) {
+            return Set("as", v);
         }
 
         public Msg Message ( string v ) {
@@ -40,10 +45,22 @@ namespace BasicExtends {
         /// <param name="value"></param>
         /// <returns></returns>
         public bool Match ( string key, string value ) {
+            if (key.Length < 1) { throw new Exception("Error, illigal MSG key set"); }
+            key = key.ToUpper();
             if (ContainsKey(key) == false) { return false; }
             var insideValue = this [key];
-            if (insideValue != value) { return false; }
+            if (insideValue.ToUpper() != value.ToUpper()) { return false; }
             return true;
+        }
+
+        /// <summary>
+        /// when key-value is unmatched, then this function return true.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public bool Unmatch ( string key, string value ) {
+            return !Match(key,value);
         }
 
         /// <summary>
@@ -72,6 +89,8 @@ namespace BasicExtends {
         /// <param name="key"></param>
         /// <returns></returns>
         public string TryGet ( string key ) {
+            if (key.Length < 1) { throw new Exception("Error, illigal MSG key set"); }
+            key = key.ToUpper();
             if (ContainsKey(key) == false) { return string.Empty; }
             var insideValue = this [key];
             if (insideValue == null) { return string.Empty; }
@@ -111,7 +130,7 @@ namespace BasicExtends {
         /// <summary>
         /// PushされたMsgを受け取るための関数を入れる。
         /// この中に入れられたアクション経由で、
-        /// メッセージの処理をかくことになる。
+        /// メッセージの処理を書くことになる。
         /// </summary>
         /// <param name="callback"></param>
         public static void Assign ( Action<Msg> callback ) {
