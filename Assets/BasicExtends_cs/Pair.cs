@@ -2,6 +2,9 @@
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
+    using System;
+    using UnityEngine;
 
     public class StringPair: Pair<string, string> { }
     public class CheckedRet<T>: Pair<bool, T> where T : class { }
@@ -56,9 +59,13 @@
         }
     }
 
+    [DataContract][Serializable]
     public class Pair<K, V>: IDictionaryDataConvertable<K, V>, IJsonable
         where V : class {
+
+        [DataMember][SerializeField]
         private K mKey;
+        [DataMember][SerializeField]
         private V mValue = null;
         public Pair () { }
         public K Key
