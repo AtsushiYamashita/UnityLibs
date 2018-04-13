@@ -93,7 +93,7 @@
 
         public static MultiTask CountDown ( int times, WorkFunc work, params object [] obj ) {
             // TimeOver(), active, result
-            Assert.IsTrue(Instance.mIsExistManager);
+            Assert.IsTrue(Instance.mIsExistManager, "missing the multi task manager");
             int count = 0;
             Push( ( not_use ) =>
             {
@@ -109,7 +109,7 @@
 
     public class MultiTaskManager: MonoBehaviour {
         //private int mWorking = 0;
-        private void Start () {
+        private void Awake () {
              MultiTask.Instance.ManagerExist();
         }
         private void Update () {

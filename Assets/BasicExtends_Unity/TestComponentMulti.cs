@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
 using System.Text;
+using System.Linq;
 
 namespace BasicExtends {
 
@@ -32,11 +33,9 @@ namespace BasicExtends {
                 mAction(mName, str);
             }
             public bool IsActive () { return mTimes == 0; }
-
-
         }
 
-        int _Size = 0;
+        int _Size = 1;
         int _ResEnd = 0;
         int _Ok = 0;
         StringBuilder _Buffer = new StringBuilder();
@@ -65,18 +64,20 @@ namespace BasicExtends {
         }
 
         private void TestProcess () {
-            var methods = GetType().GetMethods();
+            var methods = GetType().GetMethods().Where((m)=> {
+                return m.Name.IndexOf("Test") != -1;
+            });
             object [] arr = new object [1];
+
+            _Size = methods.Count() ;
             foreach (var m in methods) {
                 var name = m.Name;
-                if (name.IndexOf("Test") == -1) { continue; }
                 var res = new Result(ResultAction, name); ;
                 arr [0] = res;
-                _Size++;
                 try {
                     m.Invoke(this, arr);
                 } catch (System.Exception e) {
-                    res.Invoke("Error:" + e.Message);
+                    res.Invoke("Error" + e.Message);
                 }
             }
         }

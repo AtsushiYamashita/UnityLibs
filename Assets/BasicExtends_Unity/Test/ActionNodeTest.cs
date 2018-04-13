@@ -1,16 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using BasicExtends;
 
-public class ActionNodeTest : MonoBehaviour {
-
-    string str = string.Empty;
-
-    public void AddMemory(string str ) {
-        this.str += str;
-    }
-
-    public void Judge () {
+public class ActionNodeTest : TestComponentMulti {
+    
+    public void FailTest(Result result ) {
 
     }
 

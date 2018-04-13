@@ -68,9 +68,15 @@
             return new Trfm().Set(tr);
         }
 
+        public void Convert ( ref Transform tr ) {
+            tr.localPosition = POS;
+            tr.localEulerAngles = ROT;
+            tr.localScale = SCA;
+        }
+
         public Trfm Set ( Transform tf ) {
             POS = tf.localPosition;
-            ROT = tf.localRotation.eulerAngles;
+            ROT = tf.localEulerAngles;
             SCA = tf.localScale;
             return this;
         }
@@ -93,8 +99,6 @@
             base.Set(f, trfm);
             return this;
         }
-
-
     }
 
     /*
@@ -119,22 +123,22 @@
             return this;
         }
 
-        private TransformRecord Generate ( Transform transform ) {
-            var data = (TimedData) new TimedData().Set(Time.time, Trfm.Convert(transform));
+        private Trfm Generate ( Transform transform ) {
+            var data = new TimedData().Set(Time.time, Trfm.Convert(transform));
             mRecords.Add(data);
-            return this;
+            return data.Value;
         }
 
-        private TransformRecord Reuse ( Transform transform ) {
+        private Trfm Reuse ( Transform transform ) {
             var t = mRecords [0];
             mRecords.RemoveAt(0);
-            t.Set(Time.time, t.Value.Set(transform));
+            var pair = t.Set(Time.time, t.Value.Set(transform));
             mRecords.Add(t);
-            return this;
+            return pair.Value;
         }
 
 
-        public TransformRecord Push ( Transform transform ) {
+        public Trfm Push ( Transform transform ) {
             if (mRecords.Count < mLength) {
                 return Generate(transform);
             }
@@ -176,10 +180,9 @@
     [Serializable]
     public class RecorderEvent: UnityEvent<TransformRecord> { }
 
-
     public class TransformRecorder: MonoBehaviour {
         [SerializeField]
-        private int mSpan = 3;
+        private int mSpan = 6;
         private int mCount = 0;
         private TransformRecord mRecord = new TransformRecord();
 

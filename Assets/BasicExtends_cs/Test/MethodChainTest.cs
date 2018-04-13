@@ -9,7 +9,7 @@ public class MethodChainTest: TestComponent {
         var chain = new MethodChain<string>();
         try {
             chain.Invoke("test");
-        }catch(System.Exception e) {
+        }catch(System.Exception) {
             return Pass();
         }
         return Fail("返されるべきエラー処理が失敗しています");
@@ -27,8 +27,7 @@ public class MethodChainTest: TestComponent {
         try {
             chain.Invoke("test");
         }catch(System.Exception e) {
-            return Fail("デフォルト動作の上書きに失敗しています");
-
+            return Fail("デフォルト動作の上書きに失敗しています" + e.ToString());
         }
 
         return result ? Pass() : Fail("コールバックが正常に動作していません");
@@ -49,7 +48,7 @@ public class MethodChainTest: TestComponent {
         try {
             chain.Invoke("test");
         } catch (System.Exception e){
-            return Fail("追加した関数が正常に呼ばれていません");
+            return Fail("追加した関数が正常に呼ばれていません"+e.ToString());
         }
         return result ? Pass() : Fail();
     }
@@ -63,10 +62,9 @@ public class MethodChainTest: TestComponent {
             if (str != "tt") { return false; };
             return true;
         });
-
         try {
             chain.Invoke("test");
-        } catch (System.Exception e) {
+        } catch (System.Exception ) {
             return Pass(); 
         }
         return Fail("追加した関数が正常に呼ばれていません");
@@ -92,7 +90,7 @@ public class MethodChainTest: TestComponent {
         try {
             chain.Invoke("test2");
         } catch (System.Exception e) {
-            return Fail("追加した関数が正常に呼ばれていません");
+            return Fail("追加した関数が正常に呼ばれていません" + e.ToString());
         }
         return result ? Pass() : Fail();
     }
@@ -117,7 +115,7 @@ public class MethodChainTest: TestComponent {
         try {
             chain.Invoke("test1");
         } catch (System.Exception e) {
-            return Fail("追加した関数が正常に呼ばれていません");
+            return Fail("追加した関数が正常に呼ばれていません"+ e.ToString());
         }
         return result == false ? Pass() : Fail();
     }
