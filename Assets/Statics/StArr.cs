@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text;
-
+using UnityEngine;
 
 namespace BasicExtends {
 
@@ -57,6 +57,14 @@ namespace BasicExtends {
             return arr.Stringify(BasicHead, sepalator, BasicTail);
         }
 
+        private static string ParseToString(  object e,string sepa ) {
+            if (e.IsNull()) { return ""; }
+            if (e.GetType() == typeof(string)) {
+                return "\"" + e + "\"" + sepa;
+            }
+            return e + sepa;
+        }
+
         /// <summary>
         /// 配列を読みやすい形に文字列化する
         /// </summary>
@@ -66,11 +74,11 @@ namespace BasicExtends {
             string head, string sepalator, string tail ) {
             if (arr.IsNull()) { return BasicHead + BasicTail; }
             if (arr.Length < 1) { return BasicHead + BasicTail; }
-            StringBuilder sb = new StringBuilder(arr.Length);
+            StringBuilder sb = new StringBuilder();
             sb.Append(head);
 
             foreach (var e in arr) {
-                sb.Append(e + sepalator);
+                sb.Append(ParseToString(e, sepalator));
             }
             var ret = sb.ToString();
             return ret.Substring(0, ret.Length - sepalator.Length) + tail;
