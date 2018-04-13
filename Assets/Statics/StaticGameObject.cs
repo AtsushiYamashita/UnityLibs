@@ -5,7 +5,17 @@ using System;
 namespace BasicExtends {
     public static class StaticGameObject {
 
-        public static GameObject [] Children ( this GameObject obj ) {
+        /// <summary>
+        /// UnityでGameObjectの子供として扱われているオブジェクトを、
+        /// リスト形式で一度に取得できます
+        /// 
+        /// Usage
+        /// var childrenList = gameObject.Children();
+        /// foreach(var child in childrenList){ .... }
+        /// </summary>
+        /// <param name="obj">子供を取得したいオブジェクト</param>
+        /// <returns>取得された子供</returns>
+        public static List<GameObject>  Children ( this GameObject obj ) {
             var children = new List<GameObject>();
             var tr = obj.transform;
             for (int i = 0; i < tr.childCount; i++) {
@@ -13,7 +23,7 @@ namespace BasicExtends {
                 if (ch.activeSelf == false) { continue; }
                 children.Add(ch);
             }
-            return children.ToArray();
+            return children;
         }
 
         public static GameObject FindBrother ( this GameObject obj, string name ) {
