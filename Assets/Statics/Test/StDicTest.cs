@@ -22,5 +22,11 @@ namespace BasicExtends {
             if (dict.KeyNotFound("a")) { return ""; }
             return "発見できないはずの要素が見つかっています";
         }
+
+        public string ToJsonTest() {
+            var dict = new StringDict() { { "test", "a" }, { "t", "b" } };
+            if (dict.ToJson() != "{\"test\":\"a\",\"t\":\"b\"}") { return Fail(dict.ToJson()); }
+            return Pass();
+        }
     }
 }
