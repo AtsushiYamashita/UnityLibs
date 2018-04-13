@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using BasicExtends;
@@ -7,16 +7,15 @@ public class ScrollViewManager: MonoBehaviour {
     [SerializeField]
     private ScrollViewElement mViewPrefabs = null;
 
-    public int TryGetIndexOwn ( ScrollViewElement elm ) {
-        if (elm == null) { return -1; }
+    public int TryGetIndexOwn ( ScrollViewElement target ) {
+        if (target == null) { return -1; }
         var vp = gameObject.FindChild("Viewport");
         var cnt = vp.FindChild("Content");
-        var children = cnt.Children();
-
-        for (var i = 0; i < children.Length; i++) {
-            var child = children [i].GetComponent<ScrollViewElement>();
-            if (elm != child) { continue; }
-            return i;
+        var elements = cnt.Children().Select(( e ) => { return e.GetComponent<ScrollViewElement>(); });
+        int count = 0;
+        foreach(var e in elements) {
+            if(target == e) { return count; }
+            ++count;
         }
         return -1;
     }
