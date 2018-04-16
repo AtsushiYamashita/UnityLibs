@@ -18,20 +18,35 @@ namespace BasicExtends {
         }
 
         private void MessengerSetup () {
-            //Msg.Gen().To(gameObject.name).As(GetType().Name).Push();
             Messenger.Assign(( Msg msg ) => {
                 if (msg.Unmatch("to", gameObject.name)) { return; }
                 if (msg.Unmatch("as", GetType().Name)) { return; }
                 if (msg.Match("act", "Create")) { Create(); return; }
-                if (msg.Match("act", "Create as")) { Create(msg.TryGet("name")); return; }
+                if (msg.Match("act", "Create child")) { CreateChild(); return; }
+                var name = msg.TryGet("name");
+                if (msg.Match("act", "Create as")) { Create(name); return; }
+                if (msg.Match("act", "Create child as")) { CreateChild(name); return; }
             });
         }
 
         public void Create (string name = "") {
             var obj = Instantiate(mPrefab, Vector3.zero, Quaternion.identity);
             if (name != "") { obj.name = name; }
-            if (mParent == null) { return; }
+        }
+
+        public void CreateChild ( string name = "" ) {
+            if (mParent == null) { Create(name); return; }
+            var obj = Instantiate(mPrefab, Vector3.zero, Quaternion.identity);
+            if (name != "") { obj.name = name; }
             obj.transform.parent = mParent;
+        }
+
+        public void SetParent (Transform parent) {
+            mParent = parent;
+        }
+
+        public void SetParent(string name ) {
+
         }
     }
 }

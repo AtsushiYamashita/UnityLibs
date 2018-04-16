@@ -28,13 +28,18 @@ namespace BasicExtends {
                 set { this.mSarchKey = value; }
             }
 
-
             [SerializeField]
-            private string [] mTags = new string [0];
+            private List<string> mTags = new List<string>();
             public void SetTags ( params string [] args ) {
-                mTags = args;
+                mTags = new List<string>();
+                AddTags(args);
             }
-            public string [] Tags
+            public void AddTags ( params string [] args ) {
+                mTags.AddRange(args);
+                Store.Instance.AddByTag(this);
+
+            }
+            public List<string> Tags
             {
                 get { return mTags; }
             }
@@ -47,20 +52,10 @@ namespace BasicExtends {
                 set { this.mIndex = value; }
             }
 
-            private string GetObjectPath () {
-                string ret = Object.name;
-                Transform parent = Object.transform.parent;
-                while (parent != null) {
-                    ret = string.Format("{0}/{1}", parent.name, ret);
-                }
-                ret = string.Format("{0}/{1}", Object.scene.name, ret);
-                return ret;
-            }
-
             public override string ToString () {
                 string ret;
-                ret = string.Format("GameObject:{0}\n", GetObjectPath());
-                for (int i = 0; i < mTags.Length; i++) {
+                ret = string.Format("GameObject:{0}\n", Object.GetObjectPath());
+                for (int i = 0; i < mTags.Count; i++) {
                     ret += string.Format("tag{0}:{1}\n", i, mTags [i]);
                 }
                 ret += string.Format("index:{0}\n", mIndex);
@@ -87,39 +82,32 @@ namespace BasicExtends {
                 mTagedDatas = new Dictionary<string, List<Data>>();
             }
 
-            private void AddByKey ( Data data ) {
-                var key = data.SarchKey;
-                if (key != string.Empty) {
-                    var keyContained = mDatas.ContainsKey(key);
-                    if (!keyContained) { mDatas.Add(key, null); }
-                    if (keyContained) {
-                        var old = mDatas [key].Object;
-                        var isKeyUsed = old != data.Object;
-                        string str = string.Format("The key:{0} is used by {1},{2}", key, old, data.Object);
-                        Assert.IsTrue(!isKeyUsed, str);
-                    }
-                    mDatas [key] = data;
-                }
+            public int CountbyTag ( string str ) {
+                if (mTagedDatas.ContainsKey(str) == false) { return 0; }
+                return mTagedDatas [str].Count;
             }
 
-            private void AddByTag ( Data data ) {
+            public void AddByKey ( Data data ) {
+                var key = data.SarchKey;
+                if (key == string.Empty) { return; }
+
+                var keyContained = mDatas.ContainsKey(key);
+                if (keyContained) {
+                    var old = mDatas [key].Object;
+                    var isKeyUsed = old != data.Object;
+                    string str = string.Format("The key:{0} is used by {1},{2}", key, old, data.Object);
+                    throw new System.Exception(str);
+                }
+                mDatas.TrySet(key, data);
+            }
+
+            public void AddByTag ( Data data ) {
                 foreach (var tag in data.Tags) {
                     if (!mTagedDatas.ContainsKey(tag)) { mTagedDatas.Add(tag, new List<Data>()); }
-                    var insided = mTagedDatas [tag].Where(e => { return e.Object == data.Object; }).ToArray();
-                    if (insided.Length < 1) {
-                        mTagedDatas [tag].Add(data);
-                    }
+                    var contain = mTagedDatas [tag].Where(e => { return e.Object == data.Object; });
+                    if (contain != null) { return; }
+                    mTagedDatas [tag].Add(data);
                 }
-            }
-
-            /// <summary>
-            /// Add the object. Almost object use in awake.
-            /// </summary>
-            /// <param name="data"></param>
-            public void Add ( Data data ) {
-                if (data.Object == null) { return; }
-                AddByKey(data);
-                AddByTag(data);
             }
 
             /// <summary>
@@ -171,13 +159,46 @@ namespace BasicExtends {
         private Data mData = new Data();
         public Data Data { get { return mData; } }
 
-        void Awake () {
+        private void Reset () {
             var count = GetComponents<FindableObject>();
             Assert.IsTrue(count.Length <= 1, "Over hold :: GameObject cannnot hold this component more then 2.");
             mData.Object = gameObject;
-            Store.Instance.Add(mData);
+            var path = gameObject.GetObjectPath();
+            mData.AddTags(path);
+            mData.Index = Store.Instance.CountbyTag(path);
+            Store.Instance.AddByKey(mData);
+            Store.Instance.AddByTag(mData);
         }
 
+        private void Start () {
+            MessengerSetup();
+        }
+
+        private void MessengerSetup () {
+            Messenger.Assign(( Msg msg ) =>
+            {
+                if (msg.Unmatch("to", gameObject.name)) { return; }
+                if (msg.Unmatch("as", GetType().Name)) { return; }
+
+                if (msg.Match("act", "AddTag")) {
+                    var tag = msg.TryGet("tag");
+                    AddTag(tag); return;
+                }
+
+                if (msg.Match("act", "SetName")) {
+                    var name = msg.TryGet("name");
+                    SetName(name); return;
+                }
+            });
+        }
+
+        public void AddTag ( string str ) {
+            mData.AddTags(str);
+        }
+
+        public void SetName ( string str ) {
+            mData.AddTags(str);
+        }
     }
 
 }

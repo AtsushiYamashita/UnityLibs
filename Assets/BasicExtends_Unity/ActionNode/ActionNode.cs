@@ -51,8 +51,10 @@ namespace BasicExtends {
             private string mState = ("start");
 
             [SerializeField]
-            private NodeArray mNodes = new NodeArray()
-                .Add(new Node("start", ( ActionNode node ) =>
+            private NodeArray mNodes = new NodeArray();
+                
+            private void Reset () {
+                mNodes.Add(new Node("start", ( ActionNode node ) =>
                 {
                     node.mState = ("update");
                 }))
@@ -62,6 +64,7 @@ namespace BasicExtends {
                     node.mState = ("start");
                     node.gameObject.SetActive(false);
                 }));
+            }
 
             private void Update () {
                 mNodes.Invoke(mState, this);
