@@ -53,5 +53,16 @@ namespace BasicExtends {
         public static int IID ( this Component obj ) {
             return obj.gameObject.GetInstanceID();
         }
+
+        public static string GetObjectPath (this GameObject obj) {
+            string ret = obj.name;
+            Transform parent = obj.transform.parent;
+            while (parent != obj.transform.root) {
+                ret = string.Format("{0}/{1}", parent.name, ret);
+                parent = parent.transform.parent;
+            }
+            ret = string.Format("{0}/{1}", obj.scene.name, ret);
+            return ret;
+        }
     }
 }
