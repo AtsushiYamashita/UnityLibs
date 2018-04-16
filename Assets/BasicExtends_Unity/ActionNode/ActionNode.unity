@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311992, g: 0.38074034, b: 0.35872713, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -365,6 +365,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 708690354}
+  - component: {fileID: 708690355}
+  - component: {fileID: 708690356}
   m_Layer: 0
   m_Name: ddd
   m_TagString: Untagged
@@ -385,6 +387,66 @@ Transform:
   m_Father: {fileID: 557895259}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &708690355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 708690353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c47e5fc31be82264fb4974073b9b14b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mState: start
+  mNodes:
+    mArr:
+    - mName: START
+      mActions:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    - mName: UPDATE
+      mActions:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    - mName: END
+      mActions:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    - mName: 
+      mActions:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    - mName: 
+      mActions:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: BasicExtends.ActionNode.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+--- !u!114 &708690356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 708690353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea6b7e54ca3a1394ca3d28b832a778d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mData:
+    mSarchKey: 
+    mTags:
+    - ActionNode/aaa/ddd
+    mIndex: 1
 --- !u!1 &1575505310
 GameObject:
   m_ObjectHideFlags: 0
@@ -607,8 +669,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cb5ee318a9452d4fa0a2728bf872025, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mParent: {fileID: 1632419697}
-  mPrefab: {fileID: 708690354}
+  mParent: {fileID: 0}
+  mPrefab: {fileID: 2082173834}
 --- !u!114 &2082173837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -623,7 +685,7 @@ MonoBehaviour:
   mSended: 0
   mTo: ccc
   mAs: SimpleCreater
-  mAct: cReaTe
+  mAct: Create child as
   mList:
   - name
   - test
