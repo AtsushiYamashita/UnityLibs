@@ -5,44 +5,54 @@ using UnityEngine.Assertions;
 
 namespace BasicExtends {
 
-    class TypedArray: Dictionary<Type, BufferedArray> { }
+    class NamedObject: Dictionary<string, BufferedArray> { }
+    class TypedArray: Dictionary<Type, NamedObject> { }
 
     public class FindableStore :Singleton<FindableStore>{
 
-        private TypedArray dic = new TypedArray();
+        private TypedArray mDic = new TypedArray();
 
-        public T TryGet<T>(int index) where T:class{
+        public T[] TryGetArr<T>(string name) where T:class{
             var t = typeof(T);
-            Assert.IsTrue(dic.ContainsKey(t));
+            NamedObject dic2 = null;
+            if (mDic.TryGetValue(t, out dic2)) {
+                throw new Exception("Target type is missing.");
+            };
+            if(dic2 == null) {
+                return null;
+            }
 
-            var arr = dic [t];
-            Assert.IsTrue(arr.Length > index);
+            BufferedArray arr = null;
+            if (dic2.TryGetValue(name, out arr)) {
+                return null;
+            };
+            if (arr == null) {
+                return null;
+            }
 
-            var v = arr.TryGet<T>(index);
-            if (v != null) { return v; }
-
-            v = (T) Activator.CreateInstance(typeof(T), true);
-            arr.Arr [index] = v;
-            return v;
-        }
-
-        public void Add<T> ( params T[] arr ) where T : class {
-            Assert.IsTrue(arr.IsNotNull());
-            Assert.IsTrue(arr.Length >= 0);
-            var type = typeof(T);
-            if (dic.ContainsKey(type)==false) { dic.Add(type, new BufferedArray() ); }
-            var ba = dic [type];
-            ba.Add(arr);
-            ba.SetFront();
-        }
-
-        public T[] TryGetArray<T> (  ) where T : class {
-            var t = typeof(T);
-            Assert.IsTrue(dic.ContainsKey(t));
-
-            var arr = dic [t];
             return arr.Arr as T[];
         }
 
+        /// <summary>
+        /// 可変長なので単数にも対応
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="arr"></param>
+        public void Add<T> ( params Pair<string,T>[] arr ) where T : class {
+            Assert.IsTrue(arr.IsNotNull());
+            Assert.IsTrue(arr.Length >= 0);
+            var type = typeof(T);
+            if (mDic.ContainsKey(type)==false) {
+                mDic.Add(type, new NamedObject() );
+            }
+            var ba = mDic [type];
+            foreach(var e in arr) {
+                if (ba.ContainsKey(e.Key) == false) {
+                    ba.TrySet(e.Key, new BufferedArray());
+                }
+                ba [e.Key].Add(e.Value);
+                ba [e.Key].SetFront();
+            }
+        }
     }
 }
