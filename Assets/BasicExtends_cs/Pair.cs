@@ -83,6 +83,12 @@
             mValue = value;
             return this;
         }
+
+        public static Pair<K, V> Gen ( K key, V value ) {
+            return new Pair<K, V>().Set(key,value);
+        }
+
+
         public Dictionary<K, V> ToDic () {
             return new Dictionary<K, V> { { mKey, mValue } };
         }
