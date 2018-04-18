@@ -4,10 +4,11 @@ using UnityEngine.Assertions;
 using UnityEngine.Events;
 using System;
 using BasicExtends;
+
+
 namespace BasicExtends {
 
     namespace ActionNode {
-
         [Serializable]
         public class NodeEvent: UnityEvent<ActionNode> { }
 
@@ -18,7 +19,10 @@ namespace BasicExtends {
 
             public Node () { }
             public Node ( string str ) { mName = str.ToUpper(); }
-            public Node ( string str, UnityAction<ActionNode> act ) : this(str) { mActions.AddListener(act); }
+            public Node ( string str
+                , UnityAction<ActionNode> act ) : this(str) {
+                mActions.AddListener(act);
+            }
 
         }
 
@@ -35,12 +39,26 @@ namespace BasicExtends {
                 return this;
             }
 
+            private void AfterAction ( string state, ActionNode component ) {
+                if (state.ToUpper() == "START") {
+                    component.SetState("update");
+                    return;
+                }
+                if (state.ToUpper() == "END") {
+                    component.SetState("start");
+                    component.gameObject.SetActive(false);
+                    return;
+                }
+            }
+
             public void Invoke ( string state, ActionNode component ) {
                 ForEach(( e ) =>
                 {
+                    Assert.IsNotNull(e);
                     if (e.mName != state.ToUpper()) { return; }
                     e.mActions.Invoke(component);
                 });
+                AfterAction(state, component);
             }
         }
 
@@ -52,18 +70,33 @@ namespace BasicExtends {
 
             [SerializeField]
             private NodeArray mNodes = new NodeArray();
-                
+
+            //メインスレッド以外から呼び出すときもあるため必要
+            private string mObjectName = "";
+
+            private void Start () {
+                MessengerSetup();
+                mObjectName = gameObject.name;
+            }
+
+            private void MessengerSetup () {
+                Messenger.Assign(( Msg msg ) =>
+                {
+                    if (msg.Unmatch("to", mObjectName)) { return; }
+                    if (msg.Unmatch("as", GetType().Name)) { return; }
+                    if (msg.Match("act", "SetState")) {
+                        var state = msg.TryGet("state");
+                        SetState(state);
+                        return;
+                    }
+                });
+            }
             private void Reset () {
-                mNodes.Add(new Node("start", ( ActionNode node ) =>
-                {
-                    node.mState = ("update");
-                }))
+                //if (mNodes.Length != 0) { return; }
+                mNodes.Reset()
+                    .Add(new Node("start"))
                 .Add(new Node("update"))
-                .Add(new Node("end", ( ActionNode node ) =>
-                {
-                    node.mState = ("start");
-                    node.gameObject.SetActive(false);
-                }));
+                .Add(new Node("end"));
             }
 
             private void Update () {
@@ -76,10 +109,9 @@ namespace BasicExtends {
 
             public void DebugPrint ( string str ) {
                 DebugLog.Log.Print("{0}({1}){2}{3} "
-                    ,gameObject.name ,mState
-                    ,str.Length == 0 ? "":" : ", str);
+                    , gameObject.name, mState
+                    , str.Length == 0 ? "" : " : ", str);
             }
         }
     }
-
 }
