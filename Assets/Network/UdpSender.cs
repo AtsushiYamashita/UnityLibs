@@ -1,8 +1,5 @@
 ﻿using UnityEngine;
-using System.Text;
-
 using System.Net;
-using System.Net.Sockets;
 
 namespace BasicExtends {
     public class UdpSender: Singleton<UdpSender>, ISender {
@@ -26,7 +23,6 @@ namespace BasicExtends {
                 if (msg.Unmatch("to", "Sender")) { return; }
                 if (msg.Match("act", "Setup")) {
                     var adrs_r = msg.TryGet("adrs_r");
-                    Debug.Log("adrs_r" + adrs_r);
                     Setup(adrs_r);
                     return;
                 }
@@ -44,41 +40,16 @@ namespace BasicExtends {
         }
 
         private void SendLoop () {
-
-
             var sender = new IPEndPoint(IPAddress.Any, 8010);
-
             byte [] buffer = mData.DataQueue.MsgToByte.Dequeue();
 
-
             if (buffer.Length < 1) {
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(NetworkUnit.INTERVAL);
                 return;
             }
 
-            Debug.Log("mData.IsReceiver" + mData.IsReceiver);
-            var client = new UdpClient(sender);      // ローカルポート番号を指定。
-            client.Send(buffer, buffer.Length, mData.Receiver);  // 同期処理なので、送信し終わるまで処理が止まる。
-
-#if false
-            byte [] buffer = mData.DataQueue.MsgToByte.Dequeue();
-            if (buffer.Length < 1) {
-                System.Threading.Thread.Sleep(5);
-                return;
-            }
-
-            Msg.Gen().To("Manager")
-                .As("NetworkManager")
-                .Set("type", "SendLoop")
-                .Set("sendsize", "" + buffer.Length)
-                .Set("result", "Success").Pool();
-
-            mData.Counter.Increment();
-            //mData.Client.Connect(mData.Receiver);  
-            Debug.Log("send");
             mData.Client.Send(buffer, buffer.Length, mData.Receiver);
-            //mData.Client.Close();
-#endif
+            mData.Counter.Increment();
         }
 
         private void Send ( Msg message ) {

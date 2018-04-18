@@ -27,7 +27,7 @@ public class NetworkManager: MonoBehaviour {
                 return;
             }
             if (msg.Match("result", "Success") ) {
-                SuccessEvent(msg);
+                //Debug.Log(msg.Stringify()); // for debug
                 return;
             }
             if (msg.ContainsKey("From")) {
@@ -46,10 +46,6 @@ public class NetworkManager: MonoBehaviour {
     }
 
     private void FailEvent ( Msg msg ) {
-        Debug.Log(msg.Stringify());
-    }
-
-    private void SuccessEvent ( Msg msg ) {
         Debug.Log(msg.Stringify());
     }
 
