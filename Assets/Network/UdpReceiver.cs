@@ -67,26 +67,15 @@ namespace BasicExtends {
         public void ReceiveLoop () {
             
             var sender = mData.Sender;
-
-            Debug.Log("mData.IsReceiver" + mData.IsReceiver);
-
-            // データ受信待機
             var buffer = mData.Client.Receive(ref sender);
-            var str = Encoding.UTF8.GetString(buffer);
-
-            Msg.Gen().To("Manager").As("NetworkManager")
-    .Set("type", "ReceiveLoop")
-    .Set("result", "Success").Pool();
 
             // Receive イベント を実行
             OnRecieve(buffer, sender);
         }
 
         private static bool OnRecieve ( byte [] receved, IPEndPoint sender ) {
-
             if (receved.Length < 1) { return false; }
             var str = Encoding.UTF8.GetString(receved);
-            Debug.Log("receive data :　" + str);
             JsonNode json = JsonNode.Parse(str);
             var m = Msg.Gen().Set("From", "" + sender.Address.MapToIPv4());
             var keys = new string [] { "To", "As", "Act", "Id", "Msg", "Data" };
