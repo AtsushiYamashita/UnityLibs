@@ -186,6 +186,8 @@ namespace BasicExtends {
         /// <param name="func"></param>
         /// <returns></returns>
         public BufferedArray<T> ForEach ( Action<T> func ) {
+            Assert.IsNotNull(mArr);
+            Assert.IsNotNull(func);
             for (int i = 0; i < mArr.Length; i++) {
                 func(mArr [i]);
             }
@@ -204,6 +206,11 @@ namespace BasicExtends {
 
         public C [] TryGet<C> () where C : class {
             return mArr as C [];
+        }
+
+        public BufferedArray<T> Reset () {
+            mArr = new T [mArr.Length];
+            return this;
         }
     }
 }
