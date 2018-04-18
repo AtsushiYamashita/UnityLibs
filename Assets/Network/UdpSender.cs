@@ -40,14 +40,11 @@ namespace BasicExtends {
         }
 
         private void SendLoop () {
-            var sender = new IPEndPoint(IPAddress.Any, 8010);
             byte [] buffer = mData.DataQueue.MsgToByte.Dequeue();
-
             if (buffer.Length < 1) {
                 System.Threading.Thread.Sleep(NetworkUnit.INTERVAL);
                 return;
             }
-
             mData.Client.Send(buffer, buffer.Length, mData.Receiver);
             mData.Counter.Increment();
         }
