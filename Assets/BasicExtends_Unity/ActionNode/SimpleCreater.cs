@@ -44,9 +44,5 @@ namespace BasicExtends {
         public void SetParent (Transform parent) {
             mParent = parent;
         }
-
-        public void SetParent(string name ) {
-
-        }
     }
 }
