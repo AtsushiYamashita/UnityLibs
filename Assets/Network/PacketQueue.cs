@@ -14,12 +14,10 @@
         private static readonly byte [] mZero = new byte [0];
 
         public void Enqueue ( Msg msg ) {
-            Debug.Log("Enqueue A");
             ProtocolCheck(msg);
             lock (mLock) {
                 mQueue.Enqueue(msg);
             }
-            Debug.Log("Enqueue  E C" + mQueue.Count);
         }
 
         private void ProtocolCheck ( Msg msg ) {
@@ -39,7 +37,7 @@
                 msg = mQueue.Dequeue();
             }
             if (msg == null) { return mZero; }
-            Debug.Log("Dequeue ==>" + msg.ToJson());
+            // Debug.Log("Dequeue ==>" + msg.ToJson());
             var bytes = Encoding.UTF8.GetBytes(msg.ToJson());
             return bytes;
         }
