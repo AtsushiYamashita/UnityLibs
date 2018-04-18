@@ -1,63 +1,91 @@
 ﻿namespace BasicExtends {
-    using System.IO;
-    using System;
     using System.Collections.Generic;
-    using UnityEngine;
     using Object = System.Object;
+    using System.Text;
+    using UnityEngine;
 
     public interface IPacketQueue {
-        int Enqueue ( byte [] data, int size );
-        int Dequeue ( ref byte [] buffer, int size );
-        void Clear ();
+        MsgToByte MsgToByte { get; }
     }
 
-    public class PacketQueue : IPacketQueue {
-        struct PacketInfo {
-            public int offset;
-            public int size;
-        }
+    public class MsgToByte {
+        private System.Object mLock = new Object();
+        private Queue<Msg> mQueue = new Queue<Msg>();
+        private static readonly byte [] mZero = new byte [0];
 
-        private MemoryStream mStreamBuffer;
-        private List<PacketInfo> mOffsetList;
-        private int mOffset = 0;
-        private Object lockObj = new Object();
-
-        public PacketQueue () {
-            mStreamBuffer = new MemoryStream();
-            mOffsetList = new List<PacketInfo>();
-        }
-
-        public int Enqueue ( byte [] data, int size ) {
-            var info = new PacketInfo();
-            info.offset = mOffset;
-            info.size = size;
-            lock (lockObj) {
-                mOffsetList.Add(info);
-                mStreamBuffer.Position = mOffset;
-                mStreamBuffer.Write(data, 0, size);
-                mStreamBuffer.Flush();
-                mOffset += size;
+        public void Enqueue ( Msg msg ) {
+            Debug.Log("Enqueue A");
+            ProtocolCheck(msg);
+            lock (mLock) {
+                mQueue.Enqueue(msg);
             }
-            return size;
+            Debug.Log("Enqueue  E C" + mQueue.Count);
         }
-        public int Dequeue ( ref byte [] buffer, int size ) {
-            if (mOffsetList.Count <= 0) { return -1; }
-            int recvSize = 0;
-            lock (lockObj) {
-                PacketInfo info = mOffsetList [0];
-                int dataSize = Mathf.Min(size, info.size);
-                recvSize = mStreamBuffer.Read(buffer, 0, dataSize);
-                if (recvSize > 0) { mOffsetList.RemoveAt(0); }
-                if (mOffsetList.Count == 0) { Clear(); mOffset = 0; }
+
+        private void ProtocolCheck ( Msg msg ) {
+            var target = new string [] {
+                "To","As","Act","Msg","Data","Id"
+            };
+            foreach (var s in target) {
+                if (msg.ContainsKey(s.ToUpper())) { continue; }
+                throw new System.Exception("un formated msg ( " + s + ")" + msg.ToJson());
             }
-            return recvSize;
         }
+
+        public byte [] Dequeue () {
+            Msg msg = null;
+            if (mQueue.Count < 1) { return mZero; }
+            lock (mLock) {
+                msg = mQueue.Dequeue();
+            }
+            if (msg == null) { return mZero; }
+            Debug.Log("Dequeue ==>" + msg.ToJson());
+            var bytes = Encoding.UTF8.GetBytes(msg.ToJson());
+            return bytes;
+        }
+
         public void Clear () {
-            byte [] buffer = mStreamBuffer.GetBuffer();
-            Array.Clear(buffer, 0, buffer.Length);
-            mStreamBuffer.Position = 0;
-            mStreamBuffer.SetLength(0);
+            mQueue = new Queue<Msg>();
         }
     }
 
+    //public class ByteToMsg {
+    //    private System.Object mLock = new Object();
+    //    private Queue<byte []> mQueue = new Queue<byte []>();
+
+    //    public void Enqueue ( byte [] msg ) {
+    //        lock (mLock) {
+    //            mQueue.Enqueue(msg);
+    //        }
+    //    }
+
+    //    public void Dequeue () {
+    //        byte [] msg = null;
+    //        if (mQueue.Count < 1) { return; }
+    //        lock (mLock) {
+    //            msg = mQueue.Dequeue();
+    //        }
+    //        if (msg == null) { return; }
+    //        if (msg.Length < 1) { return; }
+    //        var str = Encoding.UTF8.GetString(msg);
+    //        JsonNode json = JsonNode.Parse(str);
+    //        Msg.Gen().To(json ["To"].Get<string>())
+    //            .As(json ["As"].Get<string>())
+    //            .Act(json ["Act"].Get<string>())
+    //            .Set("Id", "" + json ["Msg"].Get<string>())
+    //            .Set("Msg", json ["Msg"].Get<string>())
+    //            .Set("Data", json ["Data"].Get<string>()).Pool();
+    //    }
+
+    //    public void Clear () {
+    //        mQueue = new Queue<byte []>();
+    //    }
+    //}
+
+    public class PacketQueue: IPacketQueue {
+        public MsgToByte MsgToByte { private set; get; }
+        public PacketQueue () {
+            MsgToByte = new MsgToByte();
+        }
+    }
 }
