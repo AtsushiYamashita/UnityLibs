@@ -187,9 +187,7 @@ public static class StaticJson {
         if (type.IsPrimitive) {
             return "'" + obj.ToString() + "'";
         }
-
-        var dic = obj as Dictionary<object, object>;
-        return JsonStringify.Stringify(dic);
+        return JsonStringify.Stringify(obj);
     }
 
     private static Pair<bool, string> ObjectString ( string json ) {
