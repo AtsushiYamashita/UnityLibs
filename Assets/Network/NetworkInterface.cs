@@ -45,7 +45,7 @@ namespace BasicExtends {
 
     public static class NetworkUnit {
         public const int KB = 1000, MB = 1000 * KB;
-        public const int INTERVAL = 5;
+        public const int INTERVAL = 2;
         public const int DEFAULT_PORT_S = 8000;
         public const int DEFAULT_PORT_R = 8001;
 
