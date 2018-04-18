@@ -34,6 +34,10 @@ namespace BasicExtends {
             return Set("as", v);
         }
 
+        public Msg Act ( string v ) {
+            return Set("act", v);
+        }
+
         public Msg Message ( string v ) {
             return Set("msg", v);
         }
@@ -97,8 +101,21 @@ namespace BasicExtends {
             return insideValue;
         }
 
+        /// <summary>
+        /// thread un-safe but realtime
+        /// </summary>
+        /// <returns></returns>
         public Msg Push () {
             Messenger.Push(this);
+            return this;
+        }
+
+        /// <summary>
+        /// thread safe but include delay
+        /// </summary>
+        /// <returns></returns>
+        public Msg Pool () {
+            Messenger.Pool(this);
             return this;
         }
     }
@@ -109,6 +126,22 @@ namespace BasicExtends {
     public class Messenger: Singleton<Messenger> {
 
         private List<Action<Msg>> mCallBacks = new List<Action<Msg>>();
+        private Queue<Msg> mMessages = new Queue<Msg>();
+        private System.Object mLock = new System.Object();
+
+        public static void Pool(Msg msg ) {
+            lock (Instance.mLock) {
+                Instance.mMessages.Enqueue(msg);
+            }
+        }
+
+        public static void Flash () {
+            var msg = Instance.mMessages;
+            while (msg.Count > 0) {
+                var m = msg.Dequeue();
+                Push(m);
+            }
+        }
 
         /// <summary>
         /// MsgをMessengerに送信する。
@@ -124,6 +157,10 @@ namespace BasicExtends {
             }
             foreach (var cb in Instance.mCallBacks) {
                 cb.Invoke(msg);
+            }
+            if (msg.Match("to", "Debug") && msg.Match("act", "log")) {
+                Debug.Log("Debug from Msg :: " + msg.ToJson());
+                return;
             }
         }
 
