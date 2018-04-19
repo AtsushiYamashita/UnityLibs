@@ -14,13 +14,10 @@
     public class WinWebCameraCapture: MonoBehaviour, IWebCoBehaviourm {
 
         [SerializeField]
-        private float mTextureScale = 1f;
-
-        [SerializeField]
         private float mOpacity = 0.9f;
 
         [SerializeField]
-        Renderer mRender = null;
+        private MeshPrinter mMeshPrinter = null;
 
         [SerializeField]
         private UnityEvent mWakeupOk = new UnityEvent();
@@ -38,25 +35,11 @@
 
 
         public void Start () {
-            Assert.IsNotNull(mRender);
             mCamera = new WinXRCamera();
             mCamera.SetHoloOpacity(mOpacity);
-            mRender.material = new Material(Shader.Find("Unlit/Texture"));
-            mRender.material.mainTexture = mCamera.GetTexture();
-            ScaleFitTexture();
+            Assert.IsNotNull(mMeshPrinter);
         }
 
-        private static float Aspect ( float width, float height ) {
-            return height / width;
-        }
-
-        private void ScaleFitTexture () {
-            var tex = mRender.material.mainTexture;
-            float aspect = Aspect(tex.width, tex.height);
-            mRender.transform.localScale
-                = new Vector3(-mTextureScale, aspect * mTextureScale, 1f);
-            Debug.Log("ScaleFitTexture end");
-        }
 
         public void CameraWakeup_1 () {
             mCamera.CameraWakeUp(() =>
@@ -66,14 +49,15 @@
 
         }
         public void CameraPhotoMode_2 () {
-            mCamera.PhotoMode(() =>
-            {
+            mCamera.PhotoMode(mMeshPrinter,
+                () => {
                 mStartRecModeOk.Invoke();
             });
         }
 
         public void CameraShot_3 () {
             mCamera.Capture(
+                mMeshPrinter.Print,
                 () =>
                 {
                     Debug.Log("shot");
@@ -81,7 +65,6 @@
                 },
                 () =>
                 {
-                    mRender.material.SetTexture("_MainTex", mCamera.GetTexture());
                     mNessClose = true;
                     mShotEnd.Invoke();
                 });

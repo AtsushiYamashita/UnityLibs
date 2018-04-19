@@ -26,6 +26,10 @@ namespace BasicExtends {
             return this;
         }
 
+        public Msg Set ( string key, int value ) {
+            return Set(key, "" + value);
+        }
+
         public Msg To ( string v ) {
             return Set("to", v);
         }
@@ -64,7 +68,7 @@ namespace BasicExtends {
         /// <param name="value"></param>
         /// <returns></returns>
         public bool Unmatch ( string key, string value ) {
-            return !Match(key,value);
+            return !Match(key, value);
         }
 
         /// <summary>
@@ -129,7 +133,7 @@ namespace BasicExtends {
         private Queue<Msg> mMessages = new Queue<Msg>();
         private System.Object mLock = new System.Object();
 
-        public static void Pool(Msg msg ) {
+        public static void Pool ( Msg msg ) {
             lock (Instance.mLock) {
                 Instance.mMessages.Enqueue(msg);
             }

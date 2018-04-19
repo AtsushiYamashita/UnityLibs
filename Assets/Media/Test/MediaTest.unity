@@ -259,6 +259,7 @@ GameObject:
   - component: {fileID: 427430785}
   - component: {fileID: 427430784}
   - component: {fileID: 427430783}
+  - component: {fileID: 427430787}
   m_Layer: 0
   m_Name: Quad
   m_TagString: Untagged
@@ -334,6 +335,18 @@ Transform:
   m_Father: {fileID: 1480016189}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &427430787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 427430782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 103ecf8b80ea0d241867e675cc8ad3ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mScale: 1
 --- !u!1 &819257633
 GameObject:
   m_ObjectHideFlags: 0
@@ -507,9 +520,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0ec13f830a1d4f44b7bc666e2a46125, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mTextureScale: 1
   mOpacity: 0.9
-  mRender: {fileID: 427430783}
+  mMeshPrinter: {fileID: 427430787}
   mWakeupOk:
     m_PersistentCalls:
       m_Calls:

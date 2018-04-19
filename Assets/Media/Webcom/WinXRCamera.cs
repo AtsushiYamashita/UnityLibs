@@ -17,31 +17,22 @@ namespace BasicExtends {
     /// <summary>
     /// Unityのオブジェクトと一緒にWinXRのWebCam画像を取得し、
     /// </summary>
-    public class WinXRCamera :IXrCamera{
+    public class WinXRCamera {
         private static CameraParameters mCameraParam;
         private static HardwareCameraWrapper mResolution = new HardwareCameraWrapper();
         private PhotoCapture mCameraInstance = null;
-        private Texture2D mTexture = null;
         private bool mRecMode = false;
         private bool mPhotoWakeupping = false;
         private float mOpacity = 0.9f;
 
         public WinXRCamera () {
             Assert.IsNotNull(mResolution);
-            CreateTexture(mResolution.Width, mResolution.Heignt);
-            Assert.IsNotNull(mTexture);
         }
 
-        public Texture2D GetTexture () {
-            return mTexture;
-        }
-
-        public void Capture ( Action start = null, Action end = null ) {
+        public void Capture (Action<PhotoCaptureFrame> print, Action start = null, Action end = null ) {
             Debug.LogFormat("Capture => {0}", "call 1");
             if (mCameraInstance == null || mRecMode == false) {
-                Debug.LogFormat("Capture => {0}", "call -1");
-                CameraWakeUp(() => { PhotoMode(() => { Capture(); }); });
-                return;
+                throw new Exception();
             }
 
             Debug.LogFormat("Capture => {0}", "call 2");
@@ -52,9 +43,8 @@ namespace BasicExtends {
                 if (result.success == false) { return; }
 
                 if (start != null) { start.Invoke(); }
+                print(captured);
 
-                // ターゲットテクスチャに生画像データをコピーします
-                captured.UploadImageDataToTexture(mTexture);
                 if (end != null) { end.Invoke(); }
             });
         }
@@ -74,11 +64,13 @@ namespace BasicExtends {
             });
         }
 
-        public void PhotoMode ( Action start ) {
+        public void PhotoMode ( MeshPrinter to, Action start ) {
             if (mCameraInstance == null) { return; }
             if (mRecMode == true) { return; }
             Debug.LogFormat("photo mode...");
-            CameraParameters c_param = InitCameraParams(mResolution.GetResolution(), mOpacity);
+            var res = mResolution.GetResolution();
+            CameraParameters c_param = 
+                InitCameraParams(res, mOpacity);
             mCameraInstance.StartPhotoModeAsync(c_param, ( result ) =>
             {
                 mRecMode = result.success;
@@ -88,6 +80,8 @@ namespace BasicExtends {
                     return;
                 }
                 start();
+                Msg.Gen().To(to.gameObject.name).As(to.GetType().Name)
+                .Act("Setup").Set("w", res.width).Set("h", res.height).Push();
             });
         }
 
@@ -111,14 +105,6 @@ namespace BasicExtends {
             CameraRelease(() => { });
         }
 
-        private void CreateTexture ( int w, int h ) {
-            if (mTexture != null) { return; }
-            var tex = new Texture2D(w, h, TextureFormat.ARGB32, false);
-            //var tex = new Texture2D(w, h);
-            tex.filterMode = FilterMode.Bilinear;
-            tex.Apply();
-            mTexture = tex;
-        }
 
         /// <summary>
         /// 画面合成における仮想オブジェクトの非透明度
