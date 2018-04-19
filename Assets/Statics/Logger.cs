@@ -16,7 +16,9 @@ namespace BasicExtends {
             = new Dictionary<string, string>();
 
         private static string LogString ( string str ) {
-            var stack = new System.Diagnostics.StackFrame(3);
+            int look = 3;
+            System.Diagnostics.StackFrame stack = null;
+            while (stack == null) { stack = new System.Diagnostics.StackFrame(look--); }
             if (mStart == 0) { mStart = DateTime.Now.Ticks; }
             var now = (DateTime.Now.Ticks - mStart) / 1000;
             var dt = now - mPrev;
@@ -24,7 +26,7 @@ namespace BasicExtends {
             var dic = new Dictionary<string, string> {
             { "msg", str },
             { "passed", dt +"/" + now},
-            { "stack", stack.GetMethod().Name }
+            { "stack", stack.GetMethod() != null ? stack.GetMethod().Name : "(property?)" }
         };
             return dic.ToJson();
         }
