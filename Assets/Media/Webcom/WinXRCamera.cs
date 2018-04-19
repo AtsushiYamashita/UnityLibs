@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.XR.WSA.WebCam;
@@ -24,12 +25,14 @@ namespace BasicExtends {
         private bool mRecMode = false;
         private bool mPhotoWakeupping = false;
         private float mOpacity = 0.9f;
+        private string mTo = "";
 
-        public WinXRCamera () {
+        public WinXRCamera (string to) {
+            mTo = to;
             Assert.IsNotNull(mResolution);
         }
 
-        public void Capture (Action<PhotoCaptureFrame> print, Action start = null, Action end = null ) {
+        public void Capture ( Action start = null, Action end = null ) {
             Debug.LogFormat("Capture => {0}", "call 1");
             if (mCameraInstance == null || mRecMode == false) {
                 throw new Exception();
@@ -43,7 +46,12 @@ namespace BasicExtends {
                 if (result.success == false) { return; }
 
                 if (start != null) { start.Invoke(); }
-                print(captured);
+
+                List<byte> buf = new List<byte>();
+                captured.CopyRawImageDataIntoBuffer(buf);
+                Msg.Gen().To(mTo).As("MeshPrinter")
+                    .Act("Print")
+                    .SetObjectData(buf).Pool();
 
                 if (end != null) { end.Invoke(); }
             });
@@ -64,7 +72,7 @@ namespace BasicExtends {
             });
         }
 
-        public void PhotoMode ( MeshPrinter to, Action start ) {
+        public void PhotoMode ( Action start ) {
             if (mCameraInstance == null) { return; }
             if (mRecMode == true) { return; }
             Debug.LogFormat("photo mode...");
@@ -79,9 +87,9 @@ namespace BasicExtends {
                     Debug.LogFormat("Start photo mode => faild");
                     return;
                 }
-                start();
-                Msg.Gen().To(to.gameObject.name).As(to.GetType().Name)
+                Msg.Gen().To(mTo).As("MeshPrinter")
                 .Act("Setup").Set("w", res.width).Set("h", res.height).Push();
+                start();
             });
         }
 

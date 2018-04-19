@@ -17,7 +17,7 @@
         private float mOpacity = 0.9f;
 
         [SerializeField]
-        private MeshPrinter mMeshPrinter = null;
+        private string mTo = "";
 
         [SerializeField]
         private UnityEvent mWakeupOk = new UnityEvent();
@@ -33,11 +33,10 @@
         private WinXRCamera mCamera = null;
         private bool mNessClose = false;
 
-
         public void Start () {
-            mCamera = new WinXRCamera();
+            mCamera = new WinXRCamera(mTo);
             mCamera.SetHoloOpacity(mOpacity);
-            Assert.IsNotNull(mMeshPrinter);
+            Assert.IsTrue(mTo.Length > 1);
         }
 
 
@@ -49,7 +48,7 @@
 
         }
         public void CameraPhotoMode_2 () {
-            mCamera.PhotoMode(mMeshPrinter,
+            mCamera.PhotoMode(
                 () => {
                 mStartRecModeOk.Invoke();
             });
@@ -57,7 +56,6 @@
 
         public void CameraShot_3 () {
             mCamera.Capture(
-                mMeshPrinter.Print,
                 () =>
                 {
                     Debug.Log("shot");

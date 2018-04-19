@@ -29,12 +29,17 @@ namespace BasicExtends {
         private void MessengerSetup () {
             Messenger.Assign(( Msg msg ) =>
             {
+                Debug.Log(msg.ToJson());
                 if (msg.Unmatch("to", gameObject.name)) { return; }
                 if (msg.Unmatch("As", GetType().Name)) { return; }
                 if (msg.Match("act", "Setup")) {
                     var w = int.Parse(msg.TryGet("w"));
                     var h = int.Parse(msg.TryGet("h"));
                     Setup(w, h);
+                    return;
+                }
+                if (msg.Match("act", "Print")) {
+                    Print(msg.TryObjectGet<List<byte>>().ToArray());
                     return;
                 }
             });
@@ -82,12 +87,11 @@ namespace BasicExtends {
         }
 
 
-
         public void Print(byte[] argb_bytes ) {
 
-            var bd = BinarySerial.Deserialize<Pair<string, byte []>>(argb_bytes);
-            Debug.Log("bd" + bd.Key);
-            argb_bytes = bd.Value;
+            //var bd = BinarySerial.Deserialize<Pair<string, byte []>>(argb_bytes);
+            //Debug.Log("bd" + bd.Key);
+            //argb_bytes = bd.Value;
 
             int stride = 4;
             float denominator = 1.0f / 255.0f;
