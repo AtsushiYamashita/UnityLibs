@@ -2,6 +2,7 @@
 namespace BasicExtends {
     using System.Collections.Generic;
     using UnityEngine;
+    using UnityEngine.Assertions;
     using System;
 
     /// <summary>
@@ -11,6 +12,15 @@ namespace BasicExtends {
     public class Msg: StringDict {
 
         public static Msg Gen () { return new Msg(); }
+        private object mObjectData = null;
+
+        public Msg SetObjectData(object obj ) {
+            if(mObjectData!= null) {
+                Assert.IsTrue(false, "Cannot over write in msg object");
+                return this; }
+            mObjectData = obj;
+            return this;
+        }
 
         /// <summary>
         /// 値の有無にかかわらずセットする。
@@ -103,6 +113,10 @@ namespace BasicExtends {
             var insideValue = this [key];
             if (insideValue == null) { return string.Empty; }
             return insideValue;
+        }
+
+        public T TryObjectGet<T> () where T:class {
+            return mObjectData as T;
         }
 
         /// <summary>
