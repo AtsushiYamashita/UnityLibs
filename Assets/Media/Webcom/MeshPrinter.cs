@@ -73,12 +73,21 @@ namespace BasicExtends {
         public void Print (PhotoCaptureFrame captured) {
             if (mSetupped == false) { throw new System.Exception("Not setuped yet.");  }
 
+
             List<byte> buf = new List<byte>();
             captured.CopyRawImageDataIntoBuffer(buf);
-            Print(buf.ToArray());
+
+            var b = BinarySerial.Serialize(new Pair<string, byte []>().Set("てすと", buf.ToArray()));
+
+            Print(b);
         }
 
         public void Print(byte[] argb_bytes ) {
+
+            var bd = BinarySerial.Deserialize<Pair<string, byte []>>(argb_bytes);
+            Debug.Log("bd" + bd.Key);
+            argb_bytes = bd.Value;
+
             int stride = 4;
             float denominator = 1.0f / 255.0f;
             List<Color> colorArray = new List<Color>();
@@ -97,6 +106,6 @@ namespace BasicExtends {
             mRender.material.SetTexture("_MainTex", mTexture);
 
         }
-    }
 
+    }
 }
