@@ -27,6 +27,7 @@
         public void Check () {
             var state = Input.GetKey(mTarget) ? 1 : 0;
             var call = mTimingMap [mStatePrev] [state];
+            mStatePrev = state;
             if (mTargetEvent != call) { return; }
             mEvent.Invoke();
         }

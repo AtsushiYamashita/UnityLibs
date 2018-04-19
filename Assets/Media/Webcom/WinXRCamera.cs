@@ -38,8 +38,7 @@ namespace BasicExtends {
 
         public void Capture ( Action start = null, Action end = null ) {
             Debug.LogFormat("Capture => {0}", "call 1");
-            if (mRecMode == false) { return; }
-            if (mCameraInstance == null) {
+            if (mCameraInstance == null || mRecMode == false) {
                 Debug.LogFormat("Capture => {0}", "call -1");
                 CameraWakeUp(() => { PhotoMode(() => { Capture(); }); });
                 return;
