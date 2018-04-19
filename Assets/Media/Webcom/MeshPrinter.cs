@@ -78,9 +78,10 @@ namespace BasicExtends {
             captured.CopyRawImageDataIntoBuffer(buf);
 
             var b = BinarySerial.Serialize(new Pair<string, byte []>().Set("てすと", buf.ToArray()));
-
             Print(b);
         }
+
+
 
         public void Print(byte[] argb_bytes ) {
 
@@ -90,14 +91,23 @@ namespace BasicExtends {
 
             int stride = 4;
             float denominator = 1.0f / 255.0f;
+            int skip = 0;
+            Color preC = new Color(0,0,0,0);
+
             List<Color> colorArray = new List<Color>();
             for (int i = argb_bytes.Length - 1; i >= 0; i -= stride) {
-                float a = (int) (argb_bytes [i - 0]) * denominator;
+                if (skip++ % 4 != 0) {
+                    colorArray.Add(preC);
+                    continue;
+                }
+
+                char added = (char) argb_bytes [i - 0];
+                float a = 0;
                 float r = (int) (argb_bytes [i - 1]) * denominator;
                 float g = (int) (argb_bytes [i - 2]) * denominator;
                 float b = (int) (argb_bytes [i - 3]) * denominator;
-
-                colorArray.Add(new Color(r, g, b, a));
+                preC = new Color(r, g, b, a);
+                colorArray.Add(preC);
             }
 
             mTexture.SetPixels(colorArray.ToArray());
