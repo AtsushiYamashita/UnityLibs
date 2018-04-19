@@ -73,9 +73,29 @@ namespace BasicExtends {
         public void Print (PhotoCaptureFrame captured) {
             if (mSetupped == false) { throw new System.Exception("Not setuped yet.");  }
 
-            // ターゲットテクスチャに生画像データをコピーします
-            captured.UploadImageDataToTexture(mTexture);
+            List<byte> buf = new List<byte>();
+            captured.CopyRawImageDataIntoBuffer(buf);
+            Print(buf.ToArray());
+        }
+
+        public void Print(byte[] argb_bytes ) {
+            int stride = 4;
+            float denominator = 1.0f / 255.0f;
+            List<Color> colorArray = new List<Color>();
+            for (int i = argb_bytes.Length - 1; i >= 0; i -= stride) {
+                float a = (int) (argb_bytes [i - 0]) * denominator;
+                float r = (int) (argb_bytes [i - 1]) * denominator;
+                float g = (int) (argb_bytes [i - 2]) * denominator;
+                float b = (int) (argb_bytes [i - 3]) * denominator;
+
+                colorArray.Add(new Color(r, g, b, a));
+            }
+
+            mTexture.SetPixels(colorArray.ToArray());
+            mTexture.Apply();
+
             mRender.material.SetTexture("_MainTex", mTexture);
+
         }
     }
 
