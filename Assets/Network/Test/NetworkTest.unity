@@ -891,12 +891,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mSended: 0
-  mTo: Client_Send
+  mTo: Receive_Check
   mAs: ActionNode
   mAct: SetState
   mList:
   - state
   - end
+  - Network
+  - true
 --- !u!1 &1341650451
 GameObject:
   m_ObjectHideFlags: 0

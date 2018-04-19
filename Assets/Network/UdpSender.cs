@@ -15,9 +15,9 @@ namespace BasicExtends {
             Messenger.Assign(( Msg msg ) =>
             {
                 if (msg.Match("Network", "true")) {
+                    msg.Set("Network", "false");
                     Debug.Log("msg=" + msg.ToJson());
                     Send(msg);
-                    msg.Set("Network", "false");
                     return;
                 }
                 if (msg.Unmatch("to", "Sender")) { return; }

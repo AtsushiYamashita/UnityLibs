@@ -4,18 +4,43 @@ namespace BasicExtends {
     using UnityEngine;
     using UnityEngine.Assertions;
     using System;
+    using System.Runtime.Serialization;
 
     /// <summary>
     /// 実質的なJSにおけるオブジェクト。
-    /// 
     /// </summary>
-    public class Msg: StringDict {
+    [System.Serializable]
+    public class Msg: StringDict, ISerializable {
+
+        public Msg () { }
+        protected Msg ( SerializationInfo info, StreamingContext context ) {
+            mObjectData = info.GetValue("mObjectData", typeof(object));
+            var count =(int) info.GetValue("count", typeof(int));
+            var s = typeof(string);
+            for (int i = 0; i < count; i++) {
+                var k = (string) info.GetValue("key" + i, s);
+                var v = (string) info.GetValue("val" + i, s);
+                Set(k, v);
+            }
+        }
+
+        public override void GetObjectData ( SerializationInfo info, StreamingContext context ) {
+            info.AddValue("mObjectData", mObjectData, typeof(object));
+            info.AddValue("count", Count, typeof(int));
+            int i = 0;
+            foreach (var p in this) {
+                info.AddValue("key" + i, p.Key, typeof(string));
+                info.AddValue("val" + i, p.Value, typeof(string));
+                i++;
+            }
+        }
 
         public static Msg Gen () { return new Msg(); }
-        private object mObjectData = null;
+        private const string NULL_OBJ = "NULL";
 
+        private object mObjectData = NULL_OBJ;
         public Msg SetObjectData(object obj ) {
-            if(mObjectData!= null) {
+            if(mObjectData!= (object)NULL_OBJ) {
                 Assert.IsTrue(false, "Cannot over write in msg object");
                 return this; }
             mObjectData = obj;

@@ -76,10 +76,12 @@ namespace BasicExtends {
         private static bool OnRecieve ( byte [] receved, IPEndPoint sender ) {
             if (receved.Length < 1) { return false; }
             var msg = BinarySerial.Deserialize<Msg>(receved);
-//            JsonNode json = JsonNode.Parse(str);
-//            var m = Msg.Gen().Set("From", "" + sender.Address.MapToIPv4());
-//           var keys = new string [] { "To", "As", "Act", "Id", "Msg", "Data" };
-//            foreach(var k in keys) {
+            msg.Set("From", "" + sender.Address.MapToIPv4());
+            Debug.Log(msg.ToJson());
+            //            JsonNode json = JsonNode.Parse(str);
+            //            var m = Msg.Gen().Set("From", "" + sender.Address.MapToIPv4());
+            //           var keys = new string [] { "To", "As", "Act", "Id", "Msg", "Data" };
+            //            foreach(var k in keys) {
             //    var uk = k.ToUpper();
             //    var v = json [uk].Get<string>();
             //    m.Set(uk, v);

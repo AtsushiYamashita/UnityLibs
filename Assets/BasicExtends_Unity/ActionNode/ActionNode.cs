@@ -84,6 +84,7 @@ namespace BasicExtends {
                 {
                     if (msg.Unmatch("to", mObjectName)) { return; }
                     if (msg.Unmatch("as", GetType().Name)) { return; }
+                    if (msg.Match("Network", "true")) { return; }
                     if (msg.Match("act", "SetState")) {
                         var state = msg.TryGet("state");
                         SetState(state);
