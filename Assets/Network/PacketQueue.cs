@@ -10,40 +10,29 @@
 
     public class MsgToByte {
         private System.Object mLock = new Object();
-        private Queue<Msg> mQueue = new Queue<Msg>();
+        private Queue<byte[]> mQueue = new Queue<byte []>();
         private static readonly byte [] mZero = new byte [0];
 
-        public void Enqueue ( Msg msg ) {
-            ProtocolCheck(msg);
+        public void Enqueue ( byte [] msg ) {
             lock (mLock) {
                 mQueue.Enqueue(msg);
             }
         }
 
-        private void ProtocolCheck ( Msg msg ) {
-            var target = new string [] {
-                "To","As","Act","Msg","Data","Id"
-            };
-            foreach (var s in target) {
-                if (msg.ContainsKey(s.ToUpper())) { continue; }
-                throw new System.Exception("un formated msg ( " + s + ")" + msg.ToJson());
-            }
-        }
 
         public byte [] Dequeue () {
-            Msg msg = null;
+            byte[] msg = null;
             if (mQueue.Count < 1) { return mZero; }
             lock (mLock) {
-                msg = mQueue.Dequeue();
+                msg = mQueue.Dequeue(); 
             }
             if (msg == null) { return mZero; }
             // Debug.Log("Dequeue ==>" + msg.ToJson());
-            var bytes = Encoding.UTF8.GetBytes(msg.ToJson());
-            return bytes;
+            return msg;
         }
 
         public void Clear () {
-            mQueue = new Queue<Msg>();
+            mQueue = new Queue<byte[]>();
         }
     }
 

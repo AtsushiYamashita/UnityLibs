@@ -58,7 +58,7 @@ namespace BasicExtends {
                 .Set("Msg", message.ToJson())
                 .Set("result", "Success").Pool();
             if (mIsSetuped == false) { return; }
-            mData.DataQueue.MsgToByte.Enqueue(message);
+            mData.DataQueue.MsgToByte.Enqueue(BinarySerial.Serialize(message));
         }
 
         public void Close () {
