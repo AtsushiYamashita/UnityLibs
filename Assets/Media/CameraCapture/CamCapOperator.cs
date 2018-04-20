@@ -11,7 +11,7 @@
         void CameraEnd_4 ();
     }
 
-    public class WinWebCameraCapture: MonoBehaviour, IWebCoBehaviourm {
+    public class CamCapOperator: MonoBehaviour, IWebCoBehaviourm {
 
         [SerializeField]
         private float mOpacity = 0.9f;
@@ -30,11 +30,11 @@
         [SerializeField]
         private UnityEvent mEndRecEvent = new UnityEvent();
 
-        private WinXRCamera mCamera = null;
+        private CaptureCam mCamera = null;
         private bool mNessClose = false;
 
         public void Start () {
-            mCamera = new WinXRCamera(mTo);
+            mCamera = new CaptureCam(mTo);
             mCamera.SetHoloOpacity(mOpacity);
             Assert.IsTrue(mTo.Length > 1);
         }
@@ -75,7 +75,7 @@
             });
         }
 
-        ~WinWebCameraCapture () {
+        ~CamCapOperator () {
             if (mNessClose) { return; }
             mCamera.CameraRelease(() => { mEndRecEvent.Invoke(); });
         }

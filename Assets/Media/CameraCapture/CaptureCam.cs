@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.XR.WSA.WebCam;
+//using Windows.Media.Devices;
+//using System.Runtime.InteropServices;
 
 namespace BasicExtends {
 
     public interface IXrCamera {
-        Texture2D GetTexture ();
         void Capture ( Action start = null, Action end = null );
         void CameraWakeUp ( Action action );
         void PhotoMode ( Action start );
@@ -18,7 +19,7 @@ namespace BasicExtends {
     /// <summary>
     /// Unityのオブジェクトと一緒にWinXRのWebCam画像を取得し、
     /// </summary>
-    public class WinXRCamera {
+    public class CaptureCam : IXrCamera {
         private static CameraParameters mCameraParam;
         private static HardwareCameraWrapper mResolution = new HardwareCameraWrapper();
         private PhotoCapture mCameraInstance = null;
@@ -26,12 +27,18 @@ namespace BasicExtends {
         private bool mPhotoWakeupping = false;
         private float mOpacity = 0.9f;
         private string mTo = "";
+        private const string DATA_MSG_AS = "MessageTransporter";
 
-        public WinXRCamera (string to) {
+        public CaptureCam (string to) {
             mTo = to;
             Assert.IsNotNull(mResolution);
         }
 
+        /// <summary>
+        /// WebCameraとしてカメラ画像をキャプチャする
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
         public void Capture ( Action start = null, Action end = null ) {
             Debug.LogFormat("Capture => {0}", "call 1");
             if (mCameraInstance == null || mRecMode == false) {
@@ -44,13 +51,15 @@ namespace BasicExtends {
             {
                 Debug.LogFormat("Capture => {0}", result.success ? "OK" : "filed");
                 if (result.success == false) { return; }
-
                 if (start != null) { start.Invoke(); }
 
                 List<byte> buf = new List<byte>();
                 captured.CopyRawImageDataIntoBuffer(buf);
-                Msg.Gen().To(mTo).As("MeshPrinter")
+
+                // 撮影データのメッセージ送信
+                Msg.Gen().To(mTo).As(DATA_MSG_AS)
                     .Act("Print")
+                    .Set("Data",buf.Count)
                     .SetObjectData(buf).Pool();
 
                 if (end != null) { end.Invoke(); }
@@ -67,6 +76,11 @@ namespace BasicExtends {
             {
                 mCameraInstance = cameraInstance;
                 mPhotoWakeupping = false;
+
+                //GCHandle campointer = (GCHandle) cameraInstance.GetUnsafePointerToVideoDeviceController();
+                //VideoDeviceController vdc = campointer.Target as VideoDeviceController;
+                //Debug.Log(vdc.GetType());
+
                 Debug.LogFormat("wake up OK");
                 action();
             });
@@ -87,8 +101,12 @@ namespace BasicExtends {
                     Debug.LogFormat("Start photo mode => faild");
                     return;
                 }
-                Msg.Gen().To(mTo).As("MeshPrinter")
-                .Act("Setup").Set("w", res.width).Set("h", res.height).Push();
+
+                // テクスチャセットアップのための解像度通知
+                Msg.Gen().To(mTo).As(DATA_MSG_AS)
+                    .Act("Setup")
+                    .Set("w", res.width)
+                    .Set("h", res.height).Push();
                 start();
             });
         }
@@ -109,7 +127,7 @@ namespace BasicExtends {
             });
         }
 
-        ~WinXRCamera () {
+        ~CaptureCam () {
             CameraRelease(() => { });
         }
 

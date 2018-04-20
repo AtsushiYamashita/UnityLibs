@@ -19,13 +19,13 @@ namespace BasicExtends {
 
         private Func<Resolution, int> mOrderRule = ( res ) =>
         {
-            // Debug.LogFormat("res({0},{1})", res.width, res.height);
+            //Debug.LogFormat("res({0},{1})", res.width, res.height);
             return res.width * res.height;
         };
 
         private Func<Resolution, bool> mWhereRule = ( res ) =>
         {
-            return res.height > 300.0f;
+            return res.height > 10.0f;
         };
 
         public Resolution GetResolution () {

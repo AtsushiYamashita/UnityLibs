@@ -105,7 +105,7 @@ namespace BasicExtends {
                     continue;
                 }
 
-                char added = (char) argb_bytes [i - 0];
+                // char added = (char) argb_bytes [i - 0];
                 float a = 0;
                 float r = (int) (argb_bytes [i - 1]) * denominator;
                 float g = (int) (argb_bytes [i - 2]) * denominator;

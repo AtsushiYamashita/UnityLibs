@@ -59,13 +59,13 @@
         }
     }
 
-    [DataContract][Serializable]
+    [Serializable]
     public class Pair<K, V>: IDictionaryDataConvertable<K, V>, IJsonable
         where V : class {
 
-        [DataMember][SerializeField]
+        [SerializeField]
         private K mKey;
-        [DataMember][SerializeField]
+        [SerializeField]
         private V mValue = null;
         public Pair () { }
         public K Key
