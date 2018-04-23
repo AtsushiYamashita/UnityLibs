@@ -3,7 +3,8 @@ using System.Net;
 
 namespace BasicExtends {
     public class UdpSender: Singleton<UdpSender>, ISender {
-        IConnectionData mData = null;
+        ConnectionData mData = null;
+
         bool mIsSetuped = false;
 
         public UdpSender () {
@@ -30,8 +31,10 @@ namespace BasicExtends {
         }
 
         public void Setup ( string adrs_r ) {
-            mData.Setup(new ConectionThread(), ClientType.Sender, adrs_r);
-            mData.ConnectThread.LaunchThread(mData, SendLoop);
+            mData.Setup(new LoopThread(), ClientType.Sender, adrs_r);
+            mData.ConnectThread
+                .AddContinueableCheck(()=> { return mData.Client != null; })
+                .LaunchThread( SendLoop);
             Msg.Gen().To("Manager")
                 .As("NetworkManager")
                 .Set("type", "SenderSetup")
@@ -40,7 +43,7 @@ namespace BasicExtends {
         }
 
         private void SendLoop () {
-            byte [] buffer = mData.DataQueue.MsgToByte.Dequeue();
+            byte [] buffer = null; //mData.DataQueue.MsgToByte.Dequeue();
             if (buffer.Length < 1) {
                 System.Threading.Thread.Sleep(NetworkUnit.INTERVAL);
                 return;
@@ -58,7 +61,7 @@ namespace BasicExtends {
                 .Set("Msg", message.ToJson())
                 .Set("result", "Success").Pool();
             if (mIsSetuped == false) { return; }
-            mData.DataQueue.MsgToByte.Enqueue(BinarySerial.Serialize(message));
+            // mData.DataQueue.MsgToByte.Enqueue(BinarySerial.Serialize(message));
         }
 
         public void Close () {

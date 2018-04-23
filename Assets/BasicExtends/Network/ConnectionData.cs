@@ -4,8 +4,8 @@ using System;
 using UnityEngine;
 
 namespace BasicExtends {
-    public class ConnectionData: IConnectionData {
-        public static int sBufferSize = 20 * NetworkUnit.KB;
+    public class ConnectionData {
+        public static int sBufferSize = 1 * NetworkUnit.KB;
 
         public IPEndPoint Receiver { private set; get; }
         public IPEndPoint Sender { private set; get; }
@@ -15,15 +15,13 @@ namespace BasicExtends {
         public bool IsReceiver { private set; get; }
         public bool IsConnected { set; get; }
 
-        public PacketQueue DataQueue { set; get; }
-        public INetConnectThread ConnectThread { set; get; }
+        public LoopThread ConnectThread { set; get; }
 
         public ConnectionData () {
-            DataQueue = new PacketQueue();
             Counter = new ThreadsafeCounter();
         }
 
-        public void Setup ( INetConnectThread connector, ClientType type, string ip_r = "" ) {
+        public void Setup ( LoopThread connector, ClientType type, string ip_r = "" ) {
             ConnectThread = connector;
             IsReceiver = type == ClientType.Receiver;
             var address = IPAddress.Parse(IsReceiver ? NetworkUnit.GetLocalIPAddress() : ip_r);

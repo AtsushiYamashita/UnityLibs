@@ -102,166 +102,166 @@ public class StaticJasonTest: TestComponentMulti {
         result.Invoke(Pass());
     }
 
-    public void Parse_OnlyStringTest ( Result result ) {
-        // "s"
-        MultiTask.CountDown(10, ( obj ) =>
-        {
-            result.Invoke(Fail("Time Over"));
-            return MultiTask.End.TRUE;
-        });
+    //public void Parse_OnlyStringTest ( Result result ) {
+    //    // "s"
+    //    MultiTask.CountDown(10, ( obj ) =>
+    //    {
+    //        result.Invoke(Fail("Time Over"));
+    //        return MultiTask.End.TRUE;
+    //    });
 
-        JsonParseData.Parse<string>("\"s\"", ( obj, ret ) =>
-        {
-            if (obj.GetType() != typeof(string)) {
-                result.Invoke(Fail("Illefgurar type " + obj.GetType().Name));
-            }
-            if (obj.Length != 1) {
-                result.Invoke(Fail("Illefgurar element " + obj));
-            }
-            if (obj != "s") {
-                result.Invoke(Fail("Illefgurar element " + obj));
-            }
-            result.Invoke(Pass());
-        });
-    }
+    //    JsonParseData.Parse<string>("\"s\"", ( obj, ret ) =>
+    //    {
+    //        if (obj.GetType() != typeof(string)) {
+    //            result.Invoke(Fail("Illefgurar type " + obj.GetType().Name));
+    //        }
+    //        if (obj.Length != 1) {
+    //            result.Invoke(Fail("Illefgurar element " + obj));
+    //        }
+    //        if (obj != "s") {
+    //            result.Invoke(Fail("Illefgurar element " + obj));
+    //        }
+    //        result.Invoke(Pass());
+    //    });
+    //}
 
-    public void Parse_OnlyArrayTest ( Result result ) {
-        // [1,2,3]
-        MultiTask.CountDown(10, ( obj ) =>
-        {
-            result.Invoke(Fail("Time Over"));
-            return MultiTask.End.TRUE;
-        });
+    //public void Parse_OnlyArrayTest ( Result result ) {
+    //    // [1,2,3]
+    //    MultiTask.CountDown(10, ( obj ) =>
+    //    {
+    //        result.Invoke(Fail("Time Over"));
+    //        return MultiTask.End.TRUE;
+    //    });
 
-        JsonParseData.Parse<Array>("[1,2,3]", ( obj, ret ) =>
-        {
-            if (obj.GetType().IsArray == false) {
-                result.Invoke(Fail("Illefgurar type " + obj.GetType().Name));
-            }
-            if (obj.GetType() != typeof(String [])) {
-                result.Invoke(Fail("Illefgurar type " + obj.GetType().Name));
-            }
-            var strs = (string []) obj;
-            if (strs.Length != 3) {
-                result.Invoke(Fail("Illefgurar element " + obj));
-            }
-            if (strs [0] != "1") {
-                result.Invoke(Fail("Illefgurar element " + obj));
-            }
-            result.Invoke(Pass());
-        });
-    }
+    //    JsonParseData.Parse<Array>("[1,2,3]", ( obj, ret ) =>
+    //    {
+    //        if (obj.GetType().IsArray == false) {
+    //            result.Invoke(Fail("Illefgurar type " + obj.GetType().Name));
+    //        }
+    //        if (obj.GetType() != typeof(String [])) {
+    //            result.Invoke(Fail("Illefgurar type " + obj.GetType().Name));
+    //        }
+    //        var strs = (string []) obj;
+    //        if (strs.Length != 3) {
+    //            result.Invoke(Fail("Illefgurar element " + obj));
+    //        }
+    //        if (strs [0] != "1") {
+    //            result.Invoke(Fail("Illefgurar element " + obj));
+    //        }
+    //        result.Invoke(Pass());
+    //    });
+    //}
 
-    public void Parse_OnlyObjectTest ( Result result ) {
-        // {}
-        MultiTask.CountDown(10, ( obj ) =>
-        {
-            result.Invoke(Fail("Time Over"));
-            return MultiTask.End.TRUE;
-        });
+    //public void Parse_OnlyObjectTest ( Result result ) {
+    //    // {}
+    //    MultiTask.CountDown(10, ( obj ) =>
+    //    {
+    //        result.Invoke(Fail("Time Over"));
+    //        return MultiTask.End.TRUE;
+    //    });
 
-        JsonParseData.Parse<ObjDict>("{}", ( obj, ret ) =>
-        {
-            if (obj.GetType() != typeof(ObjDict)) {
-                result.Invoke(Fail("Illefgurar type " + obj.GetType().Name));
-            }
-            if (obj.Count != 0) {
-                result.Invoke(Fail("Illefgurar element " + obj.Count));
-            }
-            result.Invoke(Pass());
-        });
-    }
+    //    JsonParseData.Parse<ObjDict>("{}", ( obj, ret ) =>
+    //    {
+    //        if (obj.GetType() != typeof(ObjDict)) {
+    //            result.Invoke(Fail("Illefgurar type " + obj.GetType().Name));
+    //        }
+    //        if (obj.Count != 0) {
+    //            result.Invoke(Fail("Illefgurar element " + obj.Count));
+    //        }
+    //        result.Invoke(Pass());
+    //    });
+    //}
 
-    public void Parse_SimpleObjectTest ( Result result ) {
-        // { a:b }
-        MultiTask.CountDown(10, ( obj ) =>
-        {
-            result.Invoke(Fail("Time Over"));
-            return MultiTask.End.TRUE;
-        });
+    //public void Parse_SimpleObjectTest ( Result result ) {
+    //    // { a:b }
+    //    MultiTask.CountDown(10, ( obj ) =>
+    //    {
+    //        result.Invoke(Fail("Time Over"));
+    //        return MultiTask.End.TRUE;
+    //    });
 
-        JsonParseData.Parse<ObjDict>(
-            "{\"a\":\"b\"}", ( obj, ret ) =>
-        {
-            if (ret == false) { return; }
-            if (obj.GetType() != typeof(ObjDict)) {
-                result.Invoke(Fail("Illefgurar type " + obj.GetType().Name));
-            }
-            if (obj.Count != 1) {
-                result.Invoke(Fail("Illefgurar element @count= " + obj.Count));
-            }
-            if (obj.ContainsKey("a") == false) {
-                result.Invoke(Fail("This is not include element"));
-            }
-            JsonParseData.Parse<string>((string) obj ["a"], ( o, r ) =>
-            {
-                if (o != "b") {
-                    result.Invoke(Fail("Illefgurar element " + obj ["a"]));
-                }
-                result.Invoke(Pass());
-            });
-        });
-    }
+    //    JsonParseData.Parse<ObjDict>(
+    //        "{\"a\":\"b\"}", ( obj, ret ) =>
+    //    {
+    //        if (ret == false) { return; }
+    //        if (obj.GetType() != typeof(ObjDict)) {
+    //            result.Invoke(Fail("Illefgurar type " + obj.GetType().Name));
+    //        }
+    //        if (obj.Count != 1) {
+    //            result.Invoke(Fail("Illefgurar element @count= " + obj.Count));
+    //        }
+    //        if (obj.ContainsKey("a") == false) {
+    //            result.Invoke(Fail("This is not include element"));
+    //        }
+    //        JsonParseData.Parse<string>((string) obj ["a"], ( o, r ) =>
+    //        {
+    //            if (o != "b") {
+    //                result.Invoke(Fail("Illefgurar element " + obj ["a"]));
+    //            }
+    //            result.Invoke(Pass());
+    //        });
+    //    });
+    //}
 
-    public void Parse_ObjectTest_2 ( Result result ) {
-        // { a:b, c:d }
-        MultiTask.CountDown(10, ( obj ) =>
-        {
-            result.Invoke(Fail("Time Over"));
-            return MultiTask.End.TRUE;
-        });
+    //public void Parse_ObjectTest_2 ( Result result ) {
+    //    // { a:b, c:d }
+    //    MultiTask.CountDown(10, ( obj ) =>
+    //    {
+    //        result.Invoke(Fail("Time Over"));
+    //        return MultiTask.End.TRUE;
+    //    });
 
-        JsonParseData.Parse<ObjDict>(
-            "{\"a\":\"b\",\"c\":\"d\"}"
-            , ( obj, ret ) =>
-            {
+    //    JsonParseData.Parse<ObjDict>(
+    //        "{\"a\":\"b\",\"c\":\"d\"}"
+    //        , ( obj, ret ) =>
+    //        {
 
-                JsonParseData.Parse<string>((string) obj ["a"], ( o, r ) =>
-                {
-                    if (o == "b") { return; }
-                    result.Invoke(Fail("Illefgurar element " + obj ["a"]));
-                });
+    //            JsonParseData.Parse<string>((string) obj ["a"], ( o, r ) =>
+    //            {
+    //                if (o == "b") { return; }
+    //                result.Invoke(Fail("Illefgurar element " + obj ["a"]));
+    //            });
 
-                JsonParseData.Parse<string>((string) obj ["c"], ( o, r ) =>
-                {
-                    if (o == "d") { return; }
-                    result.Invoke(Fail("Illefgurar element " + obj ["c"]));
-                });
-                result.Invoke(Pass());
-            });
-    }
+    //            JsonParseData.Parse<string>((string) obj ["c"], ( o, r ) =>
+    //            {
+    //                if (o == "d") { return; }
+    //                result.Invoke(Fail("Illefgurar element " + obj ["c"]));
+    //            });
+    //            result.Invoke(Pass());
+    //        });
+    //}
 
-    public void Parse_ArrayIncludeObjectTest ( Result result ) {
-        // { a:[1,2,3], c:d }
-        MultiTask.CountDown(10, ( obj ) =>
-        {
-            result.Invoke(Fail("Time Over"));
-            return MultiTask.End.TRUE;
-        });
+    //public void Parse_ArrayIncludeObjectTest ( Result result ) {
+    //    // { a:[1,2,3], c:d }
+    //    MultiTask.CountDown(10, ( obj ) =>
+    //    {
+    //        result.Invoke(Fail("Time Over"));
+    //        return MultiTask.End.TRUE;
+    //    });
 
-        JsonParseData.Parse<ObjDict>(
-            "{\"a\":\"b\",\"c\":\"d\"}"
-            , ( obj, ret ) =>
-            {
+    //    JsonParseData.Parse<ObjDict>(
+    //        "{\"a\":\"b\",\"c\":\"d\"}"
+    //        , ( obj, ret ) =>
+    //        {
 
-                JsonParseData.Parse<string>((string) obj ["a"], ( o, r ) =>
-                {
-                    if (o != "[1,2,3]") { result.Invoke(Fail("Illefgurar element " + obj ["a"])); }
-                    JsonParseData.Parse<Array>(o, ( arr, re ) => {
+    //            JsonParseData.Parse<string>((string) obj ["a"], ( o, r ) =>
+    //            {
+    //                if (o != "[1,2,3]") { result.Invoke(Fail("Illefgurar element " + obj ["a"])); }
+    //                JsonParseData.Parse<Array>(o, ( arr, re ) => {
 
-                    });
-                });
+    //                });
+    //            });
 
-                JsonParseData.Parse<string>((string) obj ["c"], ( o, r ) =>
-                {
-                    if (o == "d") { return; }
-                    result.Invoke(Fail("Illefgurar element " + obj ["c"]));
-                });
+    //            JsonParseData.Parse<string>((string) obj ["c"], ( o, r ) =>
+    //            {
+    //                if (o == "d") { return; }
+    //                result.Invoke(Fail("Illefgurar element " + obj ["c"]));
+    //            });
 
 
-                result.Invoke(Pass());
-            });
-    }
+    //            result.Invoke(Pass());
+    //        });
+    //}
 
     public void Parse_ObjectIncludeObjectTest ( Result result ) {
         // { a: {c:k, t:y}, c:d }

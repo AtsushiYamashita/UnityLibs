@@ -5,93 +5,35 @@ using UnityEngine.Assertions;
 using System.Collections.Generic;
 using BasicExtends;
 
+/// <summary>
+/// FromJsonNodeから呼ばれることでJsonからオブジェクトを生成するのと同じように使える
+/// </summary>
+public interface IFromJsonNode {
+    void FromJson ( JsonNode node );
+}
+
+public static class FromJsonNode {
+    public static T Parse<T>(this JsonNode node) where T: class, IFromJsonNode {
+        T ret = (T) Activator.CreateInstance(typeof(T), true);
+        if (ret.IsNotNull()) { ret.FromJson(node); }
+        return ret;
+    }
+}
+
 public interface IJsonable {
     string ToJson ();
 }
 
-
-public class JsonParseData: Singleton<JsonParseData> {
-    private StringBuilder mToken;
-    private int mItrIndex = 0;
-    private Dictionary<Type, Func<string, Func<object>, object>>
-        mParsers = new Dictionary<Type, Func<string, Func<object>, object>>();
-
-    private Dictionary<Type, Func<object>>
-        mDefaults = new Dictionary<Type, Func<object>>();
-
-    private ObjDict ObjectParse ( string json, Func<object> def ) {
-        var inside = json.Substring(1, json.Length - 2);
-        var dic = (ObjDict) def();
-        if (inside.Length == 0) { return dic; }
-        var sets = inside.Split(',');
-        foreach (var set in sets) {
-
-            if (set.Contains(":") == false) {
-                throw new Exception("Syntax error (:)=> " + set);
-            }
-            var kv = set.Split(':');
-            dic.Add(kv [0].Substring(1,kv[1].Length-2), kv [1]);
-        }
-        return dic;
-    }
-
-    public JsonParseData () {
-        SetParser<string>(
-            delegate () { return string.Empty; },
-            (json,def)=> {
-                if(json.Contains("\"") == false || json.ToCharArray()[0] != '"') {
-                    throw new Exception("Syntax error (\")=> " + json);
-                }
-                return json.Substring(1, json.Length - 2);
-            });
-
-        // the Array sentence return string[]
-        SetParser<Array>(
-    delegate () { return StArr.To(); },
-    (json,def)=> {
-        if (json.Contains("[") == false || json.ToCharArray() [0] != '[') {
-            throw new Exception("Syntax error ([)=> " + json);
-        }
-        return json.Substring(1, json.Length - 2).Split(',');
-    });
-        SetParser<ObjDict>(
-            delegate () { return new ObjDict(); },
-            ObjectParse);
-    }
-
-    public void SetParser<T> ( Func<object> deflt, Func<string, Func<object>, object> parser ) {
-        mDefaults.TrySet(typeof(T), deflt);
-        mParsers.TrySet(typeof(T), parser);
-    }
-
-    public static void Set<T> ( Func<object> deflt, Func<string, Func<object>, object> parser ) {
-        Instance.SetParser<T>(deflt, parser);
-    }
-
-    internal static void Parse<T> ( string json, Action<T, bool> cb ) {
-        var type = typeof(T);
-        T obj;
-        bool res = true;
-        try {
-            obj = (T) Instance.mParsers [type].Invoke(
-                json, Instance.mDefaults [type]);
-        } catch (Exception) {
-            Debug.Log("test e");
-            obj = (T) Instance.mDefaults [type]();
-            res = false;
-        }
-        cb.Invoke(obj, res);
-    }
-}
-
-
 public class JsonStringify: Singleton<JsonStringify> {
+
     public static string Stringify ( object obj ) {
         var pair = new Pair<object, StringBuilder>().Set(obj, new StringBuilder());
         Instance.mStringifyMethods.Invoke(pair);
         return pair.Value.ToString();
     }
+
     private MethodChain<Pair<object, StringBuilder>> mStringifyMethods = new MethodChain<Pair<object, StringBuilder>>();
+
     private JsonStringify () {
         AddMethod(( pair ) =>
         {
@@ -135,6 +77,22 @@ public class JsonStringify: Singleton<JsonStringify> {
 
         AddMethod(( pair ) =>
         {
+            var jsonable = pair.Key as IJsonable;
+            if (jsonable.IsNull()) { return false; }
+            pair.Value.Append(jsonable.ToJson());
+            return true;
+        });
+
+        AddMethod(( pair ) =>
+        {
+            var jsonable = pair.Key as Transform;
+            if (jsonable.IsNull()) { return false; }
+            pair.Value.Append(Trfm.Convert(jsonable).ToJson());
+            return true;
+        });
+
+        AddMethod(( pair ) =>
+        {
             var obj = pair.Key as ObjDict;
             if (obj.IsNull()) { return false; }
             var dic = new Dictionary<string, string>();
@@ -157,6 +115,7 @@ public class JsonStringify: Singleton<JsonStringify> {
         }.ToJson());
             return true;
         });
+
     }
 
     public string ToString ( Pair<object, StringBuilder> obj ) {
@@ -165,11 +124,11 @@ public class JsonStringify: Singleton<JsonStringify> {
             { "class", this.GetType().Name }
         }.ToJson();
     }
+
     public void AddMethod ( Func<Pair<object, StringBuilder>, bool> action ) {
         if (mStringifyMethods.GetProcessHolder().Contains(action)) { return; }
         mStringifyMethods.GetProcessHolder().Add(action);
     }
-
 }
 
 /// <summary>

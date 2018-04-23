@@ -5,11 +5,6 @@ using System.Net.Sockets;
 
 namespace BasicExtends {
 
-    public interface INetConnectThread {
-        bool LaunchThread ( IConnectionData data, Action action );
-        bool IsLooping { set; get; }
-        void ThreadStop ();
-    }
 
     public interface IReceiver {
         bool StartServer (  );
@@ -35,10 +30,9 @@ namespace BasicExtends {
         bool IsReceiver { get; }
         bool IsConnected { set; get; }
 
-        PacketQueue DataQueue { set; get; }
-        INetConnectThread ConnectThread { set; get; }
+        LoopThread ConnectThread { set; get; }
 
-        void Setup ( INetConnectThread connector, ClientType type, string ip_r = "" );
+        void Setup ( LoopThread connector, ClientType type, string ip_r = "" );
         void ClientLifeCheck ();
         void Disconnect ();
     }

@@ -81,6 +81,10 @@ namespace BasicExtends {
             return Set("msg", v);
         }
 
+        public Msg Netwrok(string ip, int port ) {
+            return Set("Network", "True").Set("ToIp", ip).Set("port", port);
+        }
+
         /// <summary>
         /// when key-value is matched, then this function return true.
         /// </summary>

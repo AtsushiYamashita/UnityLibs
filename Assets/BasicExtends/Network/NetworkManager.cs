@@ -1,10 +1,6 @@
 ﻿using UnityEngine;
 using BasicExtends;
 
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-
 public class NetworkManager: MonoBehaviour {
 
     public IReceiver mReceiver;

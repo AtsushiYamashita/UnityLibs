@@ -7,7 +7,7 @@ namespace BasicExtends {
 
     [Serializable]
     public class UdpReceiver: Singleton<UdpReceiver>,IReceiver {
-        IConnectionData mData = null;
+        ConnectionData mData = null;
 
         private UdpReceiver () {
             mData = new ConnectionData();
@@ -39,7 +39,7 @@ namespace BasicExtends {
             }
 
             try {
-                mData.Setup(new ConectionThread(), ClientType.Receiver);
+                mData.Setup(new LoopThread(), ClientType.Receiver);
             } catch (Exception e) {
                 Msg.Gen().To("Manager").As("NetworkManager")
                     .Set("type", "StartServer")
@@ -53,7 +53,10 @@ namespace BasicExtends {
             Msg.Gen().To("Manager").As("NetworkManager")
                 .Set("type", "StartServer")
                 .Set("result", "Success").Push();
-            return mData.ConnectThread.LaunchThread(mData,ReceiveLoop);
+            mData.ConnectThread
+                .AddContinueableCheck(() => { return mData.Client != null; })
+                .LaunchThread(ReceiveLoop);
+            return true;
         }
 
         public void StopServer () {

@@ -93,9 +93,8 @@ namespace BasicExtends {
 
                 var keyContained = mDatas.ContainsKey(key);
                 if (keyContained) {
-                    var old = mDatas [key].Object;
-                    var isKeyUsed = old != data.Object;
-                    string str = string.Format("The key:{0} is used by {1},{2}", key, old, data.Object);
+                    string str = string.Format("The key:{0} is used by {1},{2}"
+                        , key, mDatas [key].Object, data.Object);
                     throw new System.Exception(str);
                 }
                 mDatas.TrySet(key, data);
