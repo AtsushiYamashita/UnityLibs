@@ -1,14 +1,20 @@
 ﻿using UnityEngine;
 using System.Net;
+using System.Net.Sockets;
 
 namespace BasicExtends {
     public class UdpSender: Singleton<UdpSender>, ISender {
-        ConnectionData mData = null;
+
+        public UdpClient mSendClient = null;
+        private LoopThread mLoop;
+        private IPEndPoint mSendTo;
+        private ThreadsafeCounter mSendId = new ThreadsafeCounter();
+        private SafeAccessList<byte[]> mMsgList = new SafeAccessList<byte[]>();
 
         bool mIsSetuped = false;
 
         public UdpSender () {
-            mData = new ConnectionData();
+            mLoop = new LoopThread();
             MessengerSetup();
         }
 
@@ -18,7 +24,7 @@ namespace BasicExtends {
                 if (msg.Match("Network", "true")) {
                     msg.Set("Network", "false");
                     //Debug.Log("send msg=" + msg.ToJson());
-                    Send(msg);
+                    SendStack(msg);
                     return;
                 }
                 if (msg.Unmatch("to", "Sender")) { return; }
@@ -31,10 +37,10 @@ namespace BasicExtends {
         }
 
         public void Setup ( string adrs_r ) {
-            mData.Setup(new LoopThread(), ClientType.Sender, adrs_r);
-            mData.ConnectThread
-                .AddContinueableCheck(()=> { return mData.Client != null; })
-                .LaunchThread( SendLoop);
+            mSendTo = new IPEndPoint(IPAddress.Parse(adrs_r), NetworkUnit.DEFAULT_PORT_R);
+            mSendClient = new UdpClient(new IPEndPoint(IPAddress.Any, NetworkUnit.DEFAULT_PORT_S));
+            mLoop.AddContinueableCheck(() => { return mSendClient != null; })
+                .LaunchThread(SendLoop);
             Msg.Gen().To("Manager")
                 .As("NetworkManager")
                 .Set("type", "SenderSetup")
@@ -42,31 +48,39 @@ namespace BasicExtends {
             mIsSetuped = true;
         }
 
+
+
         private void SendLoop () {
-            byte [] buffer = null; //mData.DataQueue.MsgToByte.Dequeue();
-            if (buffer.Length < 1) {
+            byte [] buffer = mMsgList.Pop();
+            if (buffer == null || buffer.Length < 1) {
+
                 System.Threading.Thread.Sleep(NetworkUnit.INTERVAL);
                 return;
             }
-            mData.Client.Send(buffer, buffer.Length, mData.Receiver);
-            mData.Counter.Increment();
+            mSendClient.Send(buffer, buffer.Length, mSendTo);
+            Msg.Gen().To("Manager")
+                .As("NetworkManager")
+                .Set("type", "Sender@SendLoop")
+                .Set("result", "Success").Pool();
         }
 
-        private void Send ( Msg message ) {
+        private void SendStack ( Msg message ) {
             message = message
-                .Set("Id", "" + mData.Counter.Get());
+                .Set("Id", "" + mSendId.Get());
+            mSendId.Increment();
             Msg.Gen().To("Manager")
                 .As("NetworkManager")
                 .Set("type", "Sender@Send")
                 .Set("Msg", message.ToJson())
-                .Set("result", "Success").Pool();
+                .Set("StackCount", mMsgList.Count())
+                .Set("result", "Success").Push();
             if (mIsSetuped == false) { return; }
-            // mData.DataQueue.MsgToByte.Enqueue(BinarySerial.Serialize(message));
+            mMsgList.Add(BinarySerial.Serialize(message));
         }
 
         public void Close () {
-            mData.Client.Close();
-            mData.ConnectThread.ThreadStop();
+            mSendClient.Close();
+            mLoop.ThreadStop();
         }
     }
 }

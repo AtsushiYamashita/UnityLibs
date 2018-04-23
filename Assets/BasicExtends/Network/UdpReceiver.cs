@@ -1,16 +1,17 @@
 ﻿using UnityEngine;
 using System;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 
 namespace BasicExtends {
 
     [Serializable]
     public class UdpReceiver: Singleton<UdpReceiver>,IReceiver {
-        ConnectionData mData = null;
+        LoopThread mLoop;
+        UdpClient mClient;
 
         private UdpReceiver () {
-            mData = new ConnectionData();
             MessengerSetup();
         }
 
@@ -39,7 +40,9 @@ namespace BasicExtends {
             }
 
             try {
-                mData.Setup(new LoopThread(), ClientType.Receiver);
+                mLoop = new LoopThread();
+                mClient = new UdpClient(new IPEndPoint(IPAddress.Parse(
+                    NetworkUnit.GetLocalIPAddress()), NetworkUnit.DEFAULT_PORT_R));
             } catch (Exception e) {
                 Msg.Gen().To("Manager").As("NetworkManager")
                     .Set("type", "StartServer")
@@ -49,18 +52,17 @@ namespace BasicExtends {
                 return false;
             }
 
-            mData.IsConnected = true;
             Msg.Gen().To("Manager").As("NetworkManager")
                 .Set("type", "StartServer")
                 .Set("result", "Success").Push();
-            mData.ConnectThread
-                .AddContinueableCheck(() => { return mData.Client != null; })
+            mLoop
+                .AddContinueableCheck(() => { return mClient != null; })
                 .LaunchThread(ReceiveLoop);
             return true;
         }
 
         public void StopServer () {
-            mData.ConnectThread.ThreadStop();
+            mLoop.ThreadStop();
         }
 
         /// <summary>
@@ -68,9 +70,8 @@ namespace BasicExtends {
         /// スレッド側で実行させる
         /// </summary>
         public void ReceiveLoop () {
-            
-            var sender = mData.Sender;
-            var buffer = mData.Client.Receive(ref sender);
+            var sender = new IPEndPoint(IPAddress.Any, NetworkUnit.DEFAULT_PORT_S);
+            var buffer = mClient.Receive(ref sender);
 
             // Receive イベント を実行
             OnRecieve(buffer, sender);
@@ -94,8 +95,8 @@ namespace BasicExtends {
         }
 
         public void Close () {
-            mData.Client.Close();
-            mData.ConnectThread.ThreadStop();
+            mClient.Close();
+            mLoop.ThreadStop();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace BasicExtends {
     using System;
+    using UnityEngine;
 
     /// <summary>
     /// スレッドセーフな値を作り、関数経由で処理を行うようにする
@@ -12,7 +13,6 @@
         object mLock = new object();
         [NonSerialized]
         private T mValue;
-        public T Val { get; }
 
         public SafeAccessValue<T> Action ( Func<T, T> func ) {
             var temp = func(mValue);
@@ -24,7 +24,12 @@
 
         public SafeAccessValue<T> Set ( T t ) {
             Action(( val ) => { return t; });
+            Debug.Log(mValue);
             return this;
+        }
+
+        public T Get () {
+            return mValue;
         }
     }
 }

@@ -23,7 +23,7 @@ public class NetworkManager: MonoBehaviour {
                 return;
             }
             if (msg.Match("result", "Success") ) {
-                //Debug.Log(msg.Stringify()); // for debug
+                Debug.Log(msg.Stringify()); // for debug
                 return;
             }
             if (msg.ContainsKey("From")) {

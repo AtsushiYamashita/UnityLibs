@@ -11,7 +11,7 @@
     public class LoopThread {
 
         private SafeAccessValue<bool> mLoop = new SafeAccessValue<bool>();
-        public bool CanLoop { private set { mLoop.Set(value); } get { return mLoop.Val; } }
+        public bool CanLoop { private set { mLoop.Set(value); } get { return mLoop.Get(); } }
 
         protected Thread mThread = null;
         private int mSleepTime = 1;
@@ -63,6 +63,7 @@
             try {
                 CanLoop = true;
                 mThread = new Thread(ThreadLoop);
+                Debug.Log("TEst sdfsd=" + CanLoop);
                 mThread.Start();
             } catch {
                 CanLoop = false;

@@ -33,7 +33,7 @@
                     .As(GetType().Name)
                     .Act("Sync")
                     .Netwrok(ip, port)
-                    .SetObjectData(Trfm.Convert(transform)).Push();
+                    .SetObjectData(Trfm.Convert(transform)).Pool();
                 return MultiTask.End.FALSE;
             });
 
