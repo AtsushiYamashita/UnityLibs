@@ -44,6 +44,7 @@
                     continue;
                 }
                 msg.Set(k, p);
+                k = null;
             }
             Debug.Log("     --2---    " + msg.ToJson());
         }

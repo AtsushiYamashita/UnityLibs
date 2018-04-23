@@ -39,6 +39,7 @@ namespace BasicExtends {
                     return;
                 }
                 if (msg.Match("act", "Print")) {
+                    Debug.Log("msg.Match(act, Print))");
                     Print(msg.TryObjectGet<List<byte>>().ToArray());
                     return;
                 }
