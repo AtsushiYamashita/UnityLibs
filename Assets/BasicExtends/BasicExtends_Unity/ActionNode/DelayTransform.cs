@@ -70,7 +70,8 @@
 
         private void DelayMove ( Vec3 vec, int time =  -1) {
             var t = time != -1 ? time : mDefaultTime;
-            var v = new Vector3(vec.X / t, vec.Y / t, vec.Z / t);
+            var d = vec.Convert() - transform.localPosition;
+            var v = new Vector3(d.x / t, d.y / t, d.z / t);
             MultiTask.Push(( obj ) =>
             {
                 t--;
@@ -83,7 +84,8 @@
 
         private void DelayRotate ( Vec3 vec, int time = 0 ) {
             var t = time != -1 ? time : mDefaultTime;
-            var v = new Vector3(vec.X / t, vec.Y / t, vec.Z / t);
+            var d = vec.Convert() - transform.localEulerAngles;
+            var v = new Vector3(d.x / t, d.y / t, d.z / t);
             MultiTask.Push(( obj ) =>
             {
                 t--;
@@ -95,13 +97,14 @@
 
         private void DelayScale ( Vec3 vec, int time  = 0) {
             var t = time != -1 ? time : mDefaultTime;
-            var v = new Vector3(vec.X / t, vec.Y / t, vec.Z / t);
+            var d = vec.Convert() - transform.localScale;
+            var v = new Vector3(d.x / t, d.y / t, d.z / t);
             MultiTask.Push(( obj ) =>
             {
                 t--;
                 if (t == 0) { return MultiTask.End.TRUE; }
                 var loc = transform.localScale;
-                transform.localPosition = loc + v;
+                transform.localScale = loc + v;
                 return MultiTask.End.FALSE;
             });
         }
