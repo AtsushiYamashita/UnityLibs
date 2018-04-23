@@ -17,7 +17,7 @@ namespace BasicExtends {
             {
                 if (msg.Match("Network", "true")) {
                     msg.Set("Network", "false");
-                    Debug.Log("msg=" + msg.ToJson());
+                    //Debug.Log("send msg=" + msg.ToJson());
                     Send(msg);
                     return;
                 }

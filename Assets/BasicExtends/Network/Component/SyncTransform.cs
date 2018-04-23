@@ -43,6 +43,7 @@
         private void MessengerSetup () {
             Messenger.Assign(( Msg msg ) =>
             {
+                Debug.Log("msg" + msg.ToJson());
                 if (msg.Match("Network", "true")) { return; }
                 if (msg.Unmatch("to", gameObject.name)) { return; }
                 if (msg.Unmatch("as", GetType().Name)) { return; }
@@ -55,6 +56,7 @@
         }
 
         private void Sync ( Trfm rec ) {
+            Debug.Log("test");
             Msg.Gen().To(gameObject.name)
                 .As("DelayTransform")
                 .Act("DelayTrans")

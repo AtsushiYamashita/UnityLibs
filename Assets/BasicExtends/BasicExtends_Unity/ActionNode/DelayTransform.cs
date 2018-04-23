@@ -16,6 +16,10 @@
             MessengerSetup();
         }
 
+        private void Reset () {
+            mTarget = transform;
+        }
+
         private void MessengerSetup () {
             Messenger.Assign(( Msg msg ) =>
             {
