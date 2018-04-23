@@ -63,7 +63,6 @@
             try {
                 CanLoop = true;
                 mThread = new Thread(ThreadLoop);
-                Debug.Log("TEst sdfsd=" + CanLoop);
                 mThread.Start();
             } catch {
                 CanLoop = false;

@@ -7,18 +7,22 @@ using System.Text;
 namespace BasicExtends {
 
     [Serializable]
-    public class UdpReceiver: Singleton<UdpReceiver>,IReceiver {
+    public class UdpReceiver : MonoBehaviour {
         LoopThread mLoop;
         UdpClient mClient;
 
-        private UdpReceiver () {
+        [SerializeField]
+        private int mObservePort = NetworkUnit.DEFAULT_PORT_R;
+
+        private void Start () {
             MessengerSetup();
         }
 
         private void MessengerSetup () {
             Messenger.Assign(( Msg msg ) =>
             {
-                if (msg.Unmatch("to", "Sender")) { return; }
+                if (msg.Unmatch("to", gameObject.name)) { return; }
+                if (msg.Unmatch("as", "UdpReceiver")) { return; }
                 if (msg.Match("act", "Start")) {
                     StartServer();
                     return;
@@ -42,7 +46,7 @@ namespace BasicExtends {
             try {
                 mLoop = new LoopThread();
                 mClient = new UdpClient(new IPEndPoint(IPAddress.Parse(
-                    NetworkUnit.GetLocalIPAddress()), NetworkUnit.DEFAULT_PORT_R));
+                    NetworkUnit.GetLocalIPAddress()),mObservePort ));
             } catch (Exception e) {
                 Msg.Gen().To("Manager").As("NetworkManager")
                     .Set("type", "StartServer")
@@ -70,7 +74,7 @@ namespace BasicExtends {
         /// スレッド側で実行させる
         /// </summary>
         public void ReceiveLoop () {
-            var sender = new IPEndPoint(IPAddress.Any, NetworkUnit.DEFAULT_PORT_S);
+            var sender = new IPEndPoint(IPAddress.Any, 0);
             var buffer = mClient.Receive(ref sender);
 
             // Receive イベント を実行
@@ -80,17 +84,8 @@ namespace BasicExtends {
         private static bool OnRecieve ( byte [] receved, IPEndPoint sender ) {
             if (receved.Length < 1) { return false; }
             var msg = BinarySerial.Deserialize<Msg>(receved);
-            msg.Set("From", "" + sender.Address.MapToIPv4());
+            msg.Set("From", "" + sender.Address.MapToIPv4()).Pool();
             Debug.Log(msg.ToJson());
-            //            JsonNode json = JsonNode.Parse(str);
-            //            var m = Msg.Gen().Set("From", "" + sender.Address.MapToIPv4());
-            //           var keys = new string [] { "To", "As", "Act", "Id", "Msg", "Data" };
-            //            foreach(var k in keys) {
-            //    var uk = k.ToUpper();
-            //    var v = json [uk].Get<string>();
-            //    m.Set(uk, v);
-            //}
-            msg.Pool();
             return true;
         }
 

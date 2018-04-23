@@ -448,12 +448,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mSended: 0
-  mTo: Sender
-  mAs: 
+  mTo: Manager
+  mAs: Sender
   mAct: Setup
-  mList:
-  - adrs_r
-  - 192.168.0.55
+  mList: []
 --- !u!1 &518668991
 GameObject:
   m_ObjectHideFlags: 0
@@ -1102,12 +1100,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mSended: 0
-  mTo: Sender
-  mAs: 
+  mTo: Manager
+  mAs: UdpReceiver
   mAct: Start
-  mList:
-  - adrs_r
-  - 192.168.0.55
+  mList: []
 --- !u!1 &1792340551
 GameObject:
   m_ObjectHideFlags: 0
@@ -1184,6 +1180,8 @@ GameObject:
   - component: {fileID: 1909269234}
   - component: {fileID: 1909269236}
   - component: {fileID: 1909269237}
+  - component: {fileID: 1909269239}
+  - component: {fileID: 1909269238}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -1237,6 +1235,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d012d3f421a38748888afa9b2400f21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1909269238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1909269233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6eb1d13d4f5d2c4483b72d0d174563b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mUsePort: 8000
+  mToPort: 8001
+  mToAddress: 192.168.0.126
+--- !u!114 &1909269239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1909269233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 655eabdc2f5b67f4b9298e1851ce4adf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObservePort: 8001
 --- !u!1 &1980921200
 GameObject:
   m_ObjectHideFlags: 0

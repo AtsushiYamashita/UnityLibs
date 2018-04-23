@@ -24,7 +24,6 @@
 
         public SafeAccessValue<T> Set ( T t ) {
             Action(( val ) => { return t; });
-            Debug.Log(mValue);
             return this;
         }
 

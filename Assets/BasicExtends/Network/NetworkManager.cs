@@ -3,13 +3,7 @@ using BasicExtends;
 
 public class NetworkManager: MonoBehaviour {
 
-    public IReceiver mReceiver;
-    public ISender mSender;
-
     private void Start () {
-        mReceiver = UdpReceiver.Instance;
-        mSender = UdpSender.Instance;
-
         MessengerSetup();
     }
 
@@ -37,16 +31,8 @@ public class NetworkManager: MonoBehaviour {
         Messenger.Flash();
     }
 
-    public void SenderSetup (string adres_r) {
-        mSender.Setup(adres_r);
-    }
-
     private void FailEvent ( Msg msg ) {
         Debug.Log(msg.Stringify());
     }
 
-    public void ConnectionClose () {
-        mReceiver.Close();
-        mSender.Close();
-    }
 }

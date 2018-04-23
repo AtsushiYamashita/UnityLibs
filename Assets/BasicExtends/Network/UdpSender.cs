@@ -3,18 +3,24 @@ using System.Net;
 using System.Net.Sockets;
 
 namespace BasicExtends {
-    public class UdpSender: Singleton<UdpSender>, ISender {
+    public class UdpSender: MonoBehaviour {
 
         public UdpClient mSendClient = null;
         private LoopThread mLoop;
-        private IPEndPoint mSendTo;
+        private SafeAccessValue<IPEndPoint> mSendTo = new SafeAccessValue<IPEndPoint>();
         private ThreadsafeCounter mSendId = new ThreadsafeCounter();
         private SafeAccessList<byte[]> mMsgList = new SafeAccessList<byte[]>();
 
+        [SerializeField]
+        private int mUsePort = NetworkUnit.DEFAULT_PORT_S;
+        [SerializeField]
+        private int mToPort = NetworkUnit.DEFAULT_PORT_R;
+        [SerializeField]
+        private string mToAddress = "";
+
         bool mIsSetuped = false;
 
-        public UdpSender () {
-            mLoop = new LoopThread();
+        private void Start () {
             MessengerSetup();
         }
 
@@ -23,22 +29,39 @@ namespace BasicExtends {
             {
                 if (msg.Match("Network", "true")) {
                     msg.Set("Network", "false");
-                    //Debug.Log("send msg=" + msg.ToJson());
                     SendStack(msg);
                     return;
                 }
-                if (msg.Unmatch("to", "Sender")) { return; }
+                if (msg.Unmatch("to", gameObject.name)) { return; }
+                if (msg.Unmatch("As", "Sender")) { return; }
                 if (msg.Match("act", "Setup")) {
-                    var adrs_r = msg.TryGet("adrs_r");
-                    Setup(adrs_r);
+                    Setup();
                     return;
+                }
+                if(msg.Match("ack", "SetUsePort")) {
+                    var port = int.Parse(msg.TryGet("port"));
+                    SetUsePort(port);
+                }
+                if (msg.Match("ack", "SetSendPort")) {
+                    var port = int.Parse(msg.TryGet("port"));
+                    SetSendPort(port);
                 }
             });
         }
 
-        public void Setup ( string adrs_r ) {
-            mSendTo = new IPEndPoint(IPAddress.Parse(adrs_r), NetworkUnit.DEFAULT_PORT_R);
-            mSendClient = new UdpClient(new IPEndPoint(IPAddress.Any, NetworkUnit.DEFAULT_PORT_S));
+        public void SetUsePort (int port) {
+            mUsePort = port;
+        }
+
+        public void SetSendPort ( int port ) {
+            mToPort = port;
+            mSendTo.Set( new IPEndPoint(IPAddress.Parse(mToAddress), mToPort));
+        }
+
+        public void Setup (  ) {
+            mLoop = new LoopThread();
+            mSendTo.Set(new IPEndPoint(IPAddress.Parse(mToAddress), mToPort));
+            mSendClient = new UdpClient(new IPEndPoint(IPAddress.Any, mUsePort));
             mLoop.AddContinueableCheck(() => { return mSendClient != null; })
                 .LaunchThread(SendLoop);
             Msg.Gen().To("Manager")
@@ -48,8 +71,6 @@ namespace BasicExtends {
             mIsSetuped = true;
         }
 
-
-
         private void SendLoop () {
             byte [] buffer = mMsgList.Pop();
             if (buffer == null || buffer.Length < 1) {
@@ -57,7 +78,7 @@ namespace BasicExtends {
                 System.Threading.Thread.Sleep(NetworkUnit.INTERVAL);
                 return;
             }
-            mSendClient.Send(buffer, buffer.Length, mSendTo);
+            mSendClient.Send(buffer, buffer.Length, mSendTo.Get());
             Msg.Gen().To("Manager")
                 .As("NetworkManager")
                 .Set("type", "Sender@SendLoop")
