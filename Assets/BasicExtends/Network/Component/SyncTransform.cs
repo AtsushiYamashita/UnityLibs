@@ -18,6 +18,14 @@
         [SerializeField]
         private string mSyncTo = "";
 
+        private float mCutoff = 0.05f;
+        private float mMoveOnFrame = 0.8f;
+
+        Vector3 mPos = Vector3.zero;
+        Vector3 mRot = Vector3.zero;
+        Vector3 mSca = Vector3.zero;
+
+
         void Reset () {
             mSyncTo = name;
         }
@@ -29,7 +37,7 @@
                     return MultiTask.End.FALSE;
                 }
                 Msg.Gen()
-                    .To( mSyncTo )
+                    .To(mSyncTo)
                     .As(GetType().Name)
                     .Act("Sync")
                     .Netwrok(ip, port)
@@ -54,12 +62,25 @@
             });
         }
 
+        private Vector3 VecFill ( Vector3 to, Vector3 local ) {
+            if (to == Vector3.zero) { return local; }
+            if (transform.localPosition == to) { return local; }
+            var dif = to - local;
+            var move = dif * mMoveOnFrame;
+            return move.magnitude > mCutoff ? move + local : to;
+        }
+
         private void Sync ( Trfm rec ) {
-            Msg.Gen().To(gameObject.name)
-                .As("DelayTransform")
-                .Act("DelayTrans")
-                .Set("time",mPase)
-                .SetObjectData(rec).Push();
+            mPos = rec.POS.Convert();
+            mRot = rec.ROT.Convert();
+            mSca = rec.SCA.Convert();
+
+        }
+
+        private void Update () {
+            transform.localPosition = VecFill(mPos, transform.localPosition);
+            transform.localEulerAngles = VecFill(mRot, transform.localEulerAngles);
+            transform.localScale = VecFill(mSca, transform.localScale);
         }
     }
 
