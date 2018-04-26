@@ -27,11 +27,11 @@
             return this;
         }
         public ByteList Insert<T> ( int index, T obj ) {
-            InsertRange(index, Serializer.Serialize(obj));
+            InsertRange(index, (IEnumerable<byte>)Serializer.Serialize(obj));
             return this;
         }
         public ByteList AddHead<T> ( T obj ) {
-            InsertRange(0, Serializer.Serialize(obj));
+            InsertRange(0, (IEnumerable<byte>) Serializer.Serialize(obj));
             return this;
         }
 
@@ -79,5 +79,4 @@
             return this;
         }
     }
-
 }

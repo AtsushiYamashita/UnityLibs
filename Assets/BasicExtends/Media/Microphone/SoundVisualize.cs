@@ -9,7 +9,7 @@
     public class SoundVisualize: MonoBehaviour {
 
         void Start () {
-            var m = GetComponent<Renderer>();
+            //var m = GetComponent<Renderer>();
 
         }
 
