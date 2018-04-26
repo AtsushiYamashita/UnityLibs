@@ -96,7 +96,7 @@ namespace BasicExtends {
                 .Set("StackCount", mMsgList.Count())
                 .Set("result", "Success").Push();
             if (mIsSetuped == false) { return; }
-            mMsgList.Add(BinarySerial.Serialize(message));
+            mMsgList.Add(Serializer.Serialize(message).ToArray());
         }
 
         public void Close () {

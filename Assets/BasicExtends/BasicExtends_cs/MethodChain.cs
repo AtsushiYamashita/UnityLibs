@@ -41,13 +41,18 @@
 
         /// <summary>
         /// 名前がGetListでないのは、
-        /// 高速化のためにDictionaryで処理する場合もあろうくらいの考えです。
+        /// 高速化のためにDictionaryで処理する場合もあるかな、と。
+        /// trueを返せば終了
         /// </summary>
         /// <returns></returns>
         public List<Func<A, bool>> GetProcessHolder () {
             return mList;
         }
 
+        /// <summary>
+        /// trueを返せば終了
+        /// </summary>
+        /// <param name="action"></param>
         public void SetDefault ( Func<A, bool> action ) {
             mDefault = action;
         }

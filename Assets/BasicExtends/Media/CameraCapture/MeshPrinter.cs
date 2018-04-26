@@ -83,8 +83,8 @@ namespace BasicExtends {
             List<byte> buf = new List<byte>();
             captured.CopyRawImageDataIntoBuffer(buf);
 
-            var b = BinarySerial.Serialize(new Pair<string, byte []>().Set("てすと", buf.ToArray()));
-            Print(b);
+            var b = Serializer.Serialize(new Pair<string, byte []>().Set("てすと", buf.ToArray()));
+            Print(b.ToArray());
         }
 
 

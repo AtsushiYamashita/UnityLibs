@@ -1273,7 +1273,6 @@ GameObject:
   - component: {fileID: 1980921203}
   - component: {fileID: 1980921202}
   - component: {fileID: 1980921206}
-  - component: {fileID: 1980921205}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -1347,19 +1346,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1980921200}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1980921205
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1980921200}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41dbdce86f2ce0b4abeaf68c28e3ba5c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mTarget: {fileID: 1980921201}
-  mDefaultTime: 3
 --- !u!114 &1980921206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1373,7 +1359,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ip: 0
   port: 0
-  mPase: 30
+  mPase: 3
   mSyncTo: Sphere
 --- !u!1 &2019568680
 GameObject:
