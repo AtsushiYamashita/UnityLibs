@@ -9,8 +9,6 @@
         /// </summary>
         /// <param name="length"></param>
         /// <returns></returns>
-        TimeWhileEventCaller SetRecLength ( int length );
-        TimeWhileEventCaller Push ();
         List<TimedTrfm> Get ();
         Trfm Delta ( int a, int b );
         Trfm DeltaAvarage ( int a, int b );

@@ -8,7 +8,7 @@ using BasicExtends;
 
 namespace BasicExtends {
 
-    namespace ActionNode {
+    namespace StateEvent {
         [Serializable]
         public class NodeEvent: UnityEvent<ActionNode> { }
 

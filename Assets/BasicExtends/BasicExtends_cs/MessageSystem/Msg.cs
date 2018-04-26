@@ -1,48 +1,88 @@
-﻿
-namespace BasicExtends {
-    using System.Collections.Generic;
-    using UnityEngine;
+﻿namespace BasicExtends {
     using UnityEngine.Assertions;
     using System;
-    using System.Runtime.Serialization;
 
     /// <summary>
     /// 実質的なJSにおけるオブジェクト。
     /// </summary>
-    [System.Serializable]
-    public class Msg: StringDict, ISerializable {
+    [Serializable]
+    public class Msg: StringDict,IJsonable,IFromJsonNode {
 
-        public Msg () { }
-        protected Msg ( SerializationInfo info, StreamingContext context ) {
-            mObjectData = info.GetValue("mObjectData", typeof(object));
-            var count =(int) info.GetValue("count", typeof(int));
-            var s = typeof(string);
-            for (int i = 0; i < count; i++) {
-                var k = (string) info.GetValue("key" + i, s);
-                var v = (string) info.GetValue("val" + i, s);
-                Set(k, v);
-            }
+        private object mObjectData = NULL.Null;
+        private const int HEAD_SIZE = 4;
+
+        public Msg () {
+            Serializer.AssignSerializer(GetType().Name,Serial);
+            Serializer.AssignDeserializer(GetType().Name, Deserial);
         }
 
-        public override void GetObjectData ( SerializationInfo info, StreamingContext context ) {
-            info.AddValue("mObjectData", mObjectData, typeof(object));
-            info.AddValue("count", Count, typeof(int));
-            int i = 0;
-            foreach (var p in this) {
-                info.AddValue("key" + i, p.Key, typeof(string));
-                info.AddValue("val" + i, p.Value, typeof(string));
-                i++;
+        public ByteList Serial(object obj ) {
+            var self = obj as Msg;
+            var bytes = ByteList.Zero.Add(Count);
+            Assert.IsNotNull(self);
+            foreach(var p in this) {
+                bytes.Add(p.Key.Length)
+                    .Add(p.Key)
+                    .Add(p.Value.Length)
+                    .Add(p.Value);
             }
+            var data = Serializer.Serialize(mObjectData);
+            bytes.Add(data.Count).Add(data);
+
+            System.Security.Cryptography.MD5CryptoServiceProvider md5 =
+                new System.Security.Cryptography.MD5CryptoServiceProvider();
+
+            byte [] bs = md5.ComputeHash(bytes.ToArray());
+            md5.Clear();
+
+            bytes.AddHead(bs.Length).AddHead(bs);
+            var size = bytes.Count + sizeof(int);
+            bytes.AddHead(size);
+
+            return bytes;
+        }
+
+
+        public ByteList Deserial ( ByteList bytes ) {
+            var size = bytes.DropInt32();
+            if (bytes.Count != size) { throw new UnDeserializableException(); }
+            var h_s = bytes.DropInt32();
+            var hash = bytes.DropRange(0, h_s);
+
+            System.Security.Cryptography.MD5CryptoServiceProvider md5 =
+                new System.Security.Cryptography.MD5CryptoServiceProvider();
+            byte [] bs = md5.ComputeHash(bytes.ToArray());
+            md5.Clear();
+            if (hash != bs) { throw new UnDeserializableException(); }
+
+            var dic_size = bytes.DropInt32();
+            for(int i = 0; i < dic_size; i++) {
+                var k_l = bytes.DropInt32();
+                var k = bytes.DropString(0, k_l);
+                var v_l = bytes.DropInt32();
+                var v = bytes.DropString(0, v_l);
+                Set(k, v);
+            }
+            
+            var data_size = bytes.DropInt32();
+            var data_bytes = bytes.DropRange(0, data_size);
+            mObjectData = Serializer.Deserialize(ByteList.Gen().Add(data_bytes));
+            return null;
+        }
+
+        public Msg (byte[] bytes) : this() {
+            int json_len = BitConverter.ToInt32(bytes, 0);
+            byte [] dis = new byte [json_len];
+            Array.Copy(bytes, HEAD_SIZE, dis, 0, json_len);
         }
 
         public static Msg Gen () { return new Msg(); }
-        private const string NULL_OBJ = "NULL";
 
-        private object mObjectData = NULL_OBJ;
-        public Msg SetObjectData(object obj ) {
-            if(mObjectData!= (object)NULL_OBJ) {
+        public Msg SetObjectData ( object obj ) {
+            if (mObjectData != (object) NULL.Null) {
                 Assert.IsTrue(false, "Cannot over write in msg object");
-                return this; }
+                return this;
+            }
             mObjectData = obj;
             return this;
         }
@@ -65,6 +105,10 @@ namespace BasicExtends {
             return Set(key, "" + value);
         }
 
+        public Msg Set ( string key, float value ) {
+            return Set(key, "" + value);
+        }
+
         public Msg To ( string v ) {
             return Set("to", v);
         }
@@ -81,7 +125,7 @@ namespace BasicExtends {
             return Set("msg", v);
         }
 
-        public Msg Netwrok(string ip, int port ) {
+        public Msg Netwrok ( string ip = "", int port = 0 ) {
             return Set("Network", "True").Set("ToIp", ip).Set("port", port);
         }
 
@@ -144,7 +188,7 @@ namespace BasicExtends {
             return insideValue;
         }
 
-        public T TryObjectGet<T> () where T:class {
+        public T TryObjectGet<T> () where T : class {
             return mObjectData as T;
         }
 
@@ -165,60 +209,16 @@ namespace BasicExtends {
             Messenger.Pool(this);
             return this;
         }
-    }
 
-    /// <summary>
-    /// Msgオブジェクトのやり取りを中継するオブザーバー
-    /// </summary>
-    public class Messenger: Singleton<Messenger> {
-
-        private List<Action<Msg>> mCallBacks = new List<Action<Msg>>();
-        private Queue<Msg> mMessages = new Queue<Msg>();
-        private System.Object mLock = new System.Object();
-
-        public static void Pool ( Msg msg ) {
-            lock (Instance.mLock) {
-                Instance.mMessages.Enqueue(msg);
-            }
+        public string ToJson () {
+            if(mObjectData != (object)NULL.Null) { Set("mObjectData", mObjectData.ToJson()); }
+            var str = JsonStringify.Stringify(this);
+            return str;
         }
 
-        public static void Flash () {
-            var msg = Instance.mMessages;
-            while (msg.Count > 0) {
-                var m = msg.Dequeue();
-                Push(m);
-            }
+        public void FromJson ( JsonNode node ) {
+            throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// MsgをMessengerに送信する。
-        /// 特定のKeyとValueならMessenger内部で処理し、
-        /// そうでない場合は登録されているコールバック全体にメッセージを送る。
-        /// </summary>
-        /// <param name="msg"></param>
-        public static void Push ( Msg msg ) {
-            if (msg.Match("To", "Messanger") && msg.Match("Action", "ClearAll")) {
-                Debug.Log("Data clear <= " + msg.ToJson());
-                msg.Clear();
-                return;
-            }
-            foreach (var cb in Instance.mCallBacks) {
-                cb.Invoke(msg);
-            }
-            if (msg.Match("to", "Debug") && msg.Match("act", "log")) {
-                Debug.Log("Debug from Msg :: " + msg.ToJson());
-                return;
-            }
-        }
-
-        /// <summary>
-        /// PushされたMsgを受け取るための関数を入れる。
-        /// この中に入れられたアクション経由で、
-        /// メッセージの処理を書くことになる。
-        /// </summary>
-        /// <param name="callback"></param>
-        public static void Assign ( Action<Msg> callback ) {
-            Instance.mCallBacks.Add(callback);
-        }
     }
 }
