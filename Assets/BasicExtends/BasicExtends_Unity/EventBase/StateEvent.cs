@@ -8,9 +8,9 @@ using BasicExtends;
 
 namespace BasicExtends {
 
-    namespace StateEvent {
+    namespace StateEventImp {
         [Serializable]
-        public class NodeEvent: UnityEvent<ActionNode> { }
+        public class NodeEvent: UnityEvent<StateEvent> { }
 
         [Serializable]
         public class Node {
@@ -20,7 +20,7 @@ namespace BasicExtends {
             public Node () { }
             public Node ( string str ) { mName = str.ToUpper(); }
             public Node ( string str
-                , UnityAction<ActionNode> act ) : this(str) {
+                , UnityAction<StateEvent> act ) : this(str) {
                 mActions.AddListener(act);
             }
 
@@ -39,7 +39,7 @@ namespace BasicExtends {
                 return this;
             }
 
-            private void AfterAction ( string state, ActionNode component ) {
+            private void AfterAction ( string state, StateEvent component ) {
                 if (state.ToUpper() == "START") {
                     component.SetState("update");
                     return;
@@ -51,7 +51,7 @@ namespace BasicExtends {
                 }
             }
 
-            public void Invoke ( string state, ActionNode component ) {
+            public void Invoke ( string state, StateEvent component ) {
                 ForEach(( e ) =>
                 {
                     Assert.IsNotNull(e);
@@ -63,7 +63,7 @@ namespace BasicExtends {
         }
 
 
-        public class ActionNode: MonoBehaviour {
+        public class StateEvent : MonoBehaviour {
 
             [SerializeField]
             private string mState = ("start");

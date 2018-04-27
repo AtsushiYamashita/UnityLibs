@@ -8,7 +8,7 @@ namespace BasicExtends {
 
     [Serializable]
     public class UdpReceiver : MonoBehaviour {
-        LoopThread mLoop;
+        LoopThread mLoop = null;
         UdpClient mClient;
 
         [SerializeField]
@@ -42,9 +42,10 @@ namespace BasicExtends {
                 var msg = "application can not connect.";
                 throw new NotSupportedException(msg);
             }
-
+            if (mLoop.IsNotNull()) { return true; }
             try {
                 mLoop = new LoopThread();
+                Debug.Log(mObservePort);
                 mClient = new UdpClient(new IPEndPoint(IPAddress.Parse(
                     NetworkUnit.GetLocalIPAddress()),mObservePort ));
             } catch (Exception e) {
@@ -56,7 +57,8 @@ namespace BasicExtends {
                 return false;
             }
 
-            Msg.Gen().To("Manager").As("NetworkManager")
+            Msg.Gen().To("Manager")
+                .As("NetworkManager")
                 .Set("type", "StartServer")
                 .Set("result", "Success").Push();
             mLoop
@@ -74,9 +76,8 @@ namespace BasicExtends {
         /// スレッド側で実行させる
         /// </summary>
         public void ReceiveLoop () {
-            var sender = new IPEndPoint(IPAddress.Any, 0);
+            IPEndPoint sender = null;
             var buffer = mClient.Receive(ref sender);
-
             // Receive イベント を実行
             OnRecieve(buffer, sender);
         }

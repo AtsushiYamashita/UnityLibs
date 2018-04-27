@@ -22,7 +22,6 @@ namespace BasicExtends {
 
         private void Start () {
             MessengerSetup();
-            Serializer.SetDatatypeBinary(Serializer.SerialType.Binary2);
         }
 
         private void MessengerSetup () {
@@ -39,11 +38,11 @@ namespace BasicExtends {
                     Setup();
                     return;
                 }
-                if(msg.Match("ack", "SetUsePort")) {
+                if(msg.Match("act", "SetUsePort")) {
                     var port = int.Parse(msg.TryGet("port"));
                     SetUsePort(port);
                 }
-                if (msg.Match("ack", "SetSendPort")) {
+                if (msg.Match("act", "SetSendPort")) {
                     var port = int.Parse(msg.TryGet("port"));
                     SetSendPort(port);
                 }
@@ -73,7 +72,7 @@ namespace BasicExtends {
         }
 
         private void SendLoop () {
-            byte [] buffer = mMsgList.Pop();
+            byte[] buffer = mMsgList.Pop();
             if (buffer == null || buffer.Length < 1) {
 
                 System.Threading.Thread.Sleep(NetworkUnit.INTERVAL);
@@ -90,12 +89,12 @@ namespace BasicExtends {
             message = message
                 .Set("Id", "" + mSendId.Get());
             mSendId.Increment();
-            Msg.Gen().To("Manager")
-                .As("NetworkManager")
-                .Set("type", "Sender@Send")
-                .Set("Msg", message.ToJson())
-                .Set("StackCount", mMsgList.Count())
-                .Set("result", "Success").Push();
+            //Msg.Gen().To("Manager")
+            //    .As("NetworkManager")
+            //    .Set("type", "Sender@Send")
+            //    .Set("Msg", message.ToJson())
+            //    .Set("StackCount", mMsgList.Count())
+            //    .Set("result", "Success").Push();
             if (mIsSetuped == false) { return; }
             mMsgList.Add(Serializer.Serialize(message).ToArray());
         }

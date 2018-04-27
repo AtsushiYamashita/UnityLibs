@@ -57,8 +57,8 @@
             if (to == Vector3.zero) { return local; }
             if (transform.localPosition == to) { return local; }
             var dif = to - local;
-            var move = dif.normalized * mSpeed;
-            return move.magnitude > dif.magnitude ? move + local : to;
+            var move = dif * mSpeed;
+            return move.magnitude > 0.05f ? move + local : to;
         }
 
         private void Sync(Trfm rec)

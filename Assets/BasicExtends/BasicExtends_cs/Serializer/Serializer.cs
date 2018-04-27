@@ -18,10 +18,11 @@
         public ISerializer Implement { set; private get; }
         private List<string> mTypeIndex = new List<string>();
 
-        public enum SerialType { Binary,Binary2,String }
+        public enum SerialType { Binary,Binary2,String,YetSet }
 
         public static Serializer SetDatatypeBinary(SerialType type)
         {
+            if (Instance.Implement.IsNotNull()) { return Instance; }
             if (type == SerialType.Binary) { Instance.Implement = new SerializeImp.Binary(); }
             if (type == SerialType.Binary2) { Instance.Implement = new SerializeImp.Binary2(); }
             if (type == SerialType.String) { Instance.Implement = new SerializeImp.String(); }
