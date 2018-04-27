@@ -2,14 +2,12 @@
 
     using System;
     using System.Collections.Generic;
+    using SerializeImp;
 
-    public interface ISerializer {
-        ByteList GetTypeList ( List<string> mTypeIndex );
-        Serializer SetSerializer ( string type, Func<object, ByteList> func );
-        Serializer SetDeserializer ( string type, Func<ByteList, object> func );
-        CheckedRet<object> Deserial (int id , ByteList bytes );
-        ByteList ToSerial ( object obj );
-    }
+    /// <summary>
+    /// 直列化からの復帰に失敗した場合のエラーです
+    /// </summary>
+    public class UnDeserializableException : Exception { }
 
     /// <summary>
     /// 指定した情報の直列化を行います
@@ -19,7 +17,17 @@
 
         public ISerializer Implement { set; private get; }
         private List<string> mTypeIndex = new List<string>();
-        
+
+        public enum SerialType { Binary,Binary2,String }
+
+        public static Serializer SetDatatypeBinary(SerialType type)
+        {
+            if (type == SerialType.Binary) { Instance.Implement = new SerializeImp.Binary(); }
+            if (type == SerialType.Binary2) { Instance.Implement = new SerializeImp.Binary2(); }
+            if (type == SerialType.String) { Instance.Implement = new SerializeImp.String(); }
+            return Instance;
+        }
+
         public static ByteList GetTypeList () {
             return Instance.Implement.GetTypeList(Instance.mTypeIndex);
         }
@@ -37,14 +45,16 @@
         /// 直列化された配列からインスタンスを作るための手続きを登録する
         /// </summary>
         public static Serializer AssignDeserializer ( string match, Func<ByteList, object> func ) {
-            return Instance.Implement.SetDeserializer(match, func);
+            Instance.Implement.SetDeserializer(match, func);
+            return Instance;
         }
 
         /// <summary>
         /// 直列化するための手続きを登録する
         /// </summary>
         public static Serializer AssignSerializer ( string match,  Func<object, ByteList> func ) {
-            return Instance.Implement.SetSerializer(match, func);
+             Instance.Implement.SetSerializer(match, func);
+            return Instance;
         }
 
         public static ByteList Serialize ( object obj ) {
@@ -52,13 +62,7 @@
         }
 
         public static CheckedRet<object> Deserialize ( ByteList bytes ) {
-            return Instance.Implement.Deserial(bytes.DropInt32(), bytes);
+            return Instance.Implement.Deserial(bytes);
         }
     }
-
-    /// <summary>
-    /// 直列化からの復帰に失敗した場合のエラーです
-    /// </summary>
-    public class UnDeserializableException: Exception { }
-
 }

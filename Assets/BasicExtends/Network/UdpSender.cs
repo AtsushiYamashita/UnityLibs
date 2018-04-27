@@ -22,6 +22,7 @@ namespace BasicExtends {
 
         private void Start () {
             MessengerSetup();
+            Serializer.SetDatatypeBinary(Serializer.SerialType.Binary2);
         }
 
         private void MessengerSetup () {

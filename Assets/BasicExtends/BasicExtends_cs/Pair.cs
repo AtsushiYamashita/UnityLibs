@@ -11,6 +11,7 @@
         public static readonly CheckedRet<T> mFail = new CheckedRet<T>().Set(false, null);
         public new CheckedRet<T> Set(bool flg,T obj ) { Key = flg; Value = obj; return this; }
         public static CheckedRet<T> Fail () { return mFail; }
+        public static CheckedRet<T> Succeed () { return new CheckedRet<T>(); }
     }
 
     public static class StPair {

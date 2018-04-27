@@ -1,22 +1,24 @@
-﻿namespace BasicExtends {
-
+﻿namespace BasicExtends.SerializeImp
+{
     using System;
     using System.Collections.Generic;
     using UnityEngine.Assertions;
 
-    public class BinarySerializeImplement: ISerializer {
+    public class Binary : ISerializer {
         Dictionary<int, Func<ByteList, object>> mParser = new Dictionary<int, Func<ByteList, object>>();
         Dictionary<int, Func<object, ByteList>> mSerializer = new Dictionary<int, Func<object, ByteList>>();
 
-        public BinarySerializeImplement () {
-            Serializer.AssignSerializer("int", Standards.Int.Serial);
-            Serializer.AssignDeserializer("int", Standards.Int.Deserial);
-            Serializer.AssignSerializer("float", Standards.Float.Serial);
-            Serializer.AssignDeserializer("float", Standards.Float.Deserial);
-            Serializer.AssignSerializer("string", Standards.String.Serial);
-            Serializer.AssignDeserializer("string", Standards.String.Deserial);
-            Serializer.AssignSerializer("Array", Standards.String.Serial);
-            Serializer.AssignDeserializer("Array", Standards.String.Deserial);
+        public Binary  () {
+            Serializer.AssignSerializer(  "Int", Standards.Int.Serial);
+            Serializer.AssignDeserializer("Int", Standards.Int.Deserial);
+            Serializer.AssignSerializer(  "Float", Standards.Float.Serial);
+            Serializer.AssignDeserializer("Float", Standards.Float.Deserial);
+            Serializer.AssignSerializer(  "String", Standards.String.Serial);
+            Serializer.AssignDeserializer("String", Standards.String.Deserial);
+            Serializer.AssignSerializer(  "ArrayList", Standards.ArrayList.Serial);
+            Serializer.AssignDeserializer("ArrayList", Standards.ArrayList.Deserial);
+            Serializer.AssignSerializer(  "Dictionary", Standards.Dictionary.Serial);
+            Serializer.AssignDeserializer("Dictionary", Standards.Dictionary.Deserial);
         }
 
         public ByteList GetTypeList ( List<string> list ) {
@@ -28,31 +30,34 @@
             return bytes;
         }
 
-        public Serializer SetSerializer ( string type, Func<object, ByteList> func ) {
+        public void SetSerializer ( string type, Func<object, ByteList> func ) {
             var id = Serializer.GetTypeId(type);
             mSerializer.Add(id, func);
-            return Serializer.Instance;
         }
 
-        public Serializer SetDeserializer ( string type, Func<ByteList, object> func ) {
+        public void SetDeserializer ( string type, Func<ByteList, object> func ) {
             var id = Serializer.GetTypeId(type);
             mParser.Add(id, func);
-            return Serializer.Instance;
         }
 
-        public CheckedRet<object> Deserial (int id, ByteList bytes ) {
+        /// <summary>
+        /// 基本的に [型番号] [[情報長]情報]です。
+        /// </summary>
+        public CheckedRet<object> Deserial ( ByteList bytes ) {
+            int id = bytes.DropInt32();
             var instance = mParser [id](bytes);
             return new CheckedRet<object>().Set(true, instance);
         }
 
         /// <summary>
         /// 登録された手続を使ってオブジェクトを直列化する
+        /// 基本的に [型番号] [[情報長]情報]です。
         /// </summary>
         public ByteList ToSerial ( object obj ) {
             var type_n = obj.GetType().Name;
             int id = Serializer.GetTypeId(type_n);
             Assert.IsTrue(id < 0, string.Format("This type({0}) is not assigned serializer", type_n));
-            var bytes = ToSerial(type_n);
+            var bytes = ByteList.Zero.Add(id);
             bytes.Add(ToSerial(obj));
             return bytes;
         }
@@ -82,6 +87,9 @@
                 }
             }
 
+            /// <summary>
+            /// 基本的に [[情報長]情報]です。
+            /// </summary>
             public static class String {
                 public static ByteList Serial ( object obj ) {
                     // 文字列の長さではなく、文字列を持つByte配列の長さであることに注意
@@ -96,7 +104,10 @@
                 }
             }
 
-            public static class ArrayData {
+            /// <summary>
+            /// 基本的に [[情報長]情報]です。
+            /// </summary>
+            public static class ArrayList {
                 public static ByteList Serial ( object obj ) {
                     var bytes = ByteList.Gen();
                     var arr = (Array) obj;
@@ -114,6 +125,40 @@
                         arr [i] = Serializer.Deserialize(bytes);
                     }
                     return arr;
+                }
+            }
+
+            /// <summary>
+            /// [len] [ [ k v ] [ ] ]
+            /// </summary>
+            public static class Dictionary
+            {
+                public static ByteList Serial(object obj)
+                {
+                    var bytes = ByteList.Gen();
+                    var arr = (Dictionary<object,object>)obj;
+                    bytes.Add(arr.Count);
+                    foreach (var e in arr)
+                    {
+                        bytes.Add(Serializer.Serialize(e.Key));
+                        bytes.Add(Serializer.Serialize(e.Value));
+                    }
+                    return bytes;
+                }
+                /// <summary>
+                /// Dictionary < object , object >として戻ることに注意
+                /// </summary>
+                public static object Deserial(ByteList bytes)
+                {
+                    var size = bytes.DropInt32();
+                    Dictionary<object, object> dic = new Dictionary<object, object>();
+                    for (int i = 0; i < size; i++)
+                    {
+                        var key = Serializer.Deserialize(bytes);
+                        var val = Serializer.Deserialize(bytes);
+                        dic.Add(key, val);
+                    }
+                    return dic;
                 }
             }
         }
