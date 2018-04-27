@@ -2,7 +2,6 @@
     using System.Collections.Generic;
     using System.Text;
     using UnityEngine;
-    using UnityEngine.Assertions;
 
     public class StringDict : Dictionary<string, string> { }
     public class GameObjDict : Dictionary<string, GameObject> { }
@@ -23,8 +22,9 @@
         public static string basicSeparator1 = ":";
         public static string basicSeparator2 = ",";
 
+		//= "\""
         public static string ToJson<K, V> (
-            this Dictionary<K, V> dic , string markK = "\"", string markV = "\"" ) {
+            this Dictionary<K, V> dic , string markK , string markV ) {
             string head = basicHead;
             string sep1 = basicSeparator1;
             string sep2 = basicSeparator2;

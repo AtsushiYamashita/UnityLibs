@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace BasicExtends {
 
@@ -39,8 +38,6 @@ namespace BasicExtends {
         /// <typeparam name="T"></typeparam>
         /// <param name="arr"></param>
         public void Add<T> ( params Pair<string,T>[] arr ) where T : class {
-            Assert.IsTrue(arr.IsNotNull());
-            Assert.IsTrue(arr.Length >= 0);
             var type = typeof(T);
             if (mDic.ContainsKey(type)==false) {
                 mDic.Add(type, new NamedObject() );

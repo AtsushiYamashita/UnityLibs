@@ -1,7 +1,6 @@
 ﻿namespace BasicExtends {
     using System;
     using System.Collections.Generic;
-    using UnityEngine.Assertions;
 
     public interface IMethodChain<A> where A : class {
         void Invoke ( A arg );
@@ -35,24 +34,18 @@
                 var end = func(arg);
                 if (end) { return; }
             }
-            Assert.IsNotNull(mDefault);
             mDefault(arg);
         }
 
         /// <summary>
         /// 名前がGetListでないのは、
-        /// 高速化のためにDictionaryで処理する場合もあるかな、と。
-        /// trueを返せば終了
+        /// 高速化のためにDictionaryで処理する場合もあろうくらいの考えです。
         /// </summary>
         /// <returns></returns>
         public List<Func<A, bool>> GetProcessHolder () {
             return mList;
         }
 
-        /// <summary>
-        /// trueを返せば終了
-        /// </summary>
-        /// <param name="action"></param>
         public void SetDefault ( Func<A, bool> action ) {
             mDefault = action;
         }

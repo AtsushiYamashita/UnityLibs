@@ -61,7 +61,7 @@ namespace BasicExtends {
                 ret = string.Format("{0}/{1}", parent.name, ret);
                 parent = parent.transform.parent;
             }
-            ret = string.Format("{0}/{1}", obj.scene.name, ret);
+            //ret = string.Format("{0}/{1}", obj.scene.name, ret);
             return ret;
         }
     }

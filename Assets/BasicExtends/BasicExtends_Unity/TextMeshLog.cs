@@ -7,7 +7,5 @@ public class TextMeshLog : MonoBehaviour {
 
 	void Start () {
         var tmesh = GetComponent<TextMesh>();
-        Application.logMessageReceived +=
-            (msg,stk,type) => { tmesh.text = msg + "\n" + tmesh.text; };
     }
 }

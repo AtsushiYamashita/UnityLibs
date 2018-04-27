@@ -4,6 +4,8 @@ using System.Net;
 using System.Net.Sockets;
 
 namespace BasicExtends {
+
+
     public interface IReceiver {
         bool StartServer (  );
         void StopServer ();
@@ -30,7 +32,8 @@ namespace BasicExtends {
 
         LoopThread ConnectThread { set; get; }
 
-        void Setup ( LoopThread connector, ClientType type, string ip_r = "" );
+		//= "" 
+        void Setup ( LoopThread connector, ClientType type, string ip_r );
         void ClientLifeCheck ();
         void Disconnect ();
     }

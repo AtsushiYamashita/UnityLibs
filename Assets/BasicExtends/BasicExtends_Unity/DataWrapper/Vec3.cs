@@ -1,9 +1,7 @@
 ﻿namespace BasicExtends {
 
-    using System.Linq;
     using System.Collections.Generic;
     using UnityEngine;
-    using UnityEngine.Assertions;
 
     interface IVec3 {
         float X { set; get; }
@@ -38,7 +36,6 @@
         }
 
         public Vec3 Set ( params float [] fs ) {
-            Assert.IsTrue(fs.Length == 3);
             for (int i = 0; i < fs.Length; i++) {
                 mVal [i] = fs [i];
             }
@@ -46,7 +43,6 @@
         }
 
         public Vec3 Set ( Vec3 fs ) {
-            Assert.IsNotNull(fs);
             for (int i = 0; i < 3; i++) {
                 mVal [i] = fs.mVal [i];
             }
@@ -67,8 +63,6 @@
 
 
         public static Vec3 Add ( params Vec3 [] v ) {
-            Assert.IsNotNull(v);
-            Assert.IsTrue(v.Length > 0);
             var ret = new Vec3();
             for (int n = 0; n < v.Length; n++) {
                 ret.X = v [n].X + ret.X;
@@ -105,4 +99,5 @@
             return ToJson();
         }
     }
+
 }

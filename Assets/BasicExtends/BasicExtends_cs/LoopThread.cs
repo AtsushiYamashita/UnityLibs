@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using UnityEngine;
-    using UnityEngine.Assertions;
 
     /// <summary>
     /// 指定したアクションを繰り貸すスレッド処理のラッピング
@@ -57,7 +56,6 @@
         /// <param name="data"></param>
         /// <returns></returns>
         public LoopThread LaunchThread ( Action action ) {
-            Assert.IsNotNull(action);
             mLoopAction = action;
 
             try {

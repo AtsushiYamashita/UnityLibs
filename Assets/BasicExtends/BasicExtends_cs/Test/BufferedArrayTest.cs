@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Assertions;
 using BasicExtends;
 
 
@@ -27,7 +26,6 @@ public class BufferedArrayTest : TestComponent {
 
     public string AddTest_1 () {
         var arr = new BufferedArray<string>();
-        Assert.IsTrue(arr.Arr.Length == SIZE);
         var time = arr.Arr.Length;
         for (int i = 0; i < time + 1; i++) {
             arr.Add("test");
@@ -41,7 +39,6 @@ public class BufferedArrayTest : TestComponent {
         var arr = new BufferedArray<string> {
             AddSize = add_size
         };
-        Assert.IsTrue(arr.Arr.Length == SIZE);
         var time = arr.Arr.Length;
         for (int i = 0; i < time + 1; i++) {
             arr.Add("test", ( e ) => { return e.Length < 1; });
@@ -54,7 +51,6 @@ public class BufferedArrayTest : TestComponent {
         var arr = new BufferedArray<string> {
             AddSize = add_size
         };
-        Assert.IsTrue(arr.Arr.Length == SIZE);
         var time = arr.Arr.Length;
         for (int i = 0; i < time + 1; i++) {
             arr.Add("test", ( e ) => { return e.Length < 1; });

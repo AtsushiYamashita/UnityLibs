@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 using BasicExtends;
 
 public class ScrollViewElementTest: TestComponent {
@@ -13,8 +12,6 @@ public class ScrollViewElementTest: TestComponent {
 
     protected override void Init () {
         mElement1 = GetComponent<ScrollViewElement>();
-        Assert.IsNotNull(mElement1);
-        Assert.IsNotNull(mManager);
     }
 
     public string TryGetScrollViewTest () {

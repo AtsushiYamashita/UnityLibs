@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using UnityEngine;
-using UnityEngine.Assertions;
 using System.Collections.Generic;
 using BasicExtends;
 
@@ -71,7 +70,7 @@ public class JsonStringify: Singleton<JsonStringify> {
         {
             var obj = pair.Key as Dictionary<string, string>;
             if (obj.IsNull()) { return false; }
-            pair.Value.Append(obj.ToJson<string, string>());
+            pair.Value.Append(StaticJson.ToJson(obj));
             return true;
         });
 
@@ -153,8 +152,6 @@ public static class StaticJson {
         // オブジェクト要素でなければ受け入れない。
         var s = json.IndexOf('{');
         var e = json.LastIndexOf('}');
-        Assert.IsTrue(s == 0);
-        Assert.IsTrue(s > -1 && e > -1, "Parse Error, this message is not json style object");
         var inside = json.Substring(1, e - 1);
         return StPair.Gen(true, inside);
     }

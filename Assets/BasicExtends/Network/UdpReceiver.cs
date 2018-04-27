@@ -83,9 +83,8 @@ namespace BasicExtends {
 
         private static bool OnRecieve ( byte [] receved, IPEndPoint sender ) {
             if (receved.Length < 1) { return false; }
-            var msg = Serializer.Deserialize(ByteList.Zero.Add(receved)).Value as Msg;
-            if (msg == null) { throw new UnDeserializableException(); }
-            msg.Set("From", "" + sender.Address.MapToIPv4()).Pool();
+            var msg = BinarySerial.Deserialize<Msg>(receved);
+            msg.Set("From", "" + "ThisVersionCannotUseThis").Pool();
             Debug.Log(msg.ToJson());
             return true;
         }

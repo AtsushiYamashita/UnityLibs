@@ -2,6 +2,7 @@
 
     using UnityEngine;
 
+    [RequireComponent(typeof(DelayTransform))]
     public class SyncTransform: MonoBehaviour {
 
         [SerializeField]
@@ -53,7 +54,7 @@
                 if (msg.Match("Network", "true")) { return; }
                 if (msg.Unmatch("to", gameObject.name)) { return; }
                 if (msg.Unmatch("as", GetType().Name)) { return; }
-                if (msg.Match("act", "Sync") && msg.ContainsKey("FROM")) {
+                if (msg.Match("act", "Sync")) {
                     var rec = msg.TryObjectGet<Trfm>();
                     Sync(rec);
                     return;

@@ -3,7 +3,6 @@
     using System.Collections.Generic;
     using System;
     using UnityEngine;
-    using UnityEngine.Assertions;
     using WorkFunc = System.Func<object [], MultiTask.End>;
 
     public class Worker {
@@ -68,7 +67,6 @@
         }
 
         public static MultiTask Push ( WorkFunc work, params object [] args ) {
-            Assert.IsNotNull(work);
             var done = work(args);
             if (done == End.TRUE) { return Instance; }
             Instance.GetWorker().SetWork(work, args);
@@ -93,7 +91,6 @@
 
         public static MultiTask CountDown ( int times, WorkFunc work, params object [] obj ) {
             // TimeOver(), active, result
-            Assert.IsTrue(Instance.mIsExistManager, "missing the multi task manager");
             int count = 0;
             Push( ( not_use ) =>
             {

@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 using BasicExtends.Findable;
 
 namespace BasicExtends {
@@ -160,7 +159,6 @@ namespace BasicExtends {
 
         private void Reset () {
             var count = GetComponents<FindableObject>();
-            Assert.IsTrue(count.Length <= 1, "Over hold :: GameObject cannnot hold this component more then 2.");
             mData.Object = gameObject;
             var path = gameObject.GetObjectPath();
             mData.AddTags(path);

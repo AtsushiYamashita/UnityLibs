@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using BasicExtends;
-using UnityEngine.Assertions;
 
 public class ScrollViewManagerTest : TestComponent {
 
@@ -15,8 +14,6 @@ public class ScrollViewManagerTest : TestComponent {
     protected override void Init()
     {
         mManager = GetComponent<ScrollViewManager>();
-        Assert.IsNotNull(mElement1);
-        Assert.IsNotNull(mManager);
     }
 
     // 正常系

@@ -2,16 +2,12 @@
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
     using System;
     using UnityEngine;
 
-    public class IntPair: Pair<int, int> { }
     public class StringPair: Pair<string, string> { }
-    public class CheckedRet<T>: Pair<bool, T> where T : class {
-        public static readonly CheckedRet<T> mFail = new CheckedRet<T>().Set(false, null);
-        public new CheckedRet<T> Set(bool flg,T obj ) { Key = flg; Value = obj; return this; }
-        public static CheckedRet<T> Fail () { return mFail; }
-    }
+    public class CheckedRet<T>: Pair<bool, T> where T : class { }
 
     public static class StPair {
         public static Dictionary<K, V> GenDic<K, V>
@@ -63,31 +59,25 @@
         }
     }
 
-
     [Serializable]
-    public class Pair<K, V>: IDictionaryDataConvertable<K, V>, IJsonable {
+    public class Pair<K, V>: IDictionaryDataConvertable<K, V>, IJsonable
+        where V : class {
 
         [SerializeField]
         private K mKey;
         [SerializeField]
-        private V mValue;
+        private V mValue = null;
         public Pair () { }
-
-        public K Key { set { mKey = value; } get { return mKey; } }
-        public V Value { set { mValue = value; } get { return mValue; } }
-
-        public K W { set { mKey = value; } get { return mKey; } }
-        public V H { set { mValue = value; } get { return mValue; } }
-
-        public K L { set { mKey = value; } get { return mKey; } }
-        public V R { set { mValue = value; } get { return mValue; } }
-
-        public K X { set { mKey = value; } get { return mKey; } }
-        public V Y { set { mValue = value; } get { return mValue; } }
-
-        public K Min { set { mKey = value; } get { return mKey; } }
-        public V Max { set { mValue = value; } get { return mValue; } }
-
+        public K Key
+        {
+            set { mKey = value; }
+            get { return mKey; }
+        }
+        public V Value
+        {
+            set { mValue = value; }
+            get { return mValue; }
+        }
         public virtual Pair<K, V> Set ( K key, V value ) {
             mKey = key;
             mValue = value;
@@ -95,7 +85,7 @@
         }
 
         public static Pair<K, V> Gen ( K key, V value ) {
-            return new Pair<K, V>().Set(key, value);
+            return new Pair<K, V>().Set(key,value);
         }
 
 

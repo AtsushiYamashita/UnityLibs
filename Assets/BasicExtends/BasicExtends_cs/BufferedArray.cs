@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace BasicExtends {
 
@@ -44,8 +43,6 @@ namespace BasicExtends {
         /// <param name="first"></param>
         /// <param name="app_size"></param>
         public BufferedArray ( uint first, uint app_size ) {
-            Assert.IsTrue(first > 0);
-            Assert.IsTrue(app_size > 0);
             mArr = new T [first];
             mSize = app_size;
         }
@@ -186,8 +183,6 @@ namespace BasicExtends {
         /// <param name="func"></param>
         /// <returns></returns>
         public BufferedArray<T> ForEach ( Action<T> func ) {
-            Assert.IsNotNull(mArr);
-            Assert.IsNotNull(func);
             for (int i = 0; i < mArr.Length; i++) {
                 func(mArr [i]);
             }
@@ -195,12 +190,10 @@ namespace BasicExtends {
         }
 
         public T Get ( int index ) {
-            Assert.IsTrue(index < mArr.Length);
             return mArr [index];
         }
 
         public C TryGet<C> ( int index ) where C : class {
-            Assert.IsTrue(index < mArr.Length);
             return mArr [index] as C;
         }
 
