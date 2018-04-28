@@ -16,10 +16,10 @@
 
         public Msg()
         {
+            Serializer.SetDatatype(Serializer.SerialType.Binary2);
             Serializer.AssignSerializer(GetType().Name, Serial);
             Serializer.AssignDeserializer(GetType().Name, Deserial);
         }
-
 
         protected Msg(SerializationInfo info, StreamingContext context)
         {
@@ -33,6 +33,7 @@
                 Set(k, v);
             }
         }
+
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("mObjectData", mObjectData, typeof(object));
@@ -45,7 +46,6 @@
                 i++;
             }
         }
-
 
         public ByteList Serial(object obj)
         {

@@ -1,13 +1,11 @@
-﻿using UnityEngine;
-using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-
-namespace BasicExtends {
+﻿namespace BasicExtends {
+    using UnityEngine;
+    using System;
+    using System.Net;
+    using System.Net.Sockets;
 
     [Serializable]
-    public class UdpReceiver : MonoBehaviour {
+    public class UdpReceiver: MonoBehaviour {
         LoopThread mLoop = null;
         UdpClient mClient;
 
@@ -47,7 +45,7 @@ namespace BasicExtends {
                 mLoop = new LoopThread();
                 Debug.Log(mObservePort);
                 mClient = new UdpClient(new IPEndPoint(IPAddress.Parse(
-                    NetworkUnit.GetLocalIPAddress()),mObservePort ));
+                    NetworkUnit.GetLocalIPAddress()), mObservePort));
             } catch (Exception e) {
                 Msg.Gen().To("Manager").As("NetworkManager")
                     .Set("type", "StartServer")
@@ -92,8 +90,18 @@ namespace BasicExtends {
         }
 
         public void Close () {
-            mClient.Close();
-            mLoop.ThreadStop();
+            if (mClient.IsNotNull()) { mClient.Close(); }
+            if (mLoop.IsNotNull()) { mLoop.ThreadStop(); }
+        }
+
+        private static void CloseCall ( UnityEditor.PlayModeStateChange state ) {
+            Debug.LogFormat("PlayModeStateChange({0})", state);
+            // Close();
+            UnityEditor.EditorApplication.playModeStateChanged += CloseCall;
+        }
+
+        public void Reset () {
+            UnityEditor.EditorApplication.playModeStateChanged += CloseCall;
         }
     }
 }
