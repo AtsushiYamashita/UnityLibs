@@ -5,20 +5,23 @@
     using UnityEngine.Assertions;
 
     public class Binary : ISerializer {
-        Dictionary<int, Func<ByteList, object>> mParser = new Dictionary<int, Func<ByteList, object>>();
-        Dictionary<int, Func<object, ByteList>> mSerializer = new Dictionary<int, Func<object, ByteList>>();
+
+        Dictionary<int, Func<ByteList, object>> mParser;
+        Dictionary<int, Func<object, ByteList>> mSerializer;
 
         public Binary  () {
-            Serializer.AssignSerializer(  "Int", Standards.Int.Serial);
-            Serializer.AssignDeserializer("Int", Standards.Int.Deserial);
-            Serializer.AssignSerializer(  "Float", Standards.Float.Serial);
-            Serializer.AssignDeserializer("Float", Standards.Float.Deserial);
-            Serializer.AssignSerializer(  "String", Standards.String.Serial);
-            Serializer.AssignDeserializer("String", Standards.String.Deserial);
-            Serializer.AssignSerializer(  "ArrayList", Standards.ArrayList.Serial);
-            Serializer.AssignDeserializer("ArrayList", Standards.ArrayList.Deserial);
-            Serializer.AssignSerializer(  "Dictionary", Standards.Dictionary.Serial);
-            Serializer.AssignDeserializer("Dictionary", Standards.Dictionary.Deserial);
+            mParser = new Dictionary<int, Func<ByteList, object>>();
+            mSerializer = new Dictionary<int, Func<object, ByteList>>();
+            SetSerializer("Int32", Standards.Int.Serial);
+            SetDeserializer("Int32", Standards.Int.Deserial);
+            SetSerializer("Float", Standards.Float.Serial);
+            SetDeserializer("Float", Standards.Float.Deserial);
+            SetSerializer("String", Standards.String.Serial);
+            SetDeserializer("String", Standards.String.Deserial);
+            SetSerializer("ArrayList", Standards.ArrayList.Serial);
+            SetDeserializer("ArrayList", Standards.ArrayList.Deserial);
+            SetSerializer("Dictionary", Standards.Dictionary.Serial);
+            SetDeserializer("Dictionary", Standards.Dictionary.Deserial);
         }
 
         public ByteList GetTypeList ( List<string> list ) {
@@ -32,12 +35,12 @@
 
         public void SetSerializer ( string type, Func<object, ByteList> func ) {
             var id = Serializer.GetTypeId(type);
-            mSerializer.Add(id, func);
+            mSerializer.Add(id.Value, func);
         }
 
         public void SetDeserializer ( string type, Func<ByteList, object> func ) {
             var id = Serializer.GetTypeId(type);
-            mParser.Add(id, func);
+            mParser.Add(id.Value, func);
         }
 
         /// <summary>
@@ -55,9 +58,10 @@
         /// </summary>
         public ByteList ToSerial ( object obj ) {
             var type_n = obj.GetType().Name;
-            int id = Serializer.GetTypeId(type_n);
-            Assert.IsTrue(id < 0, string.Format("This type({0}) is not assigned serializer", type_n));
-            var bytes = ByteList.Zero.Add(id);
+            var id = Serializer.GetTypeId(type_n);
+            Assert.IsTrue(id.Key, string.Format("This type({0}) is not assigned serializer", type_n));
+            if (id.Key == false) { return null; }
+            var bytes = ByteList.Zero.Add(id.Value);
             bytes.Add(ToSerial(obj));
             return bytes;
         }
@@ -78,7 +82,7 @@
             public static class Float {
                 public static ByteList Serial ( object obj ) {
                     var data = BitConverter.GetBytes((double) obj);
-                    return ByteList.Gen().Add(data.Length).Add(obj);
+                    return ByteList.Gen().Add(data.Length).Add(""+obj);
                 }
                 public static object Deserial ( ByteList bytes ) {
                     var size = bytes.DropInt32();
