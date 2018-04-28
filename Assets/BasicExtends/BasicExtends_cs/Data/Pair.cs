@@ -7,11 +7,12 @@
 
     public class IntPair: Pair<int, int> { }
     public class StringPair: Pair<string, string> { }
-    public class CheckedRet<T>: Pair<bool, T> where T : class {
-        public static readonly CheckedRet<T> mFail = new CheckedRet<T>().Set(false, null);
+    public class CheckedRet<T>: Pair<bool, T>  {
+        private static CheckedRet<T>  mFail  = new CheckedRet<T>();
         public new CheckedRet<T> Set(bool flg,T obj ) { Key = flg; Value = obj; return this; }
-        public static CheckedRet<T> Fail () { return mFail; }
+        public static CheckedRet<T> Fail () { mFail.Key = false; return mFail; }
         public static CheckedRet<T> Succeed () { return new CheckedRet<T>(); }
+        public static new CheckedRet<T> Gen ( bool flg, T obj ) { return new CheckedRet<T>().Set(flg,obj); }
     }
 
     public static class StPair {

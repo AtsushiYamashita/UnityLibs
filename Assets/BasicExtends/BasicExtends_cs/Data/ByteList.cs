@@ -9,17 +9,36 @@
         private static readonly Func<byte, byte> NULL_PIPE = e => e;
         public static ByteList Zero { get { return new ByteList(); } }
 
-        public ByteList Add ( byte [] obj ) {
-            AddRange(obj);
-            return this;
-        }
 
         public static ByteList Gen () {
             return new ByteList();
         }
 
-        public ByteList Add<T> ( T obj ) {
-            return Add(Serializer.Serialize(obj));
+        public new ByteList Add ( byte obj ) {
+            return Add(obj);
+        }
+
+        public ByteList Add ( int obj ) {
+            Add(BitConverter.GetBytes(obj));
+            return this;
+        }
+        public ByteList Add ( float obj ) {
+            Add(BitConverter.GetBytes(obj));
+            return this;
+        }
+        public ByteList Add ( ByteList obj ) {
+            AddRange(obj);
+            return this;
+        }
+
+        public ByteList Add ( string obj ) {
+            AddRange(Encoding.UTF8.GetBytes(obj));
+            return this;
+        }
+
+        public ByteList Add ( byte [] obj ) {
+            AddRange(obj);
+            return this;
         }
 
         public ByteList Insert ( int index, byte [] obj ) {
