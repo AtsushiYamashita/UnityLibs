@@ -1,10 +1,12 @@
 ﻿using System;
 using BasicExtends;
 
+[Serializable]
 public class NULL : Singleton<NULL> {
     public override string ToString () {
         return "NULL";
     }
+
     public static NULL Null
     {
         get { return Instance; }

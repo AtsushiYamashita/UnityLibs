@@ -4,8 +4,6 @@ using System.Net;
 using System.Net.Sockets;
 
 namespace BasicExtends {
-
-
     public interface IReceiver {
         bool StartServer (  );
         void StopServer ();

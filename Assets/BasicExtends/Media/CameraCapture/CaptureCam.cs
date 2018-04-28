@@ -19,7 +19,7 @@ namespace BasicExtends {
     /// <summary>
     /// Unityのオブジェクトと一緒にWinXRのWebCam画像を取得し、
     /// </summary>
-    public class CaptureCam : IXrCamera {
+    public class CaptureCam: IXrCamera {
         private static CameraParameters mCameraParam;
         private static HardwareCameraWrapper mResolution = new HardwareCameraWrapper();
         private PhotoCapture mCameraInstance = null;
@@ -28,8 +28,9 @@ namespace BasicExtends {
         private float mOpacity = 0.9f;
         private string mTo = "";
         private const string DATA_MSG_AS = "MessageTransporter";
+        private const bool mCompress = false;
 
-        public CaptureCam (string to) {
+        public CaptureCam ( string to ) {
             mTo = to;
             Assert.IsNotNull(mResolution);
         }
@@ -56,15 +57,43 @@ namespace BasicExtends {
                 List<byte> buf = new List<byte>();
                 captured.CopyRawImageDataIntoBuffer(buf);
 
+                var w = mCompress ? mResolution.Width / 2 : mResolution.Width / 1;
+                var h = mCompress ? mResolution.Heignt / 2 : mResolution.Heignt / 1;
+
+#if mCompress
+                PictureDiet(buf, mResolution.Width, mResolution.Heignt);
+#endif
+                
                 // 撮影データのメッセージ送信
                 Msg.Gen().To(mTo).As(DATA_MSG_AS)
                     .Act("Print")
-                    .Set("Data",buf.Count)
+                    .Set("w", w)
+                    .Set("h", h)
+                    .Set("Data", buf.Count)
                     .SetObjectData(buf).Pool();
+                //BinarySerial.Save("test", buf);
 
                 if (end != null) { end.Invoke(); }
             });
         }
+
+#if mCompress
+        private void PictureDiet ( List<byte> bytes, int w, int h ) {
+            if (mCompress == false) { return; }
+            for (int y = h -1; y >= 0; y--) {
+                if (y % 2 == 0) { continue; }
+                for (int x = w - 1; x >= 0; x--) {
+                    if (x % 2 == 0) { continue; }
+                    Debug.Log("(" + x + " " + y + ")");
+                    bytes.RemoveAt(y * w + x * 4 + 3);
+                    bytes.RemoveAt(y * w + x * 4 + 2);
+                    bytes.RemoveAt(y * w + x * 4 + 1);
+                    bytes.RemoveAt(y * w + x * 4 + 0);
+                }
+            }
+        }
+#endif
+
 
         public void CameraWakeUp ( Action action ) {
             // カメラ操作用のインスタンスの作成
@@ -91,7 +120,7 @@ namespace BasicExtends {
             if (mRecMode == true) { return; }
             Debug.LogFormat("photo mode...");
             var res = mResolution.GetResolution();
-            CameraParameters c_param = 
+            CameraParameters c_param =
                 InitCameraParams(res, mOpacity);
             mCameraInstance.StartPhotoModeAsync(c_param, ( result ) =>
             {
@@ -105,8 +134,9 @@ namespace BasicExtends {
                 // テクスチャセットアップのための解像度通知
                 Msg.Gen().To(mTo).As(DATA_MSG_AS)
                     .Act("Setup")
-                    .Set("w", res.width)
-                    .Set("h", res.height).Push();
+                    .Set("w", mCompress ? res.width / 2 : res.width / 1)
+                    .Set("h", mCompress ? res.height / 2 : res.height / 1)
+                    .Push();
                 start();
             });
         }
