@@ -13,6 +13,7 @@
         public static CheckedRet<T> Fail () { mFail.Key = false; return mFail; }
         public static CheckedRet<T> Succeed () { return new CheckedRet<T>(); }
         public static new CheckedRet<T> Gen ( bool flg, T obj ) { return new CheckedRet<T>().Set(flg,obj); }
+        public bool Check { get { return mKey; } }
     }
 
     public static class StPair {
@@ -70,9 +71,9 @@
     public class Pair<K, V>: IDictionaryDataConvertable<K, V>, IJsonable {
 
         [SerializeField]
-        private K mKey;
+        protected K mKey;
         [SerializeField]
-        private V mValue;
+        protected V mValue;
         public Pair () { }
 
         public K Key { set { mKey = value; } get { return mKey; } }
