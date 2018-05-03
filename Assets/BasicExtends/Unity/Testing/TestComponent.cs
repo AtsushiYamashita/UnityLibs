@@ -1,7 +1,6 @@
-﻿using UnityEngine;
-using System.Text;
-
-namespace BasicExtends {
+﻿namespace BasicExtends {
+    using UnityEngine;
+    using System.Text;
 
     /// <summary>
     /// 作った計算処理のテストを簡易的に行う。
@@ -13,15 +12,17 @@ namespace BasicExtends {
     /// このコンポネントを使うには
     /// このクラスを継承する形でxxxTestという関数を実装するだけ。
     /// ただし関数はstringを返し、publicであることが必要。
-    /// 
     /// </summary>
     public class TestComponent: MonoBehaviour {
 
-        int size = 0;
-        int ok = 0;
+        private int mSize = 0;
+        private int mOk = 0;
 
         protected virtual void Init() { }
 
+        /// <summary>
+        /// テスト処理をメソッドの名前からリフレクションで呼び出しています
+        /// </summary>
         private void TestProcess(ref StringBuilder sb)
         {
             var methods = this.GetType().GetMethods();
@@ -33,6 +34,9 @@ namespace BasicExtends {
             }
         }
 
+        /// <summary>
+        /// テスト結果を連結し、まとめて成形出力しています
+        /// </summary>
         private void TestResult(ref StringBuilder sb)
         {
             var t_name = GetType().Name;
@@ -42,11 +46,14 @@ namespace BasicExtends {
             }
 
             var format = " Test [ {0} ] end ({1}/{2})\n{3}\n ";
-            var str = string.Format(format, t_name, ok, size, sb.ToString());
-            var type = ok - size == 0 ? DebugLog.Log : DebugLog.Error;
+            var str = string.Format(format, t_name, mOk, mSize, sb.ToString());
+            var type = mOk - mSize == 0 ? DebugLog.Log : DebugLog.Error;
             type.Print(str);
         }
 
+        /// <summary>
+        /// 簡易用なのでまとめて処理を呼び出し、そのまま出力しています
+        /// </summary>
         private void Start () {
             Init();
             StringBuilder sb = new StringBuilder();
@@ -55,19 +62,30 @@ namespace BasicExtends {
         }
 
         private string Print ( string name, string ret ) {
-            size++;
+            ++mSize;
             var based = "{0}に{1}しました。{2}{3}{4}\n";
+
             if (ret.Length != 0) {
                 return string.Format(
                     based, name, "失敗",
                     "(", ret, ")");
             }
-            ok++;
+            ++mOk;
             return string.Format(
                 based, name, "成功",
                 "", "", "");
         }
 
+        /// <summary>
+        /// 成功時に返す値を提供しています
+        /// </summary>
+        protected string Pass () {
+            return "";
+        }
+
+        /// <summary>
+        /// 失敗時に返す値を提供しています
+        /// </summary>
         protected string Fail () {
             return "Fail";
         }
@@ -89,15 +107,11 @@ namespace BasicExtends {
         protected string Fail ( string str, params object [] obj ) {
             return "Fail : " + string.Format(str, obj);
         }
-
-        protected string Pass() {
-            return "";
-        }
     }
 }
 
 /*
   public string Test () {
-            return "false";
-        }
+    return Fail();
+  }
  */

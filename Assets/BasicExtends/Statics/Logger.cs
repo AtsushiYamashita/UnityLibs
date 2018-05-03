@@ -1,19 +1,15 @@
-﻿#pragma warning disable 0414
-
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace BasicExtends {
+﻿namespace BasicExtends {
+    using System;
+    using System.Collections.Generic;
+    using UnityEngine;
 
     public enum DebugLog { Log, Error }
-    public enum ReportLog { Log, Error }
 
     public static class Logger {
         public static long mStart = 0;
         public static long mPrev = 0;
-        private static Dictionary<string, string> mPlaceHolder
-            = new Dictionary<string, string>();
+        private static Action<string> [] LogFunc
+            = new Action<string> [] { Debug.Log, Debug.LogError };
 
         private static string LogString ( string str ) {
             int look = 3;
@@ -33,25 +29,10 @@ namespace BasicExtends {
 
         public static void Print ( this DebugLog type, string str ) {
             var log_str = LogString(str);
-            Action<string> log = Debug.Log;
-            Action<string> err = Debug.LogError;
-            var print = type == DebugLog.Log ? log : err;
-            print(log_str);
+            LogFunc[(int)type](log_str);
         }
 
         public static void Print ( this DebugLog type, string str, params object [] args ) {
-            Print(type, string.Format(str, args));
-        }
-
-        public static void Print ( this ReportLog type, string str ) {
-            var log_str = LogString(str);
-            Action<string> log = Debug.Log;
-            Action<string> err = Debug.LogError;
-            var print = type == ReportLog.Log ? log : err;
-            print(log_str);
-        }
-
-        public static void Print ( this ReportLog type, string str, params object [] args ) {
             Print(type, string.Format(str, args));
         }
     }
