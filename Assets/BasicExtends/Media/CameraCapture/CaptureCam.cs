@@ -1,4 +1,6 @@
-﻿using System;
+﻿#pragma warning disable 0429
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
