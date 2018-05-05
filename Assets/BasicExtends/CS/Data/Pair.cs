@@ -97,6 +97,9 @@
             return this;
         }
 
+        public static Pair<K, V> Gen (  ) {
+            return new Pair<K, V>();
+        }
         public static Pair<K, V> Gen ( K key, V value ) {
             return new Pair<K, V>().Set(key, value);
         }
