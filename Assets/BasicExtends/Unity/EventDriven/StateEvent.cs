@@ -3,23 +3,21 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
 using System;
-using BasicExtends;
-
+using BasicExtends.StateEventImp;
 
 namespace BasicExtends {
-
     namespace StateEventImp {
         [Serializable]
         public class NodeEvent: UnityEvent<StateEvent> { }
 
         [Serializable]
-        public class Node {
+        public class EventNode {
             public string mName = string.Empty;
             public NodeEvent mActions = new NodeEvent();
 
-            public Node () { }
-            public Node ( string str ) { mName = str.ToUpper(); }
-            public Node ( string str
+            public EventNode () { }
+            public EventNode ( string str ) { mName = str.ToUpper(); }
+            public EventNode ( string str
                 , UnityAction<StateEvent> act ) : this(str) {
                 mActions.AddListener(act);
             }
@@ -27,13 +25,13 @@ namespace BasicExtends {
         }
 
         [Serializable]
-        public class NodeArray: BufferedArray<Node> {
+        public class NodeArray: BufferedArray<EventNode> {
 
-            public new NodeArray Add ( Node node ) {
+            public new NodeArray Add ( EventNode node ) {
                 return (NodeArray) base.Add(node);
             }
 
-            public NodeArray Remove ( Node node ) {
+            public NodeArray Remove ( EventNode node ) {
                 Map(( e ) => { return e.mName == node.mName ? null : e; });
                 SetFront();
                 return this;
@@ -55,7 +53,7 @@ namespace BasicExtends {
                 ForEach(( e ) =>
                 {
                     Assert.IsNotNull(e);
-                    if (e.mName != state.ToUpper()) { return; }
+                    if (e.mName.ToUpper() != state.ToUpper()) { return; }
                     e.mActions.Invoke(component);
                 });
                 AfterAction(state, component);
@@ -63,56 +61,67 @@ namespace BasicExtends {
         }
 
 
-        public class StateEvent : MonoBehaviour {
+    }
 
-            [SerializeField]
-            private string mState = ("start");
+    public class StateEvent: MonoBehaviour {
 
-            [SerializeField]
-            private NodeArray mNodes = new NodeArray();
+        [SerializeField]
+        private string mState = ("start");
 
-            //メインスレッド以外から呼び出すときもあるため必要
-            private string mObjectName = "";
+        [SerializeField]
+        private NodeArray mNodes = new NodeArray();
 
-            private void Start () {
-                MessengerSetup();
-                mObjectName = gameObject.name;
-            }
+        //メインスレッド以外から呼び出すときもあるため必要
+        private string mObjectName = "";
 
-            private void MessengerSetup () {
-                Messenger.Assign(( Msg msg ) =>
-                {
-                    if (msg.Unmatch("to", mObjectName)) { return; }
-                    if (msg.Unmatch("as", GetType().Name)) { return; }
-                    if (msg.Match("Network", "true")) { return; }
-                    if (msg.Match("act", "SetState")) {
-                        var state = msg.TryGet("state");
-                        SetState(state);
-                        return;
-                    }
-                });
-            }
-            private void Reset () {
-                //if (mNodes.Length != 0) { return; }
-                mNodes.Reset()
-                    .Add(new Node("start"))
-                .Add(new Node("update"))
-                .Add(new Node("end"));
-            }
+        protected virtual void StartProcess () { }
 
-            private void Update () {
-                mNodes.Invoke(mState, this);
-            }
+        private void Start () {
+            mObjectName = gameObject.name;
+            StartProcess();
+            MessengerSetup();
+        }
 
-            public void SetState ( string state ) {
-                mState = state;
-            }
+        private void MessengerSetup () {
+            Messenger.Assign(( Msg msg ) =>
+            {
+                if (msg.Unmatch("to", mObjectName)) { return; }
+                if (msg.Unmatch("as", GetType().Name)) { return; }
+                if (msg.Match("Network", "true")) { return; }
+                if (msg.Match("act", "SetState")) {
+                    var state = msg.TryGet("state");
+                    SetState(state);
+                    return;
+                }
+            });
+        }
+        private void Reset () {
+            //if (mNodes.Length != 0) { return; }
+            mNodes.Reset()
+                .Add(new EventNode("start"))
+                .Add(new EventNode("update"))
+                .Add(new EventNode("end"));
+        }
 
-            public void DebugPrint ( string str ) {
-                DebugLog.Log.Print("{0}({1}){2}{3} "
-                    , gameObject.name, mState
-                    , str.Length == 0 ? "" : " : ", str);
-            }
+        private void Update () {
+            mNodes.Invoke(mState, this);
+        }
+
+        public void SetState ( string state ) {
+            mState = state;
+        }
+
+        public void SetUpdate () {
+            SetState("update");
+        }
+        public void SetEnd () {
+            SetState("end");
+        }
+
+        public void DebugPrint ( string str ) {
+            DebugLog.Log.Print("{0}({1}){2}{3} "
+                , gameObject.name, mState
+                , str.Length == 0 ? "" : " : ", str);
         }
     }
 }
