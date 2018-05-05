@@ -53,8 +53,16 @@ namespace BasicExtends {
         /// この中に入れられたアクション経由で、
         /// メッセージの処理を書くことになる。
         /// </summary>
-        /// <param name="callback"></param>
         public static void Assign ( Action<Msg> callback ) {
+            /* Usage : Copy%Paste this
+               Messenger.Assign(msg =>{
+                    if (msg.Unmatch("To", gameObject.name)) { return; }
+                    if (msg.Unmatch("as", GetType().Name)) { return; }
+                    if (msg.Match("act", "A")) {
+                        return;
+                    }
+               });
+             */
             Instance.mCallBacks.Add(callback);
         }
     }

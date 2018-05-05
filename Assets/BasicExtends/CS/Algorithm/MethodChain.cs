@@ -5,6 +5,7 @@
 
     public interface IMethodChain<A> where A : class {
         void Invoke ( A arg );
+        void Assign ( Func<A, bool> func );
         List<Func<A, bool>> GetProcessHolder ();
         void SetDefault ( Func<A, bool> action );
     }
@@ -38,6 +39,11 @@
             Assert.IsNotNull(mDefault);
             mDefault(arg);
         }
+
+        public void Assign ( Func<A, bool> func ) {
+            mList.Add(func);
+        }
+
 
         /// <summary>
         /// 名前がGetListでないのは、
