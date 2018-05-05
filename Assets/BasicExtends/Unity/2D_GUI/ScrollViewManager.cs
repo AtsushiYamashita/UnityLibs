@@ -11,7 +11,7 @@ public class ScrollViewManager: MonoBehaviour {
         if (target == null) { return -1; }
         var vp = gameObject.FindChild("Viewport");
         var cnt = vp.FindChild("Content");
-        var elements = cnt.Children().Select(( e ) => { return e.GetComponent<ScrollViewElement>(); });
+        var elements = cnt.ActiveChildren().Select(( e ) => { return e.GetComponent<ScrollViewElement>(); });
         int count = 0;
         foreach(var e in elements) {
             if(target == e) { return count; }

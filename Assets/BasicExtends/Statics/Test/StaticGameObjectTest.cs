@@ -3,7 +3,7 @@
     public class StaticGameObjectTest: TestComponent {
 
         public string ChildrenTest () {
-            var children = gameObject.Children();
+            var children = gameObject.ActiveChildren();
             var count = transform.childCount;
             for (int i = 0; i < count; i++) {
                 var c1 = transform.GetChild(i).IID();
@@ -18,7 +18,7 @@
 
         public string BrotherTest () {
             var parent = transform.parent.gameObject;
-            var cren = parent.Children();
+            var cren = parent.ActiveChildren();
             var brt = gameObject.FindBrother("ccc");
             if (cren [1].IID() != brt.IID()) {
                 return "正しい兄弟関係のオブジェクトではありません";
@@ -32,7 +32,7 @@
         }
 
         public string ChildTest () {
-            var c1 = gameObject.Children() [0].IID();
+            var c1 = gameObject.ActiveChildren() [0].IID();
             var c2 = gameObject.FindChild("bbb").IID();
             if (c1 != c2) {
                 return "正しい親子関係のオブジェクトではありません";
