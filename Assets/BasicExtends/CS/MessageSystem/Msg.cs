@@ -261,15 +261,22 @@
 
         public string ToJson()
         {
-            if (mObjectData != (object)NULL.Null) { Set("mObjectData", mObjectData.ToJson()); }
+            // デフォルトでは付属オブジェクトを直列化するものとして
+            // data2jsonにFalseを指定している場合だけ拒否する
+            // 既存コードに変更を加えないで対応するため
+            var data2json = Match("data2json", "False") == false;
+            if (mObjectData != (object)NULL.Null && data2json) {
+                Set("mObjectData", mObjectData.ToJson());
+            }
             var str = JsonStringify.Stringify(this);
             return str;
         }
 
         public void FromJson(JsonNode node)
         {
-            throw new NotImplementedException();
+            if (node.IsNull()) { throw new Exception(); }
+            if (node.Count < 1) { throw new Exception(); }
+            throw new Exception();
         }
-
     }
 }
