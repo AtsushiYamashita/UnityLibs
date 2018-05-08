@@ -92,5 +92,26 @@
             ROT = node ["rot"].Parse<Vec3>();
             SCA = node ["sca"].Parse<Vec3>();
         }
+
+        public override bool Equals ( object obj ) {
+            var trfm = obj as Trfm;
+            if (trfm.IsNull()) { return false; }
+            return this == trfm;
+        }
+
+        public override int GetHashCode () {
+            var hashCode = 1368377165;
+            hashCode = hashCode * -1521134295 + EqualityComparer<Vec3>.Default.GetHashCode(POS);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Vec3>.Default.GetHashCode(ROT);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Vec3>.Default.GetHashCode(SCA);
+            return hashCode;
+        }
+
+        public static bool operator == ( Trfm trfm1, Trfm trfm2 ) {
+            return EqualityComparer<Trfm>.Default.Equals(trfm1, trfm2);
+        }
+        public static bool operator != ( Trfm trfm1, Trfm trfm2 ) {
+            return !(trfm1 == trfm2);
+        }
     }
 }

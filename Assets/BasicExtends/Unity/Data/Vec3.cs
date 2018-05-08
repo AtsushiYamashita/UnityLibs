@@ -104,5 +104,27 @@
         public override string ToString () {
             return ToJson();
         }
+
+        public override bool Equals ( object obj ) {
+            var vec = obj as Vec3;
+            if (vec.IsNull()) { return false; }
+            return this == vec;
+        }
+
+        public override int GetHashCode () {
+            var hashCode = -307843816;
+            hashCode = hashCode * -1521134295 + X.GetHashCode();
+            hashCode = hashCode * -1521134295 + Y.GetHashCode();
+            hashCode = hashCode * -1521134295 + Z.GetHashCode();
+            return hashCode;
+        }
+
+        public static bool operator == ( Vec3 vec1, Vec3 vec2 ) {
+            return EqualityComparer<Vec3>.Default.Equals(vec1, vec2);
+        }
+
+        public static bool operator != ( Vec3 vec1, Vec3 vec2 ) {
+            return !(vec1 == vec2);
+        }
     }
 }
