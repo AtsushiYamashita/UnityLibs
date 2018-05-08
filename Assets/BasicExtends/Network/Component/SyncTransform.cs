@@ -6,13 +6,10 @@
     public class SyncTransform : MonoBehaviour
     {
         [SerializeField]
-        private string ip = "0";
+        private int mPlayerNo = 0;
 
         [SerializeField]
-        private int port = 0;
-
-        [SerializeField]
-        private int mPase = 3;
+        private int mPase = 2;
         private int mCount = 0;
 
         [SerializeField]
@@ -21,10 +18,12 @@
         [SerializeField]
         private float mSpeed = 0.8f;
 
+        [SerializeField]
+        private bool mIsLocal = false;
+
         Vector3 mPos = Vector3.zero;
         Vector3 mRot = Vector3.zero;
         Vector3 mSca = Vector3.zero;
-
 
         void Reset()
         {
@@ -33,54 +32,50 @@
 
         void Start()
         {
-            MessengerSetup();
-        }
-
-        private void MessengerSetup()
-        {
-            Messenger.Assign((Msg msg) =>
+            Messenger.Assign(( Msg msg ) =>
             {
                 if (msg.Match("Network", "true")) { return; }
                 if (msg.Unmatch("to", gameObject.name)) { return; }
                 if (msg.Unmatch("as", GetType().Name)) { return; }
-                if (msg.Match("act", "Sync") && msg.ContainsKey("FROM"))
-                {
+                if (msg.Match("act", "Sync") && msg.ContainsKey("FROM")) {
                     var rec = msg.TryObjectGet<Trfm>();
-                    Sync(rec);
+                    var islocal = msg.Match("isLocal","True");
+                    Sync(rec, islocal);
                     return;
                 }
             });
         }
 
-        private Vector3 VecFill(Vector3 to, Vector3 local)
+        private void Sync(Trfm rec,bool islocal)
         {
-            if (to == Vector3.zero) { return local; }
-            if (transform.localPosition == to) { return local; }
-            var dif = to - local;
-            var move = dif * mSpeed;
-            return move.magnitude > 0.05f ? move + local : to;
-        }
+            var pos = rec.POS.Convert();
+            var rot = rec.ROT.Convert();
+            var sca = rec.SCA.Convert();
+            if (islocal) {
+                transform.localPosition = pos;
+                transform.localEulerAngles = rot;
+                transform.localScale = sca;
+            } else {
+                transform.position = pos;
+                transform.eulerAngles = rot;
+                transform.localScale = sca;
+            }
 
-        private void Sync(Trfm rec)
-        {
-            mPos = rec.POS.Convert();
-            mRot = rec.ROT.Convert();
-            mSca = rec.SCA.Convert();
         }
 
         private void Update()
         {
-            transform.localPosition = VecFill(mPos, transform.localPosition);
-            transform.localEulerAngles = VecFill(mRot, transform.localEulerAngles);
-            transform.localScale = VecFill(mSca, transform.localScale);
-
             if (mCount++ % mPase != 0) { return; }
+            System.Func<Transform, Trfm> func = mIsLocal 
+                ? (System.Func<Transform, Trfm>) Trfm.Convert 
+                : Trfm.ConvertWorld;
             Msg.Gen()
                 .To(mSyncTo)
                 .As(GetType().Name)
                 .Act("Sync")
-                .Netwrok(ip, port)
-                .SetObjectData(Trfm.Convert(transform)).Pool();
+                .Set("isLocal",mIsLocal? "True": "False")
+                .Netwrok()
+                .SetObjectData(func(transform)).Pool();
         }
     }
 

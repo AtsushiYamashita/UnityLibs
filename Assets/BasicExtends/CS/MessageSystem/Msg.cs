@@ -160,6 +160,10 @@
             return Set("act", v);
         }
 
+        public Msg UnJsonable ( ) {
+            return Set("data2json", "False");
+        }
+
         public Msg Message(string v)
         {
             return Set("msg", v);

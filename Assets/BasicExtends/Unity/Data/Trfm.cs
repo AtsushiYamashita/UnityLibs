@@ -51,6 +51,9 @@
         public static Trfm Convert ( Transform tr ) {
             return new Trfm().Set(tr);
         }
+        public static Trfm ConvertWorld ( Transform tr ) {
+            return new Trfm().SetWorld(tr);
+        }
 
         public void Convert ( ref Transform tr ) {
             tr.localPosition = POS.Convert();
@@ -61,6 +64,13 @@
         public Trfm Set ( Transform tf ) {
             POS = Vec3.Convert(tf.localPosition);
             ROT = Vec3.Convert(tf.localEulerAngles);
+            SCA = Vec3.Convert(tf.localScale);
+            return this;
+        }
+
+        public Trfm SetWorld ( Transform tf ) {
+            POS = Vec3.Convert(tf.position);
+            ROT = Vec3.Convert(tf.eulerAngles);
             SCA = Vec3.Convert(tf.localScale);
             return this;
         }

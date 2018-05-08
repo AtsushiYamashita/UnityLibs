@@ -29,19 +29,24 @@ namespace BasicExtends {
         private bool mPhotoWakeupping = false;
         private float mOpacity = 0.9f;
         private string mTo = "";
-        private const string DATA_MSG_AS = "MessageTransporter";
+        private string mAs = "";
         private const bool mCompress = false;
+        private const int PACKET_SIZE = 600;
 
-        public CaptureCam ( string to ) {
-            mTo = to;
+
+        public CaptureCam () {
             Assert.IsNotNull(mResolution);
+        }
+
+        public CaptureCam Set ( string to, string as_ ) {
+            mTo = to;
+            mAs = as_;
+            return this;
         }
 
         /// <summary>
         /// WebCameraとしてカメラ画像をキャプチャする
         /// </summary>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
         public void Capture ( Action start = null, Action end = null ) {
             Debug.LogFormat("Capture => {0}", "call 1");
             if (mCameraInstance == null || mRecMode == false) {
@@ -56,8 +61,9 @@ namespace BasicExtends {
                 if (result.success == false) { return; }
                 if (start != null) { start.Invoke(); }
 
-                List<byte> buf = new List<byte>();
+                var buf = new ByteList();
                 captured.CopyRawImageDataIntoBuffer(buf);
+                //var bufd = buf as ByteList;
 
                 var w = mCompress ? mResolution.Width / 2 : mResolution.Width / 1;
                 var h = mCompress ? mResolution.Heignt / 2 : mResolution.Heignt / 1;
@@ -65,16 +71,29 @@ namespace BasicExtends {
 #if mCompress
                 PictureDiet(buf, mResolution.Width, mResolution.Heignt);
 #endif
-                
-                // 撮影データのメッセージ送信
-                Msg.Gen().To(mTo).As(DATA_MSG_AS)
-                    .Act("Print")
-                    .Set("w", w)
-                    .Set("h", h)
-                    .Set("Data", buf.Count)
-                    .SetObjectData(buf).Pool();
-                //BinarySerial.Save("test", buf);
+                int splited = buf.Count / PACKET_SIZE + 1;
+                var tick = DateTime.Now.Ticks;
+                for(int id = 0; id < 200; id++) {
+                    System.Threading.ThreadPool.QueueUserWorkItem(( obj ) =>
+                    {
+                        var t = buf.GetRange(PACKET_SIZE * id, PACKET_SIZE);
+                        // 撮影データのメッセージ送信
+                        Msg.Gen().To(mTo)
+                            .As(mAs)
+                            .Act("Print2")
+                            .Set("w", w)
+                            .Set("h", h)
+                            .Set("tick", tick)
+                            .Set("type", t.GetType().Name)
+                            .Set("id", id) // 分割データID
+                            .Set("splited", splited) // データ分割数
+                            .Set("packet_size", PACKET_SIZE) // 規定サイズ
+                            .SetObjectData(t)
+                            .UnJsonable().Pool();
+                    });
+                }
 
+                //BinarySerial.Save("test", buf);
                 if (end != null) { end.Invoke(); }
             });
         }
@@ -134,7 +153,7 @@ namespace BasicExtends {
                 }
 
                 // テクスチャセットアップのための解像度通知
-                Msg.Gen().To(mTo).As(DATA_MSG_AS)
+                Msg.Gen().To(mTo).As(mAs)
                     .Act("Setup")
                     .Set("w", mCompress ? res.width / 2 : res.width / 1)
                     .Set("h", mCompress ? res.height / 2 : res.height / 1)
@@ -183,6 +202,4 @@ namespace BasicExtends {
             return mCameraParam;
         }
     }
-
-
 }

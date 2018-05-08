@@ -68,6 +68,7 @@
 
         public byte[] DropRange(int start, int end, Func<byte,byte> pipe = null ) {
             pipe = pipe ?? NULL_PIPE;
+            end = end < Count ? end : Count;
             byte [] buf = new byte [end - start];
             for (int i = start; i < end; i++) {
                 buf [i] = this [start];
