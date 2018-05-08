@@ -1,10 +1,8 @@
-﻿namespace BasicExtends
-{
+﻿namespace BasicExtends {
 
     using UnityEngine;
 
-    public class SyncTransform : MonoBehaviour
-    {
+    public class SyncTransform: MonoBehaviour {
         [SerializeField]
         private int mPlayerNo = 0;
 
@@ -21,36 +19,34 @@
         [SerializeField]
         private bool mIsLocal = false;
 
-        Vector3 mPos = Vector3.zero;
-        Vector3 mRot = Vector3.zero;
-        Vector3 mSca = Vector3.zero;
+        private Trfm mPrev = null;
+        private Trfm mTo = null;
 
-        void Reset()
-        {
+        void Reset () {
             mSyncTo = name;
+            mPrev = Trfm.Convert(transform);
         }
 
-        void Start()
-        {
+        void Start () {
             Messenger.Assign(( Msg msg ) =>
             {
                 if (msg.Match("Network", "true")) { return; }
                 if (msg.Unmatch("to", gameObject.name)) { return; }
                 if (msg.Unmatch("as", GetType().Name)) { return; }
                 if (msg.Match("act", "Sync") && msg.ContainsKey("FROM")) {
-                    var rec = msg.TryObjectGet<Trfm>();
-                    var islocal = msg.Match("isLocal","True");
-                    Sync(rec, islocal);
+                    mTo = msg.TryObjectGet<Trfm>();
+                    mPrev = mTo;
+                    var islocal = msg.Match("isLocal", "True");
+                    Sync(islocal);
                     return;
                 }
             });
         }
 
-        private void Sync(Trfm rec,bool islocal)
-        {
-            var pos = rec.POS.Convert();
-            var rot = rec.ROT.Convert();
-            var sca = rec.SCA.Convert();
+        private void Sync ( bool islocal ) {
+            var pos = mTo.POS.Convert();
+            var rot = mTo.ROT.Convert();
+            var sca = mTo.SCA.Convert();
             if (islocal) {
                 transform.localPosition = pos;
                 transform.localEulerAngles = rot;
@@ -60,22 +56,23 @@
                 transform.eulerAngles = rot;
                 transform.localScale = sca;
             }
-
         }
 
-        private void Update()
-        {
+        private void Update () {
             if (mCount++ % mPase != 0) { return; }
-            System.Func<Transform, Trfm> func = mIsLocal 
-                ? (System.Func<Transform, Trfm>) Trfm.Convert 
+            System.Func<Transform, Trfm> func = mIsLocal
+                ? (System.Func<Transform, Trfm>) Trfm.Convert
                 : Trfm.ConvertWorld;
+            var data = func(transform);
+            if (data == mPrev) { return; }
+
             Msg.Gen()
                 .To(mSyncTo)
                 .As(GetType().Name)
                 .Act("Sync")
-                .Set("isLocal",mIsLocal? "True": "False")
+                .Set("isLocal", mIsLocal ? "True" : "False")
                 .Netwrok()
-                .SetObjectData(func(transform)).Pool();
+                .SetObjectData(data).Pool();
         }
     }
 
