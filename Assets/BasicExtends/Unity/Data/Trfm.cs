@@ -51,6 +51,9 @@
         public static Trfm Convert ( Transform tr ) {
             return new Trfm().Set(tr);
         }
+        public static Trfm ConvertWorld ( Transform tr ) {
+            return new Trfm().SetWorld(tr);
+        }
 
         public void Convert ( ref Transform tr ) {
             tr.localPosition = POS.Convert();
@@ -61,6 +64,13 @@
         public Trfm Set ( Transform tf ) {
             POS = Vec3.Convert(tf.localPosition);
             ROT = Vec3.Convert(tf.localEulerAngles);
+            SCA = Vec3.Convert(tf.localScale);
+            return this;
+        }
+
+        public Trfm SetWorld ( Transform tf ) {
+            POS = Vec3.Convert(tf.position);
+            ROT = Vec3.Convert(tf.eulerAngles);
             SCA = Vec3.Convert(tf.localScale);
             return this;
         }
@@ -81,6 +91,27 @@
             POS = node ["pos"].Parse<Vec3>();
             ROT = node ["rot"].Parse<Vec3>();
             SCA = node ["sca"].Parse<Vec3>();
+        }
+
+        public override bool Equals ( object obj ) {
+            var trfm = obj as Trfm;
+            if (trfm.IsNull()) { return false; }
+            return this == trfm;
+        }
+
+        public override int GetHashCode () {
+            var hashCode = 1368377165;
+            hashCode = hashCode * -1521134295 + EqualityComparer<Vec3>.Default.GetHashCode(POS);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Vec3>.Default.GetHashCode(ROT);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Vec3>.Default.GetHashCode(SCA);
+            return hashCode;
+        }
+
+        public static bool operator == ( Trfm trfm1, Trfm trfm2 ) {
+            return EqualityComparer<Trfm>.Default.Equals(trfm1, trfm2);
+        }
+        public static bool operator != ( Trfm trfm1, Trfm trfm2 ) {
+            return !(trfm1 == trfm2);
         }
     }
 }
