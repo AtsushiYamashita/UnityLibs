@@ -29,7 +29,7 @@ namespace BasicExtends {
         private void MessengerSetup () {
             Messenger.Assign(( Msg msg ) =>
             {
-                Debug.Log(msg.ToJson());
+                //Debug.Log(msg.ToJson());
                 if (msg.Unmatch("to", gameObject.name)) { return; }
                 if (msg.Unmatch("As", GetType().Name)) { return; }
                 if (msg.Match("act", "Setup")) {
@@ -43,6 +43,14 @@ namespace BasicExtends {
                     Print(msg.TryObjectGet<List<byte>>().ToArray());
                     return;
                 }
+                if (msg.Match("act", "Print2")) {
+                    Debug.Log("msg.Match(act, Print))");
+                    Print(int.Parse(msg.TryGet("id")),
+                        int.Parse(msg.TryGet("splited")),
+                        int.Parse(msg.TryGet("packet_size")), 
+                        msg.TryObjectGet<List<byte>>().ToArray());
+                    return;
+                }
             });
         }
 
@@ -51,6 +59,10 @@ namespace BasicExtends {
             mTexture=CreateTexture(w, h);
             mRender.material.mainTexture = mTexture;
             Assert.IsNotNull(mTexture);
+            mColor = new Color [w * h];
+            for (int i = 0;i < mColor.Length; i++) {
+                mColor[i] = new Color(0,0,0);
+            }
             mSetupped = true;
         }
 
@@ -77,13 +89,15 @@ namespace BasicExtends {
 
 
         public void Print (PhotoCaptureFrame captured) {
-            if (mSetupped == false) { throw new System.Exception("Not setuped yet.");  }
+            if (mSetupped == false) {
+                throw new System.Exception("Not setuped yet.");  }
 
 
             List<byte> buf = new List<byte>();
             captured.CopyRawImageDataIntoBuffer(buf);
 
-            var b = Serializer.Serialize(new Pair<string, byte []>().Set("てすと", buf.ToArray()));
+            var b = Serializer.Serialize(
+                new Pair<string, byte []>().Set("てすと", buf.ToArray()));
             Print(b.ToArray());
         }
 
@@ -119,8 +133,37 @@ namespace BasicExtends {
             mTexture.Apply();
 
             mRender.material.SetTexture("_MainTex", mTexture);
-
         }
 
+        Color [] mColor ;
+
+        public void Print (int id, int splited,int packet_size, byte [] argb_bytes ) {
+
+            //var bd = BinarySerial.Deserialize<Pair<string, byte []>>(argb_bytes);
+            //Debug.Log("bd" + bd.Key);
+            //argb_bytes = bd.Value;
+
+            int stride = 4;
+            float denominator = 1.0f / 255.0f;
+
+            for (int i = id * packet_size, p = id * packet_size/4; i < argb_bytes.Length; i += stride,p++) {
+                // char added = (char) argb_bytes [i - 0];
+                mColor [p].b = (int) (argb_bytes [i + 0]) * denominator;
+                mColor [p].g = (int) (argb_bytes [i + 1]) * denominator;
+                mColor [p].r = (int) (argb_bytes [i + 2]) * denominator;
+                mColor [p].a = 0;
+            }
+            Msg.Gen().To("Debug").Act("log")
+                .Set("id", id)
+                .Set("splited", splited)
+                .Set("packet_size", packet_size)
+                .Set("mColor[id * packet_size/4].r", mColor [id * packet_size / 4].r)
+                .Pool();
+
+            mTexture.SetPixels(mColor);
+            mTexture.Apply();
+
+            mRender.material.SetTexture("_MainTex", mTexture);
+        }
     }
 }

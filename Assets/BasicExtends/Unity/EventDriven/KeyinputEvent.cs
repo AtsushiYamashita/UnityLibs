@@ -34,10 +34,10 @@
     }
 
     [Serializable]
-    public class KeyEvent: MonoBehaviour {
+    public class KeyinputEvent: MonoBehaviour {
 
         [SerializeField]
-        private List<KEvent> mEventList = new List<KEvent>();
+        private List<KEvent> mEventList = new List<KEvent>() { new KEvent() };
 
         void Update () {
             foreach(var e in mEventList) {
