@@ -18,6 +18,10 @@
 
         [SerializeField]
         private string mTo = "";
+        [SerializeField]
+        private string mAs = "";
+
+        private const string DATA_MSG_AS = "MessageTransporter";
 
         [SerializeField]
         private UnityEvent mWakeupOk = new UnityEvent();
@@ -34,11 +38,15 @@
         private bool mNessClose = false;
 
         public void Start () {
-            mCamera = new CaptureCam(mTo);
+            mCamera = new CaptureCam().Set(mTo,mAs);
             mCamera.SetHoloOpacity(mOpacity);
             Assert.IsTrue(mTo.Length > 1);
         }
 
+        public void Reset() {
+            mTo = name;
+            mAs = DATA_MSG_AS;
+        }
 
         public void CameraWakeup_1 () {
             mCamera.CameraWakeUp(() =>
