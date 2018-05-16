@@ -14,6 +14,7 @@ namespace BasicExtends
         [SerializeField]
         private SyncTo mSyncTo = new SyncTo();
         private SyncData<Trfm> mSync = new SyncData<Trfm>();
+        private string mOwnIpid = "";
 
         /// <summary>
         /// 移動の速度
@@ -59,7 +60,7 @@ namespace BasicExtends
         private void Start()
         {
             mSync.Setup(mSyncTo,
-                msg => mSyncTo.mIpid == msg.TryGet("IPID"), // sync condition
+                msg => mOwnIpid == msg.TryGet("IPID"), // sync condition
                 e => { transform.localScale = e.SCA.Convert(); }, // 1st time only
                 SyncUpdate);
             var type = mIsLocal ? Trfm.Type.Local : Trfm.Type.World;
@@ -67,17 +68,11 @@ namespace BasicExtends
 
             Messenger.Assign((msg) =>
             {
-                if (msg.Match(Msg.ACT, "AutoSetIPID"))
-                {
-                    // 念のため、AutoSetIPIDを使う場合はPoolでStart後に処理するように。
-                    var ipid = msg.TryGet("IPID");
-                    return;
-                }
                 if (msg.Unmatch(Msg.TO, name)) { return; }
                 if (msg.Unmatch(Msg.AS, GetType().Name)) { return; }
                 if (msg.Match(Msg.ACT, "SetIPID"))
                 {
-                    var ipid = msg.TryGet("IPID");
+                    mOwnIpid = msg.TryGet("IPID");
                     return;
                 }
             });
