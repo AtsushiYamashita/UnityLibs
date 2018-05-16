@@ -14,6 +14,11 @@
         private object mObjectData = NULL.Null;
         private const int HEAD_SIZE = 4;
 
+        public const string TO = "to";
+        public const string AS = "as";
+        public const string ACT = "act";
+        public const string MSG = "msg";
+
         public Msg()
         {
             Serializer.AssignSerializer(GetType().Name, Serial);
@@ -145,26 +150,6 @@
             return Set(key, "" + value);
         }
 
-        public Msg To(string v)
-        {
-            return Set("to", v);
-        }
-
-        public Msg As(string v)
-        {
-            return Set("as", v);
-        }
-
-        public Msg Act(string v)
-        {
-            return Set("act", v);
-        }
-
-        public Msg Message(string v)
-        {
-            return Set("msg", v);
-        }
-
         public Msg Netwrok(string ip = "", int port = 0)
         {
             return Set("Network", "True").Set("ToIp", ip).Set("port", port);
@@ -234,9 +219,10 @@
             return insideValue;
         }
 
-        public T TryObjectGet<T>() where T : class
+        public T TryObjectGet<T>()
         {
-            return mObjectData as T;
+            try { return (T)mObjectData; }
+            catch { return default(T); }
         }
 
         /// <summary>

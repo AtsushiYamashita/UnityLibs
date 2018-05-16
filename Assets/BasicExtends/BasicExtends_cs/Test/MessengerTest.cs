@@ -56,9 +56,9 @@ public class MessengerTest: TestComponent {
         });
 
         if (n != string.Empty) { return "ゴミが入っています"; }
-        var m = Msg.Gen().To("m").Message("test").Push();
+        var m = Msg.Gen().Set(Msg.TO,"m").Set(Msg.MSG,"test").Push();
         if (n != string.Empty) { return "ゴミが入っています"; }
-        m.To("n").Push();
+        m.Set(Msg.TO,"n").Push();
         if (received != 2) { return "通信回数に異常があります。"; }
         if (n != "test") { return "正しく送信できていません"; }
         return Pass();
