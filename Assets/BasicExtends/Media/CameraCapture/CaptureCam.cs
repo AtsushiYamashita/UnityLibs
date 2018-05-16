@@ -1,4 +1,5 @@
 ﻿#pragma warning disable 0429
+#if false
 
 using System;
 using System.Collections.Generic;
@@ -192,3 +193,4 @@ namespace BasicExtends
         }
     }
 }
+#endif

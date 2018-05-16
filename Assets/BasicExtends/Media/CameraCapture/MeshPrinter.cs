@@ -1,4 +1,6 @@
-﻿using OpenCVForUnity;
+﻿#if false
+
+using OpenCVForUnity;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -162,3 +164,4 @@ namespace BasicExtends {
         }
     }
 }
+#endif
