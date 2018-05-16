@@ -1,87 +1,95 @@
 ﻿namespace BasicExtends
 {
-
     using UnityEngine;
+    using System;
 
+    /// <summary>
+    /// Transformをネットワーク越しに同期する。
+    /// </summary>
     public class SyncTransform : MonoBehaviour
     {
+        /// <summary>
+        /// 同期する対象の設定
+        /// </summary>
         [SerializeField]
-        private string ip = "0";
+        private SyncTo mSyncTo = new SyncTo();
+        private SyncData<Trfm> mSync = new SyncData<Trfm>();
 
-        [SerializeField]
-        private int port = 0;
-
-        [SerializeField]
-        private int mPase = 3;
-        private int mCount = 0;
-
-        [SerializeField]
-        private string mSyncTo = "";
-
+        /// <summary>
+        /// 移動の速度
+        /// </summary>
         [SerializeField]
         private float mSpeed = 0.8f;
 
-        Vector3 mPos = Vector3.zero;
-        Vector3 mRot = Vector3.zero;
-        Vector3 mSca = Vector3.zero;
+        /// <summary>
+        /// ローカル座標系で計算するか
+        /// </summary>
+        [SerializeField]
+        private bool mIsLocal = false;
+        private Trfm mPrevs = null;
 
-
-        void Reset()
+        public void SetIpId(string ipid)
         {
-            mSyncTo = name;
+            mSyncTo.mIpid = ipid;
         }
 
-        void Start()
+        private void Reset()
         {
-            MessengerSetup();
+            mSyncTo.mComponentName = GetType().Name;
+            mSyncTo.mObjectName = name;
         }
 
-        private void MessengerSetup()
+        /// <summary>
+        /// ローカルとワールドそれぞれに合わせて、
+        /// 目標位置にイージングで近づく
+        /// </summary>
+        private void SyncUpdate(Trfm e)
         {
-            Messenger.Assign((Msg msg) =>
+            var pos_from = mIsLocal ? transform.localPosition : transform.position;
+            var pos_set = mIsLocal ?
+                (Action<Vector3>)transform.MoveToLocal : transform.MoveTo;
+            pos_set(Vector3.Lerp(pos_from, e.POS.Convert(), mSpeed));
+
+            var rot_from = mIsLocal ? transform.localRotation : transform.rotation;
+            var rot_set = mIsLocal ?
+                (Action<Quaternion>)transform.RotateToLocal : transform.RotateTo;
+            rot_set(Quaternion.Lerp(rot_from, Quaternion.Euler(e.ROT.Convert()), mSpeed));
+        }
+
+        private void Start()
+        {
+            mSync.Setup(mSyncTo,
+                msg => mSyncTo.mIpid == msg.TryGet("IPID"), // sync condition
+                e => { transform.localScale = e.SCA.Convert(); }, // 1st time only
+                SyncUpdate);
+            var type = mIsLocal ? Trfm.Type.Local : Trfm.Type.World;
+            mPrevs = Trfm.Convert(transform, type);
+
+            Messenger.Assign((msg) =>
             {
-                if (msg.Match("Network", "true")) { return; }
-                if (msg.Unmatch("to", gameObject.name)) { return; }
-                if (msg.Unmatch("as", GetType().Name)) { return; }
-                if (msg.Match("act", "Sync") && msg.ContainsKey("FROM"))
+                if (msg.Match(Msg.ACT, "AutoSetIPID")) 
                 {
-                    var rec = msg.TryObjectGet<Trfm>();
-                    Sync(rec);
+                    // 念のため、AutoSetIPIDを使う場合はPoolでStart後に処理するように。
+                    var ipid = msg.TryGet("IPID");
+                    return;
+                }
+                if (msg.Unmatch(Msg.TO, name)) { return; }
+                if (msg.Unmatch(Msg.AS, GetType().Name)) { return; }
+                if (msg.Match(Msg.ACT, "SetIPID"))
+                {
+                    var ipid = msg.TryGet("IPID");
                     return;
                 }
             });
         }
 
-        private Vector3 VecFill(Vector3 to, Vector3 local)
-        {
-            if (to == Vector3.zero) { return local; }
-            if (transform.localPosition == to) { return local; }
-            var dif = to - local;
-            var move = dif * mSpeed;
-            return move.magnitude > 0.05f ? move + local : to;
-        }
-
-        private void Sync(Trfm rec)
-        {
-            mPos = rec.POS.Convert();
-            mRot = rec.ROT.Convert();
-            mSca = rec.SCA.Convert();
-        }
-
         private void Update()
         {
-            transform.localPosition = VecFill(mPos, transform.localPosition);
-            transform.localEulerAngles = VecFill(mRot, transform.localEulerAngles);
-            transform.localScale = VecFill(mSca, transform.localScale);
+            mSync.Sync();
 
-            if (mCount++ % mPase != 0) { return; }
-            Msg.Gen()
-                .To(mSyncTo)
-                .As(GetType().Name)
-                .Act("Sync")
-                .Netwrok(ip, port)
-                .SetObjectData(Trfm.Convert(transform)).Pool();
+            var type = mIsLocal ? Trfm.Type.Local : Trfm.Type.World;
+            var now = Trfm.Convert(transform, type);
+            mSync.UpdateSend(() => { return mPrevs != now; }, now);
         }
     }
-
 }
