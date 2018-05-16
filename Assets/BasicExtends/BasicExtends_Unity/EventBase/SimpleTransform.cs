@@ -18,8 +18,8 @@ namespace BasicExtends {
             //Msg.Gen().To(gameObject.name).As(GetType().Name).Push();
             Messenger.Assign(( Msg msg ) =>
             {
-                if (msg.Unmatch("to", gameObject.name)) { return; }
-                if (msg.Unmatch("as", GetType().Name)) { return; }
+                if (msg.Unmatch(Msg.TO, gameObject.name)) { return; }
+                if (msg.Unmatch(Msg.AS, GetType().Name)) { return; }
                 
                 if (msg.Match("act", "SetPos")) {
                     Rotate(msg.TryGet("vec"));
@@ -170,7 +170,7 @@ namespace BasicExtends {
         public void DebugPrintTransform () {
             DebugLog.Log.Print("{0}{1} "
                 , gameObject.name
-                , Trfm.Convert(transform).ToJson());
+                , Trfm.Convert(transform, Trfm.Type.Local).ToJson());
         }
     }
 }
