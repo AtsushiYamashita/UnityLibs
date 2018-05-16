@@ -5,17 +5,15 @@
 
     public class ConditionCheck: MonoBehaviour {
 
-        [SerializeField]
-        private bool mResult = false;
+        //[SerializeField]
+        //private bool mResult = false;
         [SerializeField]
         private Component mTarget = null;
 
         public Component Target { get { return mTarget; } }
 
-        [SerializeField]
-        private string mCondition = "";
-
         public void Check () {
+            throw new System.NotImplementedException();
 
         }
 
@@ -26,5 +24,4 @@
             Blackbord.ValueStore.Add(Pair<string, float>.Gen(key, value));
         }
     }
-
 }

@@ -5,7 +5,7 @@ public class NetworkManager: MonoBehaviour {
 
     private void Start () {
         MessengerSetup();
-        Serializer.SetDatatypeBinary(Serializer.SerialType.Binary2);
+        Serializer.SetDatatype(Serializer.SerialType.Binary2);
         Msg.Gen().Set(Msg.TO, gameObject.name)
             .Set(Msg.AS, "UdpReceiver")
             .Set(Msg.ACT, "Start")
