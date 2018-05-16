@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using OpenCVForUnity;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -12,11 +12,13 @@ namespace BasicExtends {
     public class MeshPrinter: MonoBehaviour {
 
         [SerializeField]
+        private UnityEvent mDrawUpdate = new UnityEvent();
+
+        [SerializeField]
         private float mScale = 1f;
         Renderer mRender = null;
         private Texture2D mTexture = null;
         private bool mSetupped = false;
-
 
         private void Start () {
             mRender = GetComponent<Renderer>();
@@ -29,7 +31,7 @@ namespace BasicExtends {
         private void MessengerSetup () {
             Messenger.Assign(( Msg msg ) =>
             {
-                Debug.Log(msg.ToJson());
+                //Debug.Log(msg.ToJson());
                 if (msg.Unmatch("to", gameObject.name)) { return; }
                 if (msg.Unmatch("As", GetType().Name)) { return; }
                 if (msg.Match("act", "Setup")) {
@@ -43,6 +45,11 @@ namespace BasicExtends {
                     Print(msg.TryObjectGet<List<byte>>().ToArray());
                     return;
                 }
+                if (msg.Match("act", "Print2")) {
+                    Debug.Log("msg.Match(act, Print2))");
+                    MatPrint( msg.TryObjectGet<Mat>());
+                    return;
+                }
             });
         }
 
@@ -51,6 +58,10 @@ namespace BasicExtends {
             mTexture=CreateTexture(w, h);
             mRender.material.mainTexture = mTexture;
             Assert.IsNotNull(mTexture);
+            mColor = new Color [w * h];
+            for (int i = 0;i < mColor.Length; i++) {
+                mColor[i] = new Color(0,0,0);
+            }
             mSetupped = true;
         }
 
@@ -77,13 +88,15 @@ namespace BasicExtends {
 
 
         public void Print (PhotoCaptureFrame captured) {
-            if (mSetupped == false) { throw new System.Exception("Not setuped yet.");  }
+            if (mSetupped == false) {
+                throw new System.Exception("Not setuped yet.");  }
 
 
             List<byte> buf = new List<byte>();
             captured.CopyRawImageDataIntoBuffer(buf);
 
-            var b = Serializer.Serialize(new Pair<string, byte []>().Set("てすと", buf.ToArray()));
+            var b = Serializer.Serialize(
+                new Pair<string, byte []>().Set("てすと", buf.ToArray()));
             Print(b.ToArray());
         }
 
@@ -119,8 +132,33 @@ namespace BasicExtends {
             mTexture.Apply();
 
             mRender.material.SetTexture("_MainTex", mTexture);
-
         }
 
+        Color [] mColor ;
+
+        public void MatPrint ( Mat mat) {
+            //OpenCVForUnity.Utils.fastMatToTexture2D(mat, mTexture);
+            //mTexture.Apply();
+            //var s = string.Format("({0},{1},{2},{3})", mat.get(0, 0) [0], mat.get(0, 0) [1], mat.get(0, 0) [2], mat.get(0, 0) [3]);
+            //Msg.Gen().To("Debug").Act("log")
+            //    .Set("msg", "")
+            //    .Set("w", mat.size().width + "")
+            //    .Set("mat(0,0)", s)
+            //    .Set("col(0.0)", mTexture.GetPixel(0, 0) + "")
+            //    .Pool();
+
+            OpenCVForUnity.Utils.matToTexture2D(mat, mTexture);
+            mTexture.Apply();
+            var s = string.Format("({0},{1},{2},{3})", mat.get(0, 0) [0], mat.get(0, 0) [1], mat.get(0, 0) [2], mat.get(0, 0) [3]);
+            Msg.Gen().To("Debug").Act("log")
+                .Set("msg", "")
+                .Set("w", mat.size().width + "")
+                .Set("mat(0,0)", s)
+                .Set("col(0.0)", mTexture.GetPixel(0, 0) + "")
+                .Pool();
+
+
+            mRender.material.SetTexture("_MainTex", mTexture);
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace BasicExtends
+namespace BasicExtends
 {
     using UnityEngine;
     using System;
@@ -67,7 +67,7 @@
 
             Messenger.Assign((msg) =>
             {
-                if (msg.Match(Msg.ACT, "AutoSetIPID")) 
+                if (msg.Match(Msg.ACT, "AutoSetIPID"))
                 {
                     // 念のため、AutoSetIPIDを使う場合はPoolでStart後に処理するように。
                     var ipid = msg.TryGet("IPID");

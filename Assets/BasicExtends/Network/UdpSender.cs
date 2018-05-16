@@ -1,15 +1,15 @@
-﻿using UnityEngine;
-using System.Net;
-using System.Net.Sockets;
+﻿namespace BasicExtends {
+    using UnityEngine;
+    using System.Net;
+    using System.Net.Sockets;
 
-namespace BasicExtends {
     public class UdpSender: MonoBehaviour {
 
         public UdpClient mSendClient = null;
         private LoopThread mLoop;
         private SafeAccessValue<IPEndPoint> mSendTo = new SafeAccessValue<IPEndPoint>();
         private ThreadsafeCounter mSendId = new ThreadsafeCounter();
-        private SafeAccessList<byte[]> mMsgList = new SafeAccessList<byte[]>();
+        private SafeAccessList<byte []> mMsgList = new SafeAccessList<byte []>();
 
         [SerializeField]
         private int mUsePort = NetworkUnit.DEFAULT_PORT_S;
@@ -33,12 +33,12 @@ namespace BasicExtends {
                     return;
                 }
                 if (msg.Unmatch("to", gameObject.name)) { return; }
-                if (msg.Unmatch("As", "Sender")) { return; }
+                if (msg.Unmatch("As", "UdpSender")) { return; }
                 if (msg.Match("act", "Setup")) {
                     Setup();
                     return;
                 }
-                if(msg.Match("act", "SetUsePort")) {
+                if (msg.Match("act", "SetUsePort")) {
                     var port = int.Parse(msg.TryGet("port"));
                     SetUsePort(port);
                 }
@@ -49,16 +49,16 @@ namespace BasicExtends {
             });
         }
 
-        public void SetUsePort (int port) {
+        public void SetUsePort ( int port ) {
             mUsePort = port;
         }
 
         public void SetSendPort ( int port ) {
             mToPort = port;
-            mSendTo.Set( new IPEndPoint(IPAddress.Parse(mToAddress), mToPort));
+            mSendTo.Set(new IPEndPoint(IPAddress.Parse(mToAddress), mToPort));
         }
 
-        public void Setup (  ) {
+        public void Setup () {
             mLoop = new LoopThread();
             mSendTo.Set(new IPEndPoint(IPAddress.Parse(mToAddress), mToPort));
             mSendClient = new UdpClient(new IPEndPoint(IPAddress.Any, mUsePort));
@@ -72,7 +72,7 @@ namespace BasicExtends {
         }
 
         private void SendLoop () {
-            byte[] buffer = mMsgList.Pop();
+            byte [] buffer = mMsgList.Pop();
             if (buffer == null || buffer.Length < 1) {
 
                 System.Threading.Thread.Sleep(NetworkUnit.INTERVAL);
@@ -102,6 +102,13 @@ namespace BasicExtends {
         public void Close () {
             mSendClient.Close();
             mLoop.ThreadStop();
+        }
+
+        public void Reset () {
+            UnityEditor.EditorApplication.playModeStateChanged
+                += delegate ( UnityEditor.PlayModeStateChange state ) {
+                    Close();
+                };
         }
     }
 }

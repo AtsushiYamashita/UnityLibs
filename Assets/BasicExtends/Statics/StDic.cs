@@ -23,6 +23,10 @@
         public static string basicSeparator1 = ":";
         public static string basicSeparator2 = ",";
 
+        public static Dictionary<K,V> FromJson<K, V> ( this JsonNode node ) {
+            throw new System.Exception();
+        }
+
         public static string ToJson<K, V> (
             this Dictionary<K, V> dic , string markK = "\"", string markV = "\"" ) {
             string head = basicHead;

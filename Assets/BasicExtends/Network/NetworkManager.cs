@@ -11,7 +11,7 @@ public class NetworkManager: MonoBehaviour {
             .Set(Msg.ACT, "Start")
             .Pool();
         Msg.Gen().Set(Msg.TO, gameObject.name)
-            .Set(Msg.AS, "Sender")
+            .Set(Msg.AS, "UdpSender")
             .Set(Msg.ACT, "Setup")
             .Pool();
     }
