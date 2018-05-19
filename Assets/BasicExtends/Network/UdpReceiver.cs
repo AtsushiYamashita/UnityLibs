@@ -47,7 +47,7 @@
                 mClient = new UdpClient(new IPEndPoint(IPAddress.Parse(
                     NetworkUnit.GetLocalIPAddress()), mObservePort));
             } catch (Exception e) {
-                Msg.Gen().To("Manager").As("NetworkManager")
+                Msg.Gen().Set(Msg.TO,"Manager").Set(Msg.AS,"NetworkManager")
                     .Set("type", "StartServer")
                     .Set("result", "Fail")
                     .Set("msg", e.ToString())
@@ -55,8 +55,8 @@
                 return false;
             }
 
-            Msg.Gen().To("Manager")
-                .As("NetworkManager")
+            Msg.Gen().Set(Msg.TO,"Manager")
+                .Set(Msg.AS, "NetworkManager")
                 .Set("type", "StartServer")
                 .Set("result", "Success").Push();
             mLoop

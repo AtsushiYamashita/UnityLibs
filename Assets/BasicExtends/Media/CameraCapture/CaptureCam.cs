@@ -1,4 +1,5 @@
 ﻿#pragma warning disable 0429
+#if false
 
 using System;
 using System.Collections.Generic;
@@ -7,21 +8,25 @@ using UnityEngine.Assertions;
 using UnityEngine.XR.WSA.WebCam;
 //using Windows.Media.Devices;
 //using System.Runtime.InteropServices;
+using OpenCVForUnity;
 
-namespace BasicExtends {
+namespace BasicExtends
+{
 
-    public interface IXrCamera {
-        void Capture ( Action start = null, Action end = null );
-        void CameraWakeUp ( Action action );
-        void PhotoMode ( Action start );
-        void CameraRelease ( Action action );
-        void SetHoloOpacity ( float opacity );
+    public interface IXrCamera
+    {
+        void Capture(Action start = null, Action end = null);
+        void CameraWakeUp(Action action);
+        void PhotoMode(Action start);
+        void CameraRelease(Action action);
+        void SetHoloOpacity(float opacity);
     }
 
     /// <summary>
     /// Unityのオブジェクトと一緒にWinXRのWebCam画像を取得し、
     /// </summary>
-    public class CaptureCam: IXrCamera {
+    public class CaptureCam : IXrCamera
+    {
         private static CameraParameters mCameraParam;
         private static HardwareCameraWrapper mResolution = new HardwareCameraWrapper();
         private PhotoCapture mCameraInstance = null;
@@ -34,11 +39,13 @@ namespace BasicExtends {
         private const int PACKET_SIZE = 600;
 
 
-        public CaptureCam () {
+        public CaptureCam()
+        {
             Assert.IsNotNull(mResolution);
         }
 
-        public CaptureCam Set ( string to, string as_ ) {
+        public CaptureCam Set(string to, string as_)
+        {
             mTo = to;
             mAs = as_;
             return this;
@@ -47,82 +54,59 @@ namespace BasicExtends {
         /// <summary>
         /// WebCameraとしてカメラ画像をキャプチャする
         /// </summary>
-        public void Capture ( Action start = null, Action end = null ) {
+        public void Capture(Action start = null, Action end = null)
+        {
             Debug.LogFormat("Capture => {0}", "call 1");
-            if (mCameraInstance == null || mRecMode == false) {
+            if (mCameraInstance == null || mRecMode == false)
+            {
                 throw new Exception();
             }
 
             Debug.LogFormat("Capture => {0}", "call 2");
+            if (start != null) { start.Invoke(); }
 
-            mCameraInstance.TakePhotoAsync(( result, captured ) =>
-            {
-                Debug.LogFormat("Capture => {0}", result.success ? "OK" : "filed");
-                if (result.success == false) { return; }
-                if (start != null) { start.Invoke(); }
 
-                var buf = new ByteList();
-                captured.CopyRawImageDataIntoBuffer(buf);
-                //var bufd = buf as ByteList;
+            while (cam.didUpdateThisFrame == false) { System.Threading.Thread.Sleep(1); }
 
-                var w = mCompress ? mResolution.Width / 2 : mResolution.Width / 1;
-                var h = mCompress ? mResolution.Heignt / 2 : mResolution.Heignt / 1;
+            Debug.LogFormat("{0},{1}", cam.width, cam.height);
+            var rgba_mat = new Mat(new Size(cam.width, cam.height), CvType.CV_8UC4);
+            Debug.Log(rgba_mat.size());
+            var colors = cam.GetPixels32();
+            OpenCVForUnity.Utils.webCamTextureToMat(cam, rgba_mat, colors);
+            var size = rgba_mat.size();
+            var bgra_mat = new Mat(new Size(cam.width, cam.height), CvType.CV_8UC4);
+            Imgproc.cvtColor(rgba_mat, bgra_mat, Imgproc.COLOR_BGRA2RGBA);
 
-#if mCompress
-                PictureDiet(buf, mResolution.Width, mResolution.Heignt);
-#endif
-                int splited = buf.Count / PACKET_SIZE + 1;
-                var tick = DateTime.Now.Ticks;
-                for(int id = 0; id < 200; id++) {
-                    System.Threading.ThreadPool.QueueUserWorkItem(( obj ) =>
-                    {
-                        var t = buf.GetRange(PACKET_SIZE * id, PACKET_SIZE);
-                        // 撮影データのメッセージ送信
-                        Msg.Gen().To(mTo)
-                            .As(mAs)
-                            .Act("Print2")
-                            .Set("w", w)
-                            .Set("h", h)
-                            .Set("tick", tick)
-                            .Set("type", t.GetType().Name)
-                            .Set("id", id) // 分割データID
-                            .Set("splited", splited) // データ分割数
-                            .Set("packet_size", PACKET_SIZE) // 規定サイズ
-                            .SetObjectData(t)
-                            .UnJsonable().Pool();
-                    });
-                }
+            var tick = DateTime.Now.Ticks;
+            Msg.Gen().To(mTo)
+                .As(mAs)
+                .Act("Print2")
+                .Set("w", "" + size.width)
+                .Set("h", "" + size.height)
+                .Set("tick", tick)
+                .SetObjectData(rgba_mat)
+                .UnJsonable().Pool();
 
-                //BinarySerial.Save("test", buf);
-                if (end != null) { end.Invoke(); }
-            });
+            if (end != null) { end.Invoke(); }
         }
 
-#if mCompress
-        private void PictureDiet ( List<byte> bytes, int w, int h ) {
-            if (mCompress == false) { return; }
-            for (int y = h -1; y >= 0; y--) {
-                if (y % 2 == 0) { continue; }
-                for (int x = w - 1; x >= 0; x--) {
-                    if (x % 2 == 0) { continue; }
-                    Debug.Log("(" + x + " " + y + ")");
-                    bytes.RemoveAt(y * w + x * 4 + 3);
-                    bytes.RemoveAt(y * w + x * 4 + 2);
-                    bytes.RemoveAt(y * w + x * 4 + 1);
-                    bytes.RemoveAt(y * w + x * 4 + 0);
-                }
-            }
-        }
-#endif
-
-
-        public void CameraWakeUp ( Action action ) {
+        WebCamTexture cam;
+        public void CameraWakeUp(Action action)
+        {
             // カメラ操作用のインスタンスの作成
             if (mCameraInstance != null) { return; }
             if (mPhotoWakeupping == true) { return; }
             mPhotoWakeupping = true;
             Debug.LogFormat("wake up...");
-            PhotoCapture.CreateAsync(true, ( PhotoCapture cameraInstance ) =>
+            Application.RequestUserAuthorization(UserAuthorization.WebCam);
+            var device = WebCamTexture.devices[0].name;
+            Debug.Log("device : " + device);
+            cam = new WebCamTexture(device);
+            cam.Play();
+            Debug.Log("cam" + cam);
+            Debug.Log("cam.dimension" + cam.dimension);
+
+            PhotoCapture.CreateAsync(true, (PhotoCapture cameraInstance) =>
             {
                 mCameraInstance = cameraInstance;
                 mPhotoWakeupping = false;
@@ -136,18 +120,20 @@ namespace BasicExtends {
             });
         }
 
-        public void PhotoMode ( Action start ) {
+        public void PhotoMode(Action start)
+        {
             if (mCameraInstance == null) { return; }
             if (mRecMode == true) { return; }
             Debug.LogFormat("photo mode...");
             var res = mResolution.GetResolution();
             CameraParameters c_param =
                 InitCameraParams(res, mOpacity);
-            mCameraInstance.StartPhotoModeAsync(c_param, ( result ) =>
+            mCameraInstance.StartPhotoModeAsync(c_param, (result) =>
             {
                 mRecMode = result.success;
                 Debug.LogFormat("Start photo mode");
-                if (result.success == false) {
+                if (result.success == false)
+                {
                     Debug.LogFormat("Start photo mode => faild");
                     return;
                 }
@@ -155,19 +141,20 @@ namespace BasicExtends {
                 // テクスチャセットアップのための解像度通知
                 Msg.Gen().To(mTo).As(mAs)
                     .Act("Setup")
-                    .Set("w", mCompress ? res.width / 2 : res.width / 1)
-                    .Set("h", mCompress ? res.height / 2 : res.height / 1)
+                    .Set("w", cam.width)
+                    .Set("h", cam.height)
                     .Push();
                 start();
             });
         }
 
-        public void CameraRelease ( Action action ) {
+        public void CameraRelease(Action action)
+        {
             // カメラを非アクティベート化します
             if (mCameraInstance == null) { return; }
             if (mRecMode == false) { return; }
             Debug.LogFormat("CameraRelease");
-            mCameraInstance.StopPhotoModeAsync(( result ) =>
+            mCameraInstance.StopPhotoModeAsync((result) =>
             {
                 // photo capture のリソースをシャットダウンします
                 mCameraInstance.Dispose();
@@ -178,7 +165,8 @@ namespace BasicExtends {
             });
         }
 
-        ~CaptureCam () {
+        ~CaptureCam()
+        {
             CameraRelease(() => { });
         }
 
@@ -188,11 +176,13 @@ namespace BasicExtends {
         /// この値が大きいほど色が濃くなる。
         /// </summary>
         /// <param name="opacity"></param>
-        public void SetHoloOpacity ( float opacity ) {
+        public void SetHoloOpacity(float opacity)
+        {
             mOpacity = opacity;
         }
 
-        private static CameraParameters InitCameraParams ( Resolution res, float opacity ) {
+        private static CameraParameters InitCameraParams(Resolution res, float opacity)
+        {
             if (mCameraParam.cameraResolutionWidth == res.width) { return mCameraParam; }
             mCameraParam = new CameraParameters();
             mCameraParam.hologramOpacity = opacity; // 不透明度
@@ -203,3 +193,4 @@ namespace BasicExtends {
         }
     }
 }
+#endif

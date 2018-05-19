@@ -15,7 +15,7 @@ namespace BasicExtends {
 
         public void Send () {
             if (mTo == "") { return; }
-            var msg = Msg.Gen().To(mTo).Set("as", mAs).Set("act", mAct);
+            var msg = Msg.Gen().Set(Msg.TO, mTo).Set("as", mAs).Set("act", mAct);
 
             var k = "";
             foreach(var e in mList) {

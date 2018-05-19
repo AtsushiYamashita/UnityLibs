@@ -64,8 +64,8 @@
             mSendClient = new UdpClient(new IPEndPoint(IPAddress.Any, mUsePort));
             mLoop.AddContinueableCheck(() => { return mSendClient != null; })
                 .LaunchThread(SendLoop);
-            Msg.Gen().To("Manager")
-                .As("NetworkManager")
+            Msg.Gen().Set(Msg.TO, "Manager")
+                .Set(Msg.AS,"NetworkManager")
                 .Set("type", "SenderSetup")
                 .Set("result", "Success").Pool();
             mIsSetuped = true;
@@ -79,8 +79,8 @@
                 return;
             }
             mSendClient.Send(buffer, buffer.Length, mSendTo.Get());
-            Msg.Gen().To("Manager")
-                .As("NetworkManager")
+            Msg.Gen().Set(Msg.TO,"Manager")
+                .Set(Msg.AS, "NetworkManager")
                 .Set("type", "Sender@SendLoop")
                 .Set("result", "Success").Pool();
         }

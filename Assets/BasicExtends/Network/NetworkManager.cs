@@ -6,21 +6,21 @@ public class NetworkManager: MonoBehaviour {
     private void Start () {
         MessengerSetup();
         Serializer.SetDatatype(Serializer.SerialType.Binary2);
-        Msg.Gen().To(gameObject.name)
-            .As("UdpReceiver")
-            .Act("Start")
+        Msg.Gen().Set(Msg.TO, gameObject.name)
+            .Set(Msg.AS, "UdpReceiver")
+            .Set(Msg.ACT, "Start")
             .Pool();
-        Msg.Gen().To(gameObject.name)
-            .As("UdpSender")
-            .Act("Setup")
+        Msg.Gen().Set(Msg.TO, gameObject.name)
+            .Set(Msg.AS, "UdpSender")
+            .Set(Msg.ACT, "Setup")
             .Pool();
     }
 
     private void MessengerSetup () {
         Messenger.Assign(( Msg msg ) =>
         {
-            if (msg.Unmatch("to", "Manager")) { return; }
-            if (msg.Unmatch("as", "NetworkManager")) { return; }
+            if (msg.Unmatch(Msg.TO, "Manager")) { return; }
+            if (msg.Unmatch(Msg.AS, "NetworkManager")) { return; }
             if (msg.Match("result", "Fail") ) {
                 FailEvent(msg);
                 return;

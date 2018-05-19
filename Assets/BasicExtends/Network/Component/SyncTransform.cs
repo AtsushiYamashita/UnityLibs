@@ -1,79 +1,90 @@
-﻿namespace BasicExtends {
-
+namespace BasicExtends
+{
     using UnityEngine;
+    using System;
 
-    public class SyncTransform: MonoBehaviour {
+    /// <summary>
+    /// Transformをネットワーク越しに同期する。
+    /// </summary>
+    public class SyncTransform : MonoBehaviour
+    {
+        /// <summary>
+        /// 同期する対象の設定
+        /// </summary>
         [SerializeField]
-        private int mPlayerNo = 0;
+        private SyncTo mSyncTo = new SyncTo();
+        private SyncData<Trfm> mSync = new SyncData<Trfm>();
+        private string mOwnIpid = "";
 
-        [SerializeField]
-        private int mPase = 2;
-        private int mCount = 0;
-
-        [SerializeField]
-        private string mSyncTo = "";
-
+        /// <summary>
+        /// 移動の速度
+        /// </summary>
         [SerializeField]
         private float mSpeed = 0.8f;
 
+        /// <summary>
+        /// ローカル座標系で計算するか
+        /// </summary>
         [SerializeField]
         private bool mIsLocal = false;
+        private Trfm mPrevs = null;
 
-        private Trfm mPrev = null;
-        private Trfm mTo = null;
-
-        void Reset () {
-            mSyncTo = name;
-            mPrev = Trfm.Convert(transform);
+        public void SetIpId(string ipid)
+        {
+            mSyncTo.mIpid = ipid;
         }
 
-        void Start () {
-            Messenger.Assign(( Msg msg ) =>
+        private void Reset()
+        {
+            mSyncTo.mComponentName = GetType().Name;
+            mSyncTo.mObjectName = name;
+        }
+
+        /// <summary>
+        /// ローカルとワールドそれぞれに合わせて、
+        /// 目標位置にイージングで近づく
+        /// </summary>
+        private void SyncUpdate(Trfm e)
+        {
+            var pos_from = mIsLocal ? transform.localPosition : transform.position;
+            var pos_set = mIsLocal ?
+                (Action<Vector3>)transform.MoveToLocal : transform.MoveTo;
+            pos_set(Vector3.Lerp(pos_from, e.POS.Convert(), mSpeed));
+
+            var rot_from = mIsLocal ? transform.localRotation : transform.rotation;
+            var rot_set = mIsLocal ?
+                (Action<Quaternion>)transform.RotateToLocal : transform.RotateTo;
+            rot_set(Quaternion.Lerp(rot_from, Quaternion.Euler(e.ROT.Convert()), mSpeed));
+        }
+
+        private void Start()
+        {
+            mSync.Setup(mSyncTo,
+                msg => mOwnIpid == msg.TryGet("IPID"), // sync condition
+                e => { transform.localScale = e.SCA.Convert(); }, // 1st time only
+                SyncUpdate);
+            var type = mIsLocal ? Trfm.Type.Local : Trfm.Type.World;
+            mPrevs = Trfm.Convert(transform, type);
+
+            Messenger.Assign((msg) =>
             {
-                if (msg.Match("Network", "true")) { return; }
-                if (msg.Unmatch("to", gameObject.name)) { return; }
-                if (msg.Unmatch("as", GetType().Name)) { return; }
-                if (msg.Match("act", "Sync") && msg.ContainsKey("FROM")) {
-                    mTo = msg.TryObjectGet<Trfm>();
-                    mPrev = mTo;
-                    var islocal = msg.Match("isLocal", "True");
-                    Sync(islocal);
+                if (msg.Unmatch(Msg.TO, name)) { return; }
+                if (msg.Unmatch(Msg.AS, GetType().Name)) { return; }
+                if (msg.Match(Msg.ACT, "SetIPID"))
+                {
+                    mOwnIpid = msg.TryGet("IPID");
                     return;
                 }
             });
         }
 
-        private void Sync ( bool islocal ) {
-            var pos = mTo.POS.Convert();
-            var rot = mTo.ROT.Convert();
-            var sca = mTo.SCA.Convert();
-            if (islocal) {
-                transform.localPosition = pos;
-                transform.localEulerAngles = rot;
-                transform.localScale = sca;
-            } else {
-                transform.position = pos;
-                transform.eulerAngles = rot;
-                transform.localScale = sca;
-            }
-        }
+        private void Update()
+        {
+            mSync.Sync();
 
-        private void Update () {
-            if (mCount++ % mPase != 0) { return; }
-            System.Func<Transform, Trfm> func = mIsLocal
-                ? (System.Func<Transform, Trfm>) Trfm.Convert
-                : Trfm.ConvertWorld;
-            var data = func(transform);
-            if (data == mPrev) { return; }
-
-            Msg.Gen()
-                .To(mSyncTo)
-                .As(GetType().Name)
-                .Act("Sync")
-                .Set("isLocal", mIsLocal ? "True" : "False")
-                .Netwrok()
-                .SetObjectData(data).Pool();
+            var type = mIsLocal ? Trfm.Type.Local : Trfm.Type.World;
+            var now = Trfm.Convert(transform, type);
+            mSync.UpdateSend(() => { return mPrevs != now; }, now);
         }
     }
-
 }

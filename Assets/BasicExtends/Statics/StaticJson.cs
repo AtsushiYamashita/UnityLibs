@@ -87,7 +87,7 @@ public class JsonStringify: Singleton<JsonStringify> {
         {
             var jsonable = pair.Key as Transform;
             if (jsonable.IsNull()) { return false; }
-            pair.Value.Append(Trfm.Convert(jsonable).ToJson());
+            pair.Value.Append(Trfm.Convert(jsonable,Trfm.Type.Local).ToJson());
             return true;
         });
 

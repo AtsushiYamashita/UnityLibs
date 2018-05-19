@@ -1,4 +1,5 @@
-﻿namespace BasicExtends {
+﻿#if false
+namespace BasicExtends {
     using UnityEngine;
     using UnityEngine.Assertions;
     using UnityEngine.Events;
@@ -87,7 +88,6 @@
             if (mNessClose) { return; }
             mCamera.CameraRelease(() => { mEndRecEvent.Invoke(); });
         }
-
     }
-
 }
+#endif

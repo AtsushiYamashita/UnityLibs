@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿#if false
+
+using OpenCVForUnity;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -12,11 +14,13 @@ namespace BasicExtends {
     public class MeshPrinter: MonoBehaviour {
 
         [SerializeField]
+        private UnityEvent mDrawUpdate = new UnityEvent();
+
+        [SerializeField]
         private float mScale = 1f;
         Renderer mRender = null;
         private Texture2D mTexture = null;
         private bool mSetupped = false;
-
 
         private void Start () {
             mRender = GetComponent<Renderer>();
@@ -44,11 +48,8 @@ namespace BasicExtends {
                     return;
                 }
                 if (msg.Match("act", "Print2")) {
-                    Debug.Log("msg.Match(act, Print))");
-                    Print(int.Parse(msg.TryGet("id")),
-                        int.Parse(msg.TryGet("splited")),
-                        int.Parse(msg.TryGet("packet_size")), 
-                        msg.TryObjectGet<List<byte>>().ToArray());
+                    Debug.Log("msg.Match(act, Print2))");
+                    MatPrint( msg.TryObjectGet<Mat>());
                     return;
                 }
             });
@@ -137,33 +138,30 @@ namespace BasicExtends {
 
         Color [] mColor ;
 
-        public void Print (int id, int splited,int packet_size, byte [] argb_bytes ) {
+        public void MatPrint ( Mat mat) {
+            //OpenCVForUnity.Utils.fastMatToTexture2D(mat, mTexture);
+            //mTexture.Apply();
+            //var s = string.Format("({0},{1},{2},{3})", mat.get(0, 0) [0], mat.get(0, 0) [1], mat.get(0, 0) [2], mat.get(0, 0) [3]);
+            //Msg.Gen().To("Debug").Act("log")
+            //    .Set("msg", "")
+            //    .Set("w", mat.size().width + "")
+            //    .Set("mat(0,0)", s)
+            //    .Set("col(0.0)", mTexture.GetPixel(0, 0) + "")
+            //    .Pool();
 
-            //var bd = BinarySerial.Deserialize<Pair<string, byte []>>(argb_bytes);
-            //Debug.Log("bd" + bd.Key);
-            //argb_bytes = bd.Value;
-
-            int stride = 4;
-            float denominator = 1.0f / 255.0f;
-
-            for (int i = id * packet_size, p = id * packet_size/4; i < argb_bytes.Length; i += stride,p++) {
-                // char added = (char) argb_bytes [i - 0];
-                mColor [p].b = (int) (argb_bytes [i + 0]) * denominator;
-                mColor [p].g = (int) (argb_bytes [i + 1]) * denominator;
-                mColor [p].r = (int) (argb_bytes [i + 2]) * denominator;
-                mColor [p].a = 0;
-            }
+            OpenCVForUnity.Utils.matToTexture2D(mat, mTexture);
+            mTexture.Apply();
+            var s = string.Format("({0},{1},{2},{3})", mat.get(0, 0) [0], mat.get(0, 0) [1], mat.get(0, 0) [2], mat.get(0, 0) [3]);
             Msg.Gen().To("Debug").Act("log")
-                .Set("id", id)
-                .Set("splited", splited)
-                .Set("packet_size", packet_size)
-                .Set("mColor[id * packet_size/4].r", mColor [id * packet_size / 4].r)
+                .Set("msg", "")
+                .Set("w", mat.size().width + "")
+                .Set("mat(0,0)", s)
+                .Set("col(0.0)", mTexture.GetPixel(0, 0) + "")
                 .Pool();
 
-            mTexture.SetPixels(mColor);
-            mTexture.Apply();
 
             mRender.material.SetTexture("_MainTex", mTexture);
         }
     }
 }
+#endif

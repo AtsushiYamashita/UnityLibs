@@ -23,6 +23,9 @@
         [SerializeField]
         private int mLength = 6;
 
+        [SerializeField]
+        private Trfm.Type mRecordType = Trfm.Type.World;
+
         public Trfm GetRecent () {
             return mRecords.Last().Value;
         }
@@ -33,7 +36,7 @@
         }
 
         private Trfm Generate ( Transform transform ) {
-            var data = new TimedTrfm().Set(Time.time, Trfm.Convert(transform));
+            var data = new TimedTrfm().Set(Time.time, Trfm.Convert(transform, mRecordType));
             mRecords.Add(data);
             return data.Value;
         }
@@ -41,7 +44,7 @@
         private Trfm Reuse ( Transform transform ) {
             var t = mRecords [0];
             mRecords.RemoveAt(0);
-            var pair = t.Set(Time.time, t.Value.Set(transform));
+            var pair = t.Set(Time.time, t.Value.Set(transform, mRecordType));
             mRecords.Add(t);
             return pair.Value;
         }
