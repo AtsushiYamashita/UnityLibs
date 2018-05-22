@@ -1,7 +1,5 @@
 ﻿namespace BasicExtends {
     using System.Text;
-    using System.Collections.Generic;
-    using UnityEngine;
 
     public static class StString {
         public static ByteList ToUTF8Lst(this string str) {
