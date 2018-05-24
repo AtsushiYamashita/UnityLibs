@@ -132,7 +132,7 @@
         public override bool Equals ( object obj ) {
             var trfm = obj as Trfm;
             if (trfm.IsNull()) { return false; }
-            return this == trfm;
+            return this.GetHashCode() == trfm.GetHashCode();
         }
 
         public override int GetHashCode () {
