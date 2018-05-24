@@ -40,8 +40,8 @@
             listen.Bind(new IPEndPoint(IPAddress.Any, mReceivePort));
             listen.Listen(1);
 
-            ThreadManager.Get().Work(listen, MakeConnection );
-            ThreadManager.Get().Work(null, Receive);
+            ThreadManager.Get().Work("SocketTCPReceiver Setup1", listen, MakeConnection );
+            ThreadManager.Get().Work("SocketTCPReceiver Setup2", null, Receive);
         }
     }
 

@@ -6,7 +6,7 @@
 
     [Serializable]
     public class UdpReceiver: MonoBehaviour {
-        LoopThread mLoop = null;
+        LifedThread mLoop = null;
         UdpClient mClient;
 
         [SerializeField]
@@ -41,9 +41,9 @@
                 throw new NotSupportedException(msg);
             }
             if (mLoop.IsNotNull()) { return true; }
+            mLoop = ThreadManager.Get();
+            Debug.Log(mObservePort);
             try {
-                mLoop = new LoopThread();
-                Debug.Log(mObservePort);
                 mClient = new UdpClient(new IPEndPoint(IPAddress.Parse(
                     NetworkUnit.GetLocalIPAddress()), mObservePort));
             } catch (Exception e) {
@@ -59,49 +59,37 @@
                 .Set(Msg.AS, "NetworkManager")
                 .Set("type", "StartServer")
                 .Set("result", "Success").Push();
-            mLoop
-                .AddContinueableCheck(() => { return mClient != null; })
-                .LaunchThread(ReceiveLoop);
+            mLoop.Work("Udp client receiver",null, ReceiveLoop);
             return true;
-        }
-
-        public void StopServer () {
-            mLoop.ThreadStop();
         }
 
         /// <summary>
         /// 受信と待機処理
         /// スレッド側で実行させる
         /// </summary>
-        public void ReceiveLoop () {
+        public ThreadState ReceiveLoop (object obj) {
             IPEndPoint sender = null;
-            var buffer = mClient.Receive(ref sender);
-            // Receive イベント を実行
-            OnRecieve(buffer, sender);
+            mClient.Client.ReceiveTimeout = 100;
+            try {
+                var buffer = mClient.Receive(ref sender);
+                Msg.Gen().Set(Msg.TO, "Debug").Set(Msg.ACT, "log").Set(Msg.MSG, "get").Pool();
+                OnRecieve(buffer, sender);
+                return ThreadState.Continue;
+            } catch {
+                return ThreadState.Continue;
+            }
         }
 
         private static bool OnRecieve ( byte [] receved, IPEndPoint sender ) {
             if (receved.Length < 1) { return false; }
             var msg = Serializer.Deserialize(ByteList.Zero.Add(receved)).Value as Msg;
-            if (msg == null) { throw new UnDeserializableException(); }
-            msg.Set("From", "" + sender.Address.MapToIPv4()).Pool();
-            Debug.Log(msg.ToJson());
+            if (msg == null) {
+                Msg.Gen().Set(Msg.TO, "Debug").Set(Msg.ACT, "log").Set(Msg.MSG, "UnDeserializableException").Pool();
+                throw new UnDeserializableException();
+            }
+            msg.Set("From", "" + NetowrkUtil.GetOwnIP()).Pool();
+            //Msg.Gen().Set(Msg.TO, "Debug").Set(Msg.ACT, "log").Set(Msg.MSG, "receice ok:" + msg.ToJson()).Pool();
             return true;
-        }
-
-        public void Close () {
-            if (mClient.IsNotNull()) { mClient.Close(); }
-            if (mLoop.IsNotNull()) { mLoop.ThreadStop(); }
-        }
-
-        private static void CloseCall ( UnityEditor.PlayModeStateChange state ) {
-            Debug.LogFormat("PlayModeStateChange({0})", state);
-            // Close();
-            UnityEditor.EditorApplication.playModeStateChanged += CloseCall;
-        }
-
-        public void Reset () {
-            UnityEditor.EditorApplication.playModeStateChanged += CloseCall;
         }
     }
 }

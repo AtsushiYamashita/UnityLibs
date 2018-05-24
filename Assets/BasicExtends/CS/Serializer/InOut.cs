@@ -24,7 +24,7 @@
         }
 
         private static byte[] buf = new byte[1024];
-        private LoopThread mThread = null;
+        private LifedThread mThread = null;
         private Stack<SaveData> mDataStack = new Stack<SaveData>();
 
         /// <summary>
@@ -34,23 +34,23 @@
         public void Write(string filename)
         {
             if (mThread != null || mDataStack.Count == 0) { return; }
-            mThread = new LoopThread();
+            mThread = ThreadManager.Get();
             string path = DataPath(filename);
             int data_first = mDataStack.Count;
 
             FileStream fs_w = new FileStream(path, FileMode.Create, FileAccess.Write);
-            mThread.LaunchThread(() =>
+            mThread.Work("InOut write", null,(e) =>
             {
                 if (mDataStack.Count == 0 || fs_w.CanWrite == false)
                 {
-                    ThreadEnd();
-                    return;
+                    return ThreadState.End;
                 }
                 var obj = mDataStack.Pop().Data;
                 var bytes = Serializer.GetTypeList();
                 bytes.Add(Serializer.Serialize(obj));
                 bytes.AddHead(bytes.Count);
                 fs_w.WriteAsync(bytes.ToArray(), 0, bytes.Count);
+                return ThreadState.Continue;
             });
         }
 
@@ -65,7 +65,6 @@
             FileStream fs_r = new FileStream(path, FileMode.Open, FileAccess.Read);
             if (mDataStack.Count == 0 || fs_r.CanRead == false)
             {
-                ThreadEnd();
                 return null;
             }
             fs_r.Read(buf, 0, sizeof(int));
@@ -105,24 +104,24 @@
         public void Read(string filename, string to, string a_s, string act)
         {
             if (mThread != null) { return; }
-            mThread = new LoopThread();
+            mThread = ThreadManager.Get();
 
             var data = ReadFromFile(filename);
             if (data == null || CheckHash(data) == false) { return; }
             ParseToDic(data);
 
-            mThread.LaunchThread(() =>
+            mThread.Work("InOut Read", null,(e) =>
             {
                 if (data.Count < 1)
                 {
-                    ThreadEnd();
-                    return;
+                    return ThreadState.End;
                 }
                 var type_data = Serializer.Deserialize(data);
                 Msg.Gen().Set(Msg.TO, to)
                     .Set(Msg.AS, a_s)
                     .Set(Msg.ACT, act)
                     .SetObjectData(type_data).Pool();
+                return ThreadState.Continue;
             });
         }
 
@@ -131,10 +130,5 @@
             return Application.dataPath + "/" + filename + ".bin"; ;
         }
 
-        private void ThreadEnd()
-        {
-            mThread.ThreadStop();
-            mThread = null;
-        }
     }
 }

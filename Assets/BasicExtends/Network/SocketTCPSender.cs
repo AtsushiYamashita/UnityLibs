@@ -16,34 +16,34 @@
         bool mIsSetuped = false;
         private SafeAccessList<byte []> mMsgList = new SafeAccessList<byte []>();
 
-        private static string GetOwnIP () {
-            try {
-                //ホスト名を取得
-                string hostname = Dns.GetHostName();
 
-                //ホスト名からIPアドレスを取得
-                IPAddress [] addr_arr = Dns.GetHostAddresses(hostname);
+        private void Start () {
+            MessengerSetup();
+        }
 
-                foreach (IPAddress addr in addr_arr) {
-                    string addr_str = addr.ToString();
-                    bool isIPv4 = addr_str.IndexOf(".") > 0;
-                    bool notLocalhost = addr_str.StartsWith("127.") == false;
-                    if (isIPv4 && notLocalhost) { return addr_str; }
+        private void MessengerSetup () {
+            Messenger.Assign(( Msg msg ) =>
+            {
+                if (msg.Match("Network", "true")) {
+                    msg.Set("Network", "false");
+                    SendStack(msg);
+                    return;
                 }
-            } catch (System.Exception e) {
-                Msg.Gen().Set(Msg.TO, "Debug")
-                    .Set(Msg.ACT, "log")
-                    .Set(Msg.MSG, e.ToString()).Pool();
-            }
-            return "";
+                if (msg.Unmatch(Msg.TO, gameObject.name)) { return; }
+                if (msg.Unmatch(Msg.AS, "UdpSender")) { return; }
+                if (msg.Match(Msg.ACT, "Setup")) {
+                    Setup();
+                    return;
+                }
+            });
         }
 
         private void Setup () {
-            var recv_ip = GetOwnIP();
+            var recv_ip = NetowrkUtil.GetOwnIP();
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socket.NoDelay = true;
             socket.SendBufferSize = 0;
-            ThreadManager.Get().Work(null, ( obj ) =>
+            ThreadManager.Get().Work("SocketTCPSender Setup1", null, ( obj ) =>
             {
                 IPAddress recv = IPAddress.Any;
                 try {
@@ -55,7 +55,7 @@
                 return ThreadState.End;
             });
 
-            ThreadManager.Get().Work(null, ( obj ) =>
+            ThreadManager.Get().Work("SocketTCPSender Setup 2", null, ( obj ) =>
             {
                 byte [] buffer = mMsgList.Pop();
                 if (buffer == null || buffer.Length < 1) {

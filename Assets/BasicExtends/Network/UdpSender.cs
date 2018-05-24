@@ -6,7 +6,7 @@
     public class UdpSender: MonoBehaviour {
 
         public UdpClient mSendClient = null;
-        private LoopThread mLoop;
+        private LifedThread mLoop;
         private SafeAccessValue<IPEndPoint> mSendTo = new SafeAccessValue<IPEndPoint>();
         private ThreadsafeCounter mSendId = new ThreadsafeCounter();
         private SafeAccessList<byte []> mMsgList = new SafeAccessList<byte []>();
@@ -59,11 +59,10 @@
         }
 
         public void Setup () {
-            mLoop = new LoopThread();
+            mLoop = ThreadManager.Get();
             mSendTo.Set(new IPEndPoint(IPAddress.Parse(mToAddress), mToPort));
             mSendClient = new UdpClient(new IPEndPoint(IPAddress.Any, mUsePort));
-            mLoop.AddContinueableCheck(() => { return mSendClient != null; })
-                .LaunchThread(SendLoop);
+            mLoop.Work("Udp client send loop",null, SendLoop);
             Msg.Gen().Set(Msg.TO, "Manager")
                 .Set(Msg.AS,"NetworkManager")
                 .Set("type", "SenderSetup")
@@ -71,44 +70,31 @@
             mIsSetuped = true;
         }
 
-        private void SendLoop () {
+        private ThreadState SendLoop (object e) {
             byte [] buffer = mMsgList.Pop();
             if (buffer == null || buffer.Length < 1) {
-
-                System.Threading.Thread.Sleep(NetworkUnit.INTERVAL);
-                return;
+                return ThreadState.Sleep;
             }
             mSendClient.Send(buffer, buffer.Length, mSendTo.Get());
             Msg.Gen().Set(Msg.TO,"Manager")
                 .Set(Msg.AS, "NetworkManager")
                 .Set("type", "Sender@SendLoop")
                 .Set("result", "Success").Pool();
+            return ThreadState.Continue;
         }
 
         private void SendStack ( Msg message ) {
             message = message
                 .Set("Id", "" + mSendId.Get());
             mSendId.Increment();
-            //Msg.Gen().To("Manager")
-            //    .As("NetworkManager")
+            if (mIsSetuped == false) { return; }
+            //Msg.Gen().Set(Msg.TO, "Manager")
+            //    .Set(Msg.AS, "NetworkManager")
             //    .Set("type", "Sender@Send")
-            //    .Set("Msg", message.ToJson())
+            //    .Set(Msg.MSG, message.ToJson())
             //    .Set("StackCount", mMsgList.Count())
             //    .Set("result", "Success").Push();
-            if (mIsSetuped == false) { return; }
             mMsgList.Add(Serializer.Serialize(message).ToArray());
-        }
-
-        public void Close () {
-            mSendClient.Close();
-            mLoop.ThreadStop();
-        }
-
-        public void Reset () {
-            UnityEditor.EditorApplication.playModeStateChanged
-                += delegate ( UnityEditor.PlayModeStateChange state ) {
-                    Close();
-                };
         }
     }
 }
