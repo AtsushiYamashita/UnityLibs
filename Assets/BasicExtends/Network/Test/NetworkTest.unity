@@ -1285,7 +1285,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mUsePort: 8000
   mToPort: 8001
-  mToAddress: 192.168.0.126
+  mToAddress: 127.0.0.1
 --- !u!114 &1909269239
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1394,11 +1394,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 412f30ef4a7a65342b77e3a79a184b15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ip: 0
-  port: 0
-  mPase: 2
-  mSyncTo: Sphere
+  mSyncTo:
+    mObjectName: 
+    mComponentName: 
+    mIpid: 0
+    mPase: 3
   mSpeed: 0.8
+  mIsLocal: 0
 --- !u!1 &2019568680
 GameObject:
   m_ObjectHideFlags: 0
