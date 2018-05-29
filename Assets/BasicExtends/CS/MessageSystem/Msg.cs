@@ -11,7 +11,7 @@
     public class Msg : StringDict, IJsonable, IFromJsonNode, ISerializable
     {
 
-        private object mObjectData = NULL.Null;
+        private object mObjectData = null;
         private const int HEAD_SIZE = 4;
 
         public const string TO = "to";
@@ -262,6 +262,19 @@
         {
             if (node.IsNull()) { throw new Exception(); }
             if (node.Count < 1) { throw new Exception(); }
+            var ret = Gen();
+            int i = 0;
+
+            try {
+                while (true) {
+                    var key = node ["key" + i].Get<string>();
+                    var value = node ["value" + i].Get<string>();
+                    i++;
+                    ret.TrySet(key, value);
+                }
+            } catch { }
+
+            DebugLog.Log.Print(node.ToString());
             throw new Exception();
         }
     }

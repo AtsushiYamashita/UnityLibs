@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using UnityEngine.Assertions;
+    using UnityEngine;
 
     public class Binary : ISerializer {
 
@@ -16,6 +17,8 @@
             SetDeserializer("Int32", Standards.Int.Deserial);
             SetSerializer("Float", Standards.Float.Serial);
             SetDeserializer("Float", Standards.Float.Deserial);
+            SetSerializer("Single", Standards.Float.Serial);
+            SetDeserializer("Single", Standards.Float.Deserial);
             SetSerializer("String", Standards.String.Serial);
             SetDeserializer("String", Standards.String.Deserial);
             SetSerializer("ArrayList", Standards.ArrayList.Serial);
@@ -57,12 +60,13 @@
         /// 基本的に [型番号] [[情報長]情報]です。
         /// </summary>
         public ByteList ToSerial ( object obj ) {
+            if (obj.IsNull()) { throw new Exception(); }
             var type_n = obj.GetType().Name;
             var id = Serializer.GetTypeId(type_n);
             Assert.IsTrue(id.Key, string.Format("This type({0}) is not assigned serializer", type_n));
             if (id.Key == false) { return null; }
             var bytes = ByteList.Zero.Add(id.Value);
-            bytes.Add(ToSerial(obj));
+            bytes.Add(mSerializer[id.Value](obj));
             return bytes;
         }
 
@@ -81,12 +85,12 @@
 
             public static class Float {
                 public static ByteList Serial ( object obj ) {
-                    var data = BitConverter.GetBytes((double) obj);
-                    return ByteList.Gen().Add(data.Length).Add(""+obj);
+                    var data = BitConverter.GetBytes((Single) obj);
+                    return ByteList.Gen().Add(data.Length).Add(data);
                 }
                 public static object Deserial ( ByteList bytes ) {
                     var size = bytes.DropInt32();
-                    var data = BitConverter.ToDouble(bytes.DropRange(0, size), 0);
+                    var data = BitConverter.ToSingle(bytes.DropRange(0, size), 0);
                     return data;
                 }
             }

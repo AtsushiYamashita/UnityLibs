@@ -58,7 +58,7 @@
             if (index >= 0) { return Pair<bool, int>.Gen(true, index); }
             mTypeIndex.Add(type);
             index = mTypeIndex.IndexOf(type);
-            DebugLog.Log.Print("type({0},{1})", type, index);
+            //DebugLog.Log.Print("type({0},{1})", type, index);
             return Pair<bool, int>.Gen(false, index);
         }
 

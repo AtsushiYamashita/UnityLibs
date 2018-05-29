@@ -71,7 +71,14 @@ public class JsonStringify: Singleton<JsonStringify> {
         {
             var obj = pair.Key as Dictionary<string, string>;
             if (obj.IsNull()) { return false; }
-            pair.Value.Append(obj.ToJson<string, string>());
+            int i = 0;
+            var dic = new StringDict();
+            foreach(var e in obj) {
+                dic.TrySet("key" + i, e.Key);
+                dic.TrySet("val" + i, e.Value);
+                i++;
+            }
+            pair.Value.Append(dic.ToJson<string, string>());
             return true;
         });
 
