@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#if !UNITY_STANDALONE_WIN
+
+using UnityEngine;
 using System.Collections;
 using System.Linq;
 using UnityEngine.XR.WSA.WebCam;
@@ -77,3 +79,5 @@ public class VideoCaptureExample: MonoBehaviour {
         m_VideoCapture.StopVideoModeAsync(OnStoppedVideoCaptureMode);
     }
 }
+
+#endif
