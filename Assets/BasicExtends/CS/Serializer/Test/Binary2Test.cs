@@ -98,26 +98,26 @@ public class Binary2Test: TestComponent {
         return Pass();
     }
 
-    public string StringTest_WithIntArray () {
-        Serializer.SetDatatype(Serializer.SerialType.Binary2);
-        int [] arr = new int[3];
-        for (int i = 0; i < 3; i++) {
-            arr [i] = i;
-        }
-        var msg = Msg.Gen()
-            .Set(Msg.TO, "test")
-            .Set(Msg.ACT, "test")
-            .Set("data2json", "False")
-            .SetObjectData(arr);
-        var encoded = Serializer.Serialize(msg);
-        var decoded = Serializer.Deserialize<Msg>(encoded);
-        if (decoded.Key == false) { return Fail("Parse fail"); }
-        var msg2 = decoded.Value;
-        if (msg2.Unmatch(Msg.TO, "test")) { return Fail("Parsed value is " + decoded.Value); }
-        var obj = msg2.TryObjectGet<int[]>();
-        for (int i = 0; i < 3; i++) {
-            if (obj[i] != i) { return Fail("Parse mismatch"); }
-        }
-        return Pass();
-    }
+    //public string StringTest_WithIntArray () {
+    //    Serializer.SetDatatype(Serializer.SerialType.Binary2);
+    //    int [] arr = new int[3];
+    //    for (int i = 0; i < 3; i++) {
+    //        arr [i] = i;
+    //    }
+    //    var msg = Msg.Gen()
+    //        .Set(Msg.TO, "test")
+    //        .Set(Msg.ACT, "test")
+    //        .Set("data2json", "False")
+    //        .SetObjectData(arr);
+    //    var encoded = Serializer.Serialize(msg);
+    //    var decoded = Serializer.Deserialize<Msg>(encoded);
+    //    if (decoded.Key == false) { return Fail("Parse fail"); }
+    //    var msg2 = decoded.Value;
+    //    if (msg2.Unmatch(Msg.TO, "test")) { return Fail("Parsed value is " + decoded.Value); }
+    //    var obj = msg2.TryObjectGet<int[]>();
+    //    for (int i = 0; i < 3; i++) {
+    //        if (obj[i] != i) { return Fail("Parse mismatch"); }
+    //    }
+    //    return Pass();
+    //}
 }

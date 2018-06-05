@@ -7,7 +7,7 @@
     {
         ByteList GetTypeList(List<string> mTypeIndex);
         void SetSerializer(string type, Func<object, ByteList> func);
-        void SetDeserializer(string type, Func<ByteList, object> func);
+        void SetDeserializer(string type, Func<ByteList, CheckedRet<object>> func);
         CheckedRet<object> Deserial( ByteList bytes);
         ByteList ToSerial(object obj);
     }
