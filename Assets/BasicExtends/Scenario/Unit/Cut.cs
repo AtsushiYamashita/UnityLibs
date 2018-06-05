@@ -1,16 +1,10 @@
 ﻿namespace BasicExtends.Scenario {
     using BasicExtends;
 
-    public class Cut: StateEvent, IFactoryReceiver,ICanSkip {
-        protected IFactory mFactory = null;
+    public class Cut: ScenarioProcess {
 
-        // インタフェース設計上の都合で作った関数。実際には呼ばれない
-        void IFactoryReceiver.InstanceSet<T> ( T t ) {
-            throw new System.Exception("this allow only type of scene");
-        }
-
-        protected override void StartProcess () {
-            mFactory = new TokenbaseParser<Actor>();
+        protected override void ProcessStart () {
+            mFactory = new TokenbaseParser();
             mFactory.SetTarget(this);
 
             Messenger.Assign(msg => {
@@ -21,14 +15,12 @@
                     return;
                 }
             });
+
+            base.ProcessStart();
         }
 
         public void InstanceSet( Actor actor ) {
             actor.transform.parent = transform; 
-        }
-
-        public void Skip () {
-            throw new System.NotImplementedException();
         }
     }
 }

@@ -1,10 +1,8 @@
 ﻿namespace BasicExtends.Scenario {
 
-    public class ScenarioScene: SenarioIterator<StateEvent> {
-
-        protected override void StartProcess () {
+    public class ScenarioScene: ScenarioProcess {
+        protected override void Init () {
             TypeName = GetType().Name;
         }
-
     }
 }

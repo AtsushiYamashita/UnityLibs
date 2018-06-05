@@ -20,7 +20,7 @@
     /// <summary>
     /// 読込を管理するイベント
     /// </summary>
-    public class Loader: MonoBehaviour,ILoader {
+    public class Loader: MonoBehaviour, ILoader {
 
         [SerializeField]
         UnityEvent mLoadStart = new UnityEvent();
@@ -28,7 +28,7 @@
         LoadingEvent mLoading = new LoadingEvent();
         [SerializeField]
         UnityEvent mLoadEnd = new UnityEvent();
-        private Pair<float,int> mChecked = Pair<float,int>.Gen(0,0); // time,ocunt
+        private Pair<float, int> mChecked = Pair<float, int>.Gen(0, 0); // time,ocunt
 
         private Dictionary<string, bool> mStates = new Dictionary<string, bool>();
 
@@ -66,7 +66,7 @@
                 if (msg.Unmatch("as", GetType().Name)) { return; }
                 if (msg.Match("act", "set")) {
                     var isDone = msg.TryGet("state").ToUpper() == "True".ToUpper();
-                    Set(msg.TryGet("name"),  isDone);
+                    Set(msg.TryGet("name"), isDone);
                     return;
                 }
                 if (msg.Match("act", "reset")) {
@@ -82,13 +82,13 @@
             });
         }
 
-        public void AssignLoadingAction(UnityAction<ILoader> action ) {
+        public void AssignLoadingAction ( UnityAction<ILoader> action ) {
             mLoading.AddListener(action);
         }
 
         private void Update () {
             var done = Done;
-            if(done >= 1) {
+            if (done >= 1) {
                 mLoadEnd.Invoke();
                 enabled = false;
                 return;
