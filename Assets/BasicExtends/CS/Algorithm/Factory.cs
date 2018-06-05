@@ -19,7 +19,7 @@
             : base(string.Format("Error, unparsable({0}:{1})", str, line) + e) { }
     }
 
-    public class TokenbaseParser<T>: IFactory where T : class {
+    public class TokenbaseParser: IFactory  {
         public bool IsParsable { get { return mScript == null; } }
         private IMethodChain<FactoryArgs> mChain = new MethodChain<FactoryArgs>();
         private ScriptTokenizer mScript = null;

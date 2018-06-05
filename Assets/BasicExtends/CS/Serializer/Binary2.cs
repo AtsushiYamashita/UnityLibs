@@ -24,7 +24,7 @@
 
         public void SetSerializer ( string type, Func<object, ByteList> func ) { }
 
-        public void SetDeserializer ( string type, Func<ByteList, object> func ) { }
+        public void SetDeserializer ( string type, Func<ByteList, CheckedRet<object>> func ) { }
 
         /// <summary>
         /// 基本的に [型番号] [[情報長]情報]です。

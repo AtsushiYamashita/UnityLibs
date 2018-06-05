@@ -96,5 +96,11 @@
         public static Dictionary<K, V> TrySet<K, V> ( this Dictionary<K, V> dic, IDictionaryDataConvertable<K,V> data ) {
             return dic.TrySet(data.Key, data.Value) ;
         }
+
+        public static CheckedRet<V> TryGet<K,V> (this Dictionary<K,V> dic ,K key) {
+            var r1 = default(V);
+            var r2 = dic.TryGetValue(key, out r1);
+            return CheckedRet<V>.Gen(r2, r1);
+        }
     }
 }

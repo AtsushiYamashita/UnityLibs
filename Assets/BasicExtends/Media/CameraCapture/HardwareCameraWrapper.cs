@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !UNITY_STANDALONE_WIN
+using System;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.XR.WSA.WebCam;
@@ -38,3 +39,4 @@ namespace BasicExtends {
         }
     }
 }
+#endif

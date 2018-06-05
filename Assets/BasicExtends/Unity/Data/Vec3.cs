@@ -1,6 +1,6 @@
 ﻿namespace BasicExtends {
 
-    using System.Linq;
+    using System;
     using System.Collections.Generic;
     using UnityEngine;
     using UnityEngine.Assertions;
@@ -15,12 +15,42 @@
     }
 
     [System.Serializable]
-    public class Vec3: IJsonable, IVec3,IFromJsonNode {
+    public class Vec3: IJsonable, IVec3, IFromJsonNode {
         private const int cX = 0, cY = 1, cZ = 2;
         [SerializeField]
         public float [] mVal = new float [3];
         internal int magnitude;
 
+        public Vec3 () {
+            Serializer.SetDatatype(Serializer.SerialType.Binary);
+            Serializer.AssignSerializer(GetType().Name, Serial);
+            Serializer.AssignDeserializer(GetType().Name, Deserial);
+        }
+        public static ByteList Serial ( object obj ) {
+            var self = obj as Vec3;
+            var bytes = ByteList.Zero
+                .Add(self.X).Add(self.Y).Add(self.Z)
+                .Add(self.GetHashCode())
+                .WriteCountToHead();
+            return bytes;
+        }
+
+        public static CheckedRet<object> Deserial ( ByteList bytes ) {
+            var size = bytes.DropInt32();
+            if (bytes.Count != size) {
+                return CheckedRet<object>.Fail();
+            }
+
+            var ret = new Vec3();
+            for (int i = 0; i < 3; i++) {
+                ret.mVal [i] = bytes.DropFloat();
+            }
+            int hash = bytes.DropInt32();
+            if (hash != ret.GetHashCode()) {
+                return CheckedRet<object>.Fail();
+            }
+            return CheckedRet<object>.Gen(true, ret);
+        }
         public float X
         {
             set { mVal [cX] = value; }

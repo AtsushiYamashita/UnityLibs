@@ -28,9 +28,9 @@ namespace BasicExtends {
         bool IsReceiver { get; }
         bool IsConnected { set; get; }
 
-        LoopThread ConnectThread { set; get; }
+        LifedThread ConnectThread { set; get; }
 
-        void Setup ( LoopThread connector, ClientType type, string ip_r = "" );
+        void Setup ( LifedThread connector, ClientType type, string ip_r = "" );
         void ClientLifeCheck ();
         void Disconnect ();
     }

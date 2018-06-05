@@ -58,14 +58,14 @@
             if (index >= 0) { return Pair<bool, int>.Gen(true, index); }
             mTypeIndex.Add(type);
             index = mTypeIndex.IndexOf(type);
-            DebugLog.Log.Print("type({0},{1})", type, index);
+            //DebugLog.Log.Print("type({0},{1})", type, index);
             return Pair<bool, int>.Gen(false, index);
         }
 
         /// <summary>
         /// 直列化された配列からインスタンスを作るための手続きを登録する
         /// </summary>
-        public static Serializer AssignDeserializer ( string match, Func<ByteList, object> func ) {
+        public static Serializer AssignDeserializer ( string match, Func<ByteList, CheckedRet<object>> func ) {
             Assert.IsNotNull(Instance);
             Assert.IsNotNull(Instance.Implement);
             Instance.Implement.SetDeserializer(match, func);
@@ -90,9 +90,23 @@
             return Instance.Implement.Deserial(bytes);
         }
 
+        public static CheckedRet<T> Deserialize<T> ( byte [] bytes ) {
+            var b = ByteList.Zero.Add(bytes);
+            return Deserialize<T>(b);
+        }
+
         public static CheckedRet<T> Deserialize<T> ( ByteList bytes ) {
             var v = Instance.Implement.Deserial(bytes);
-            return v.Key ? CheckedRet<T>.Gen(true, (T) v.Value) : CheckedRet<T>.Fail();
+            if (v.Key == false) {
+                return CheckedRet<T>.Fail();
+            }
+            try {
+                var val = (T) v.Value;
+                return CheckedRet<T>.Gen(true, val);
+            } catch (Exception e) {
+                DebugLog.Error.Print("parse fail<{0}>{1}", typeof(T).Name, e);
+                return CheckedRet<T>.Fail();
+            }
         }
     }
 }

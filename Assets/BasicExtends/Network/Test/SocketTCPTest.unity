@@ -124,6 +124,9 @@ GameObject:
   - component: {fileID: 144503988}
   - component: {fileID: 144503987}
   - component: {fileID: 144503986}
+  - component: {fileID: 144503992}
+  - component: {fileID: 144503991}
+  - component: {fileID: 144503990}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -153,7 +156,7 @@ Camera:
   m_GameObject: {fileID: 144503985}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
+  m_ClearFlags: 2
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
@@ -194,6 +197,77 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!102 &144503990
+TextMesh:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 144503985}
+  m_Text: sssss
+  m_OffsetZ: 4
+  m_CharacterSize: 0.011
+  m_LineSpacing: 1
+  m_Anchor: 1
+  m_Alignment: 1
+  m_TabSize: 2
+  m_FontSize: 100
+  m_FontStyle: 0
+  m_RichText: 1
+  m_Font: {fileID: 0}
+  m_Color:
+    serializedVersion: 2
+    rgba: 4294967295
+--- !u!23 &144503991
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 144503985}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_Materials:
+  - {fileID: 10100, guid: 0000000000000000e000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!114 &144503992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 144503985}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 110915f064b319a4a82814968b3a7953, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mPrintAssert: 1
+  mPrintError: 1
+  mPrintException: 1
+  mPrintLog: 1
+  mPrintWarning: 1
 --- !u!1 &228459680
 GameObject:
   m_ObjectHideFlags: 0
@@ -314,7 +388,7 @@ MonoBehaviour:
               m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
               m_IntArgument: 0
               m_FloatArgument: 0
-              m_StringArgument: close
+              m_StringArgument: end
               m_BoolArgument: 0
             m_CallState: 2
         m_TypeName: BasicExtends.StateEventImp.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
@@ -332,7 +406,7 @@ MonoBehaviour:
               m_IntArgument: 0
               m_FloatArgument: 0
               m_StringArgument: 
-              m_BoolArgument: 0
+              m_BoolArgument: 1
             m_CallState: 2
         m_TypeName: BasicExtends.StateEventImp.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
@@ -450,7 +524,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mSended: 0
   mTo: Manager
-  mAs: Sender
+  mAs: SocketTCPSender
   mAct: Setup
   mList: []
 --- !u!1 &518668991
@@ -633,7 +707,7 @@ MonoBehaviour:
               m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
               m_IntArgument: 0
               m_FloatArgument: 0
-              m_StringArgument: close
+              m_StringArgument: end
               m_BoolArgument: 0
             m_CallState: 2
         m_TypeName: BasicExtends.StateEventImp.NodeEvent, Assembly-CSharp, Version=0.0.0.0,
@@ -1093,8 +1167,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mSended: 0
   mTo: Manager
-  mAs: UdpReceiver
-  mAct: Start
+  mAs: SocketTCPReceiver
+  mAct: Setup
   mList: []
 --- !u!1 &1792340551
 GameObject:
@@ -1219,6 +1293,9 @@ GameObject:
   - component: {fileID: 1909269237}
   - component: {fileID: 1909269239}
   - component: {fileID: 1909269238}
+  - component: {fileID: 1909269240}
+  - component: {fileID: 1909269242}
+  - component: {fileID: 1909269241}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -1278,15 +1355,27 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1909269233}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f6eb1d13d4f5d2c4483b72d0d174563b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   mUsePort: 8000
   mToPort: 8001
-  mToAddress: 192.168.0.126
+  mToAddress: 127.0.0.1
 --- !u!114 &1909269239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1909269233}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 655eabdc2f5b67f4b9298e1851ce4adf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObservePort: 8001
+--- !u!114 &1909269240
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -1294,10 +1383,35 @@ MonoBehaviour:
   m_GameObject: {fileID: 1909269233}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 655eabdc2f5b67f4b9298e1851ce4adf, type: 3}
+  m_Script: {fileID: 11500000, guid: abb629249828b1a48bcc6c94b6089c8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mObservePort: 8001
+  mDeadTime: 0.1
+--- !u!114 &1909269241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1909269233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86f1727b7e675844bb7c617e1f92aae5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mReceivePort: 8002
+--- !u!114 &1909269242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1909269233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de8353ae710ad4f9b4b5ae5a54f945, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mSendToPort: 8001
+  mSendToIp: 127.0.0.1
 --- !u!1 &1980921200
 GameObject:
   m_ObjectHideFlags: 0
@@ -1394,11 +1508,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 412f30ef4a7a65342b77e3a79a184b15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ip: 0
-  port: 0
-  mPase: 2
-  mSyncTo: Sphere
+  mSyncTo:
+    mObjectName: Sphere
+    mComponentName: SyncTransform
+    mIpid: 0
+    mPase: 3
   mSpeed: 0.8
+  mIsLocal: 0
 --- !u!1 &2019568680
 GameObject:
   m_ObjectHideFlags: 0
