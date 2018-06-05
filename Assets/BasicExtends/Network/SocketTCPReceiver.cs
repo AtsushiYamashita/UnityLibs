@@ -9,6 +9,23 @@
         private int mReceivePort = 0;
         private Socket mConnectSocket = null;
 
+
+        private void Start () {
+            MessengerSetup();
+        }
+
+        private void MessengerSetup () {
+            Messenger.Assign(( Msg msg ) =>
+            {
+                if (msg.Unmatch("to", gameObject.name)) { return; }
+                if (msg.Unmatch("as", "SocketTCPReceiver")) { return; }
+                if (msg.Match("act", "Setup")) {
+                    Setup();
+                    return;
+                }
+            });
+        }
+
         private ThreadState MakeConnection (object obj) {
             var listen = (Socket) obj;
             var isConnect = listen.Poll(0, SelectMode.SelectRead);
@@ -29,6 +46,8 @@
             int size = mConnectSocket
                 .Receive(buffer, buffer.Length, SocketFlags.None);
             if (size < 1) { return ThreadState.Continue; }
+
+            Serializer.SetDatatype(Serializer.SerialType.Binary);
             var ret = Serializer.Deserialize(ByteList.Gen().Add(buffer));
             if (ret.Key == false) { return ThreadState.Continue; }
             return ThreadState.Continue;

@@ -12,7 +12,6 @@ namespace BasicExtends {
         [SerializeField]
         private SyncTo mSyncTo = new SyncTo();
         private SyncData<Trfm> mSync = new SyncData<Trfm>();
-        private string mOwnIpid = "";
 
         /// <summary>
         /// 移動の速度
@@ -58,16 +57,10 @@ namespace BasicExtends {
             mSync.Update = SyncUpdate;
             mSync.Setup(receiveMatch);
 
-            var type = mIsLocal ? Trfm.Type.Local : Trfm.Type.World;
-
             Messenger.Assign(( msg ) =>
             {
                 if (msg.Unmatch(Msg.TO, name)) { return; }
                 if (msg.Unmatch(Msg.AS, GetType().Name)) { return; }
-                if (msg.Match(Msg.ACT, "SetIPID")) {
-                    mOwnIpid = msg.TryGet("IPID");
-                    return;
-                }
             });
         }
 

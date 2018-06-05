@@ -4,11 +4,11 @@
 
     public class NetworkManager: MonoBehaviour {
 
-        private string mOwnIp = string.Empty;
+//        private string mOwnIp = string.Empty;
 
         private void Start () {
             MessengerSetup();
-            Serializer.SetDatatype(Serializer.SerialType.Binary2);
+//            Serializer.SetDatatype(Serializer.SerialType.Binary2);
             Msg.Gen().Set(Msg.TO, gameObject.name)
                 .Set(Msg.AS, "UdpReceiver")
                 .Set(Msg.ACT, "Start")
@@ -17,7 +17,7 @@
                 .Set(Msg.AS, "UdpSender")
                 .Set(Msg.ACT, "Setup")
                 .Pool();
-            mOwnIp = NetowrkUtil.GetOwnIP();
+//            mOwnIp = NetowrkUtil.GetOwnIP();
         }
 
         private void MessengerSetup () {
@@ -47,7 +47,5 @@
         private void FailEvent ( Msg msg ) {
             Debug.Log(msg.Stringify());
         }
-
     }
-
 }

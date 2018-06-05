@@ -42,12 +42,12 @@
             }
             if (mLoop.IsNotNull()) { return true; }
             mLoop = ThreadManager.Get();
-            Debug.Log(mObservePort);
+            Debug.Log("StartServer:mObservePort" + mObservePort);
             try {
                 mClient = new UdpClient(new IPEndPoint(IPAddress.Parse(
                     NetworkUnit.GetLocalIPAddress()), mObservePort));
             } catch (Exception e) {
-                Msg.Gen().Set(Msg.TO,"Manager").Set(Msg.AS,"NetworkManager")
+                Msg.Gen().Set(Msg.TO, "Manager").Set(Msg.AS, "NetworkManager")
                     .Set("type", "StartServer")
                     .Set("result", "Fail")
                     .Set("msg", e.ToString())
@@ -55,11 +55,11 @@
                 return false;
             }
 
-            Msg.Gen().Set(Msg.TO,"Manager")
+            Msg.Gen().Set(Msg.TO, "Manager")
                 .Set(Msg.AS, "NetworkManager")
                 .Set("type", "StartServer")
                 .Set("result", "Success").Push();
-            mLoop.Work("Udp client receiver",null, ReceiveLoop);
+            mLoop.Work("Udp client receiver", null, ReceiveLoop);
             return true;
         }
 
@@ -67,12 +67,13 @@
         /// 受信と待機処理
         /// スレッド側で実行させる
         /// </summary>
-        public ThreadState ReceiveLoop (object obj) {
+        public ThreadState ReceiveLoop ( object obj ) {
             IPEndPoint sender = null;
-            mClient.Client.ReceiveTimeout = 100;
+            mClient.Client.ReceiveTimeout = 3000;
             try {
+                Msg.Gen().Set(Msg.TO, "Debug").Set(Msg.ACT, "log").Set(Msg.MSG, "R START").Pool();
                 var buffer = mClient.Receive(ref sender);
-                Msg.Gen().Set(Msg.TO, "Debug").Set(Msg.ACT, "log").Set(Msg.MSG, "get").Pool();
+                Msg.Gen().Set(Msg.TO, "Debug").Set(Msg.ACT, "log").Set(Msg.MSG, "R OK").Pool();
                 OnRecieve(buffer, sender);
                 return ThreadState.Continue;
             } catch {
@@ -81,14 +82,29 @@
         }
 
         private static bool OnRecieve ( byte [] receved, IPEndPoint sender ) {
+            var test = Msg.Gen().Set(Msg.TO, "Debug")
+                .Set(Msg.ACT, "log").Set("what", "get 798789789--------");
+            test.Pool();
             if (receved.Length < 1) { return false; }
-            var msg = Serializer.Deserialize(ByteList.Zero.Add(receved)).Value as Msg;
-            if (msg == null) {
-                Msg.Gen().Set(Msg.TO, "Debug").Set(Msg.ACT, "log").Set(Msg.MSG, "UnDeserializableException").Pool();
+            CheckedRet<Msg> obj = null;
+            try {
+                Serializer.SetDatatype(Serializer.SerialType.Binary);
+                obj = Serializer.Deserialize<Msg>(ByteList.Zero.Add(receved));
+                if (obj.Key == false) {
+                    throw new UnDeserializableException();
+                }
+            } catch (Exception e) {
+                DebugLog.Log.Print(e.ToString());
+                Msg.Gen().Set(Msg.TO, "Debug").
+                   Set(Msg.ACT, "log")
+                   .Set(Msg.MSG, "UnDeserializableException").Pool();
                 throw new UnDeserializableException();
             }
-            msg.Set("From", "" + NetowrkUtil.GetOwnIP()).Pool();
-            //Msg.Gen().Set(Msg.TO, "Debug").Set(Msg.ACT, "log").Set(Msg.MSG, "receice ok:" + msg.ToJson()).Pool();
+
+            obj.Value.Set("From", "" + NetowrkUtil.GetOwnIP()).Pool();
+            Msg.Gen().Set(Msg.TO, "Debug").Set(Msg.ACT, "log")
+                .Set(Msg.MSG, "receice ok:" + obj.Value.ToJson()).Pool();
+            DebugLog.Log.Print("test1 => " + obj.Value.ToJson());
             return true;
         }
     }

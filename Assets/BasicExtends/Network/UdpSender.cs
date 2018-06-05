@@ -28,7 +28,6 @@
             Messenger.Assign(( Msg msg ) =>
             {
                 if (msg.Match("Network", "true")) {
-                    msg.Set("Network", "false");
                     SendStack(msg);
                     return;
                 }
@@ -70,22 +69,24 @@
             mIsSetuped = true;
         }
 
-        private ThreadState SendLoop (object e) {
+        private ThreadState SendLoop (object o) {
             byte [] buffer = mMsgList.Pop();
             if (buffer == null || buffer.Length < 1) {
                 return ThreadState.Sleep;
             }
             mSendClient.Send(buffer, buffer.Length, mSendTo.Get());
-            Msg.Gen().Set(Msg.TO,"Manager")
+
+            Msg.Gen().Set(Msg.TO, "Manager")
                 .Set(Msg.AS, "NetworkManager")
                 .Set("type", "Sender@SendLoop")
                 .Set("result", "Success").Pool();
+
             return ThreadState.Continue;
         }
 
         private void SendStack ( Msg message ) {
-            message = message
-                .Set("Id", "" + mSendId.Get());
+            message .Set("Id", "" + mSendId.Get())
+                .Set("Network","false");
             mSendId.Increment();
             if (mIsSetuped == false) { return; }
             //Msg.Gen().Set(Msg.TO, "Manager")
@@ -94,7 +95,10 @@
             //    .Set(Msg.MSG, message.ToJson())
             //    .Set("StackCount", mMsgList.Count())
             //    .Set("result", "Success").Push();
+            DebugLog.Log.Print("PUSH FOR SEND ==> "+ message.ToJson());
+            Serializer.SetDatatype(Serializer.SerialType.Binary);
             mMsgList.Add(Serializer.Serialize(message).ToArray());
+            message.Set(Msg.TO, "");
         }
     }
 }

@@ -11,6 +11,7 @@
 
         [SerializeField]
         private Pair<int, int> mPortRange = new Pair<int, int>();
+
         private Dictionary<int, PortState> mPortState = new Dictionary<int, PortState>();
         private object mLock = new object();
 
@@ -28,7 +29,7 @@
                     return;
                 }
                 if (msg.Match(Msg.ACT, "SetPortState")) {
-                    var port = msg.TryGet("port").ParseInt();
+                    //var port = msg.TryGet("port").ParseInt();
                     return;
                 }
 

@@ -77,8 +77,8 @@
                     .Netwrok().Pool();
                 }
                 var match_ret = receiveMatch == null ? true : receiveMatch(msg);
-                Debug.Log("Recesive => " + msg.ToJson());
-                Debug.Log("match_ret => " + match_ret);
+                //Debug.Log("Recesive => " + msg.ToJson());
+                //Debug.Log("match_ret => " + match_ret);
                 if (msg.Match(Msg.ACT, "Sync") && msg.ContainsKey("FROM") && match_ret) {
                     TryGet = msg.TryObjectGet<T>;
                     mControllLocked = LOCK_Time;
