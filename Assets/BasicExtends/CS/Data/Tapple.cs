@@ -22,6 +22,7 @@
 
         public Tapple Add ( params object [] arr ) {
             foreach (var obj in arr) {
+                if (obj == null) { continue; }
                 mList.Add(obj.GetType(), obj);
             }
             return this;
