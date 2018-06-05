@@ -12,7 +12,6 @@
             ID = id;
         }
 
-
         private LifedThreadManager mHolder;
         private Thread mThread = null;
         public int ID { get; private set; }
@@ -30,10 +29,15 @@
             mName = name;
             Debug.Log("Thread start:" + name);
             lock (mLock) {
-                mThread = new Thread(Loop);
-                mThread.IsBackground = true;
-                var args = Tapple.Gen.Add(this, action, obj);
-                mThread.Start(args);
+                try {
+                    mThread = new Thread(Loop);
+                    mThread.IsBackground = true;
+                    var args = Tapple.Gen.Add(this, action, obj);
+                    mThread.Start(args);
+                }catch(Exception e) {
+                    throw new Exception(e.ToString());
+                }
+
             }
         }
 

@@ -7,8 +7,6 @@
     /// 処理そのものはThreadManagerにほぼ依存している。
     /// </summary>
     public class LifedThreadManager: MonoBehaviour {
-        [SerializeField]
-        private float mDeadTime = 0.1f;
 
         private void Start () {
             ThreadManager.Instance.Enable = true;
